@@ -1,0 +1,58 @@
+.scenario-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.scenario-btn--active {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+.scenario-result {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--bg-alt);
+}
+
+.scenario-result__compare {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.scenario-result__compare > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scenario-result__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-dim);
+}
+
+.scenario-result__value {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.scenario-result__value--sim {
+  color: var(--accent-strong);
+}
+
+.scenario-result__arrow {
+  color: var(--text-dim);
+}
+
+.scenario-result__note {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
