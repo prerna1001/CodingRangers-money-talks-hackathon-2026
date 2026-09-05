@@ -11,6 +11,10 @@
   gap: 18px;
 }
 
+.agent-timeline--finalizing {
+  border-color: var(--accent-border);
+}
+
 .agent-timeline__header h2 {
   font-size: 19px;
   margin-bottom: 4px;

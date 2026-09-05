@@ -2,15 +2,22 @@
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background:
+    linear-gradient(180deg, rgba(17, 169, 120, 0.08), transparent 34rem),
+    var(--bg);
 }
 
 .page__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 40px;
+  padding: 18px 40px;
   border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(18px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .brand {
@@ -22,8 +29,8 @@
 .brand__mark {
   width: 30px;
   height: 30px;
-  border-radius: 8px;
-  background: var(--accent);
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--accent), var(--info));
   color: #ffffff;
   font-size: 12px;
   font-weight: 700;
@@ -34,8 +41,8 @@
 }
 
 .brand__name {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 15.5px;
+  font-weight: 800;
   color: var(--text-h);
 }
 
@@ -47,9 +54,9 @@
 .page__main {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 48px 20px;
+  padding: 36px 20px 56px;
 }
 
 .page__stack {

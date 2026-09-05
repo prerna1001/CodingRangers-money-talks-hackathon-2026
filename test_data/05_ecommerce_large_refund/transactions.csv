@@ -1,0 +1,9 @@
+txn_id,posted_date,period_id,account_id,account_name,account_type,category,counterparty_name,counterparty_type,amount,currency,memo
+jul_shopify_sales,2026-07-31,2026-07,4000,Gross sales,revenue,gross_sales,Shopify,customer,240000,USD,Gross sales
+jul_refunds,2026-07-31,2026-07,4050,Refunds,revenue,refunds,Shopify,customer,-12000,USD,Refunds
+jul_ads,2026-07-15,2026-07,6100,Paid ads,opex,paid_ads,Meta Ads,vendor,48000,USD,Paid acquisition
+jul_fulfillment,2026-07-20,2026-07,5200,Fulfillment costs,cogs,fulfillment,ShipBob,vendor,36000,USD,Fulfillment
+aug_shopify_sales,2026-08-31,2026-08,4000,Gross sales,revenue,gross_sales,Shopify,customer,286000,USD,Gross sales
+aug_refunds,2026-08-31,2026-08,4050,Refunds,revenue,refunds,Shopify,customer,-28000,USD,Refund spike from SKU R2
+aug_ads,2026-08-15,2026-08,6100,Paid ads,opex,paid_ads,Meta Ads,vendor,72000,USD,Back-to-school campaign
+aug_fulfillment,2026-08-20,2026-08,5200,Fulfillment costs,cogs,fulfillment,ShipBob,vendor,47000,USD,Carrier surcharge

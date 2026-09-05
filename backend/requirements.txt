@@ -1,0 +1,22 @@
+# --- Claude's half: agentic pipeline, API, guardrails ---
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+sse-starlette>=2.1
+langgraph>=0.2
+anthropic>=0.39
+chromadb>=0.5
+sentence-transformers>=3.2
+rank-bm25>=0.2
+python-multipart>=0.0.12
+python-dotenv>=1.0
+
+# --- Codex's half: analytics, data, persistence, eval ---
+pandas>=2.2
+numpy>=2.0
+sqlalchemy>=2.0
+rapidfuzz>=3.9
+
+# --- shared ---
+pytest>=8.3
+httpx>=0.27

@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { uploadFile } from '../services/api'
+import { uploadFiles } from '../services/api'
 import './UploadCard.css'
 
 function formatBytes(bytes) {
@@ -10,7 +10,7 @@ function formatBytes(bytes) {
 }
 
 export default function UploadCard({ onUploaded }) {
-  const [file, setFile] = useState(null)
+  const [files, setFiles] = useState([])
   const [status, setStatus] = useState('idle') // idle | uploading | success | error
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -19,16 +19,25 @@ export default function UploadCard({ onUploaded }) {
   const inputRef = useRef(null)
 
   const reset = () => {
-    setFile(null)
+    setFiles([])
     setStatus('idle')
     setResult(null)
     setError(null)
     setCallInfo(null)
   }
 
+  // Accepts several CSVs at once -- typically transactions.csv plus
+  // period_summaries.csv. The backend detects which is which.
   const handleFile = useCallback((selected) => {
-    if (!selected) return
-    setFile(selected)
+    const picked = Array.from(selected || []).filter(Boolean)
+    if (!picked.length) return
+    setFiles((prev) => {
+      const merged = [...prev]
+      picked.forEach((f) => {
+        if (!merged.some((m) => m.name === f.name && m.size === f.size)) merged.push(f)
+      })
+      return merged
+    })
     setStatus('idle')
     setResult(null)
     setError(null)
@@ -38,18 +47,18 @@ export default function UploadCard({ onUploaded }) {
     (e) => {
       e.preventDefault()
       setIsDragging(false)
-      handleFile(e.dataTransfer.files?.[0])
+      handleFile(e.dataTransfer.files)
     },
     [handleFile],
   )
 
   const handleUpload = async () => {
-    if (!file) return
+    if (!files.length) return
     setStatus('uploading')
     setError(null)
     const startedAt = performance.now()
     try {
-      const res = await uploadFile(file)
+      const res = await uploadFiles(files)
       setResult(res)
       setCallInfo({
         url: `${window.location.origin}/api/upload`,
@@ -71,7 +80,7 @@ export default function UploadCard({ onUploaded }) {
       </div>
 
       <div
-        className={`dropzone ${isDragging ? 'dropzone--active' : ''} ${file ? 'dropzone--filled' : ''}`}
+        className={`dropzone ${isDragging ? 'dropzone--active' : ''} ${files.length ? 'dropzone--filled' : ''}`}
         onDragOver={(e) => {
           e.preventDefault()
           setIsDragging(true)
@@ -86,11 +95,12 @@ export default function UploadCard({ onUploaded }) {
           ref={inputRef}
           type="file"
           accept=".csv"
+          multiple
           hidden
-          onChange={(e) => handleFile(e.target.files?.[0])}
+          onChange={(e) => handleFile(e.target.files)}
         />
 
-        {!file ? (
+        {!files.length ? (
           <>
             <svg className="dropzone__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
@@ -101,35 +111,39 @@ export default function UploadCard({ onUploaded }) {
                 strokeLinejoin="round"
               />
             </svg>
-            <p className="dropzone__title">Drag & drop a CSV file here</p>
-            <p className="dropzone__subtitle">or click to browse — .csv only</p>
+            <p className="dropzone__title">Drag &amp; drop CSV files here</p>
+            <p className="dropzone__subtitle">transactions.csv and period_summaries.csv — .csv only</p>
           </>
         ) : (
-          <div className="file-chip">
-            <svg className="file-chip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinejoin="round"
-              />
-              <path d="M14 3v5h5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-            </svg>
-            <div className="file-chip__meta">
-              <span className="file-chip__name">{file.name}</span>
-              <span className="file-chip__size">{formatBytes(file.size)}</span>
-            </div>
-            <button
-              type="button"
-              className="file-chip__remove"
-              onClick={(e) => {
-                e.stopPropagation()
-                reset()
-              }}
-              aria-label="Remove file"
-            >
-              ×
-            </button>
+          <div className="file-chip-list">
+            {files.map((f) => (
+              <div className="file-chip" key={`${f.name}-${f.size}`}>
+                <svg className="file-chip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinejoin="round"
+                  />
+                  <path d="M14 3v5h5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                </svg>
+                <div className="file-chip__meta">
+                  <span className="file-chip__name">{f.name}</span>
+                  <span className="file-chip__size">{formatBytes(f.size)}</span>
+                </div>
+                <button
+                  type="button"
+                  className="file-chip__remove"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setFiles((prev) => prev.filter((x) => !(x.name === f.name && x.size === f.size)))
+                  }}
+                  aria-label={`Remove ${f.name}`}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -138,7 +152,7 @@ export default function UploadCard({ onUploaded }) {
         <button
           type="button"
           className="btn btn--primary"
-          disabled={!file || status === 'uploading'}
+          disabled={!files.length || status === 'uploading'}
           onClick={handleUpload}
         >
           {status === 'uploading' ? (

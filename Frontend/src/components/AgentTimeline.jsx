@@ -44,13 +44,19 @@ export default function AgentTimeline({ steps, onComplete }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [steps])
 
-  const progressPct = Math.round((doneIndices.length / steps.length) * 100)
+  const totalSteps = Math.max(steps.length, 1)
+  const progressPct = Math.round((doneIndices.length / totalSteps) * 100)
+  const finalizing = doneIndices.length >= steps.length
 
   return (
-    <div className="agent-timeline">
+    <div className={`agent-timeline ${finalizing ? 'agent-timeline--finalizing' : ''}`}>
       <div className="agent-timeline__header">
-        <h2>Running analysis</h2>
-        <p>Multi-agent pipeline is processing your data</p>
+        <h2>{finalizing ? 'Preparing results dashboard' : 'Running analysis'}</h2>
+        <p>
+          {finalizing
+            ? 'Agent work is complete. Waiting for the final evidence-backed result payload.'
+            : 'Multi-agent pipeline is processing your data'}
+        </p>
       </div>
 
       <div className="agent-timeline__bar">
@@ -79,6 +85,15 @@ export default function AgentTimeline({ steps, onComplete }) {
             </li>
           )
         })}
+        {finalizing && (
+          <li className="agent-step agent-step--running">
+            <span className="agent-step__icon">
+              <span className="agent-step__spinner" />
+            </span>
+            <span className="agent-step__name">Results dashboard</span>
+            <span className="agent-step__status">Finalizing</span>
+          </li>
+        )}
       </ul>
     </div>
   )

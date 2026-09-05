@@ -1,34 +1,123 @@
-.waterfall-chart h3 {
-  font-size: 15px;
-  margin-bottom: 2px;
+.waterfall-chart {
+  min-width: 0;
 }
 
-.waterfall-chart__subtitle {
-  font-size: 12.5px;
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.panel-heading h3 {
+  font-size: 16px;
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+
+.panel-heading p {
   color: var(--text-dim);
-  margin-bottom: 12px;
+  font-size: 12.5px;
 }
 
-.waterfall-tooltip {
-  background: var(--surface-raised);
+.waterfall-chart__badge {
+  border: 1px solid var(--accent-border);
+  background: var(--accent-bg);
+  color: var(--accent-strong);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.waterfall-chart__frame {
+  position: relative;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 12.5px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  box-shadow: var(--shadow-sm);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 92%, var(--accent-bg)), var(--surface-raised)),
+    var(--surface-raised);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.waterfall-tooltip strong {
-  color: var(--text-h);
+.waterfall-chart__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--text-dim);
+  font-size: 13px;
+  text-align: center;
+  z-index: 1;
+}
+
+.waterfall-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 300px;
+}
+
+.waterfall-chart__grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.waterfall-chart__zero {
+  stroke: var(--border-strong);
+  stroke-width: 1.2;
+}
+
+.waterfall-chart__connector {
+  stroke: var(--text-dim);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 5;
+  opacity: 0.48;
+}
+
+.waterfall-chart__axis,
+.waterfall-chart__label,
+.waterfall-chart__value {
+  font-family: var(--sans);
+  dominant-baseline: middle;
+}
+
+.waterfall-chart__axis {
+  fill: var(--text-dim);
+  font-size: 11px;
+}
+
+.waterfall-chart__label {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.waterfall-chart__label-muted {
+  fill: var(--text-dim);
+  font-weight: 600;
+}
+
+.waterfall-chart__value {
+  fill: var(--text-h);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.waterfall-chart__value--down {
+  fill: var(--danger);
 }
 
 .waterfall-chart__legend {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 12px;
   color: var(--text-dim);
 }
@@ -44,4 +133,20 @@
   height: 9px;
   border-radius: 2px;
   display: inline-block;
+}
+
+@media (max-width: 720px) {
+  .panel-heading {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .waterfall-chart__frame {
+    overflow-x: auto;
+  }
+
+  .waterfall-chart__svg {
+    width: 860px;
+    max-width: none;
+  }
 }

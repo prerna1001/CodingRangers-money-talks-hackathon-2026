@@ -1,4 +1,27 @@
 prism.md
-prism2.md
-.env
-.env.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.pytest_tmp/
+
+# Backend runtime artifacts
+backend/*.db
+backend/.chroma/
+backend/.cache/
+backend/ledgerlight_memory.db
+backend/.env
+
+# Frontend
+node_modules/
+Frontend/dist/
+Frontend/.vite/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
