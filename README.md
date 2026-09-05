@@ -1,1 +1,28 @@
-# prerna-money-talks-hackathon-2026
+# FinOps Explain AI
+
+### Problem Statement
+
+We want a solution that will allow financial analysts to make sense of scattered transaction or other financial data. We want to keep track of seasonality or other trends that explain changes across time.
+
+### Our Solution
+
+We have build a website where you can upload some transactional data, and then a multi-agent workflow will analyze the data and output a comprehensive written report with its findings.
+
+### Key Features
+
+(Work in progress)
+
+### Tech Stack
+
+Our frontend relies on React. Our backend relies on LangGraph, written in Python.
+
+### How It Works
+
+(Work in progress)
+
+### How to Run and Use It
+
+1. Clone this repository onto your device. Navigate to the root directory.
+2. Run `npm install` to install necessary dependencies.
+3. Run `npm run dev` to initialize the website.
+4. Navigate to `localhost:5173` to access the website.
