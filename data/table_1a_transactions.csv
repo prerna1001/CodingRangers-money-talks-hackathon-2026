@@ -1,0 +1,537 @@
+transaction_id,date,client_id,client_name,client_tier,account_type,sku,units,gross_sales,discounts,refunds,shipping_revenue,fulfillment_cost,paid_ad_spend,memo
+TXN-10001,2025-01-01,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,3,360.00,36.00,0.00,11.77,9.85,18.91,Google Shopping Ad
+TXN-10002,2025-01-02,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,6,720.00,72.00,0.00,10.61,17.59,46.56,Meta Ad Campaign #12
+TXN-10003,2025-01-03,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-A101,20,1600.00,320.00,0.00,67.22,36.22,58.07,TikTok Paid Ad
+TXN-10004,2025-01-04,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,10.36,6.89,18.22,PPC High CAC Campaign
+TXN-10005,2025-01-05,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,22,1650.00,330.00,0.00,43.67,43.03,28.02,Google Shopping Ad
+TXN-10006,2025-01-06,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,39,2925.00,585.00,0.00,53.01,86.21,45.16,Organic search referral
+TXN-10007,2025-01-07,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,14.90,2.78,23.04,Wholesale recurring contract
+TXN-10008,2025-01-07,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,7.68,1.92,33.46,TikTok Paid Ad
+TXN-10009,2025-01-08,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.43,0.00,Defective item return - High SKU-B202 return rate
+TXN-10010,2025-01-08,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,47,3525.00,528.75,0.00,71.95,91.12,59.89,Influencer Promo
+TXN-10011,2025-01-09,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,10.96,2.27,24.09,TikTok Paid Ad
+TXN-10012,2025-01-10,CLI-005,Lumina Living,VIP,Gross Sales,SKU-A101,7,560.00,56.00,0.00,11.82,18.02,27.01,Google Shopping Ad
+TXN-10013,2025-01-11,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,14.72,9.07,21.71,Wholesale recurring contract
+TXN-10014,2025-01-12,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,3,270.00,27.00,0.00,8.74,5.47,57.91,Email Newsletter Conversion
+TXN-10015,2025-01-13,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,2,240.00,24.00,0.00,13.79,6.33,28.84,Organic search referral
+TXN-10016,2025-01-13,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,2,240.00,24.00,0.00,12.32,6.26,59.01,Google Shopping Ad
+TXN-10017,2025-01-14,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,45,3600.00,360.00,0.00,82.21,122.09,58.40,Wholesale recurring contract
+TXN-10018,2025-01-15,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,33,2475.00,371.25,0.00,76.12,65.86,17.88,Direct Web
+TXN-10019,2025-01-15,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,3,360.00,36.00,0.00,5.71,8.29,25.30,Meta Ad Campaign #12
+TXN-10020,2025-01-16,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.64,0.00,Defective item return - High SKU-B202 return rate
+TXN-10021,2025-01-16,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,40,3000.00,450.00,0.00,47.55,112.72,30.94,Quarterly stock order
+TXN-10022,2025-01-17,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-A101,2,160.00,16.00,0.00,12.28,6.20,19.92,TikTok Paid Ad
+TXN-10023,2025-01-18,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,9.43,3.22,22.86,Google Shopping Ad
+TXN-10024,2025-01-19,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,7.14,2.30,9.58,PPC High CAC Campaign
+TXN-10025,2025-01-20,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,9.23,17.07,59.79,Wholesale recurring contract
+TXN-10026,2025-01-21,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,13,975.00,195.00,0.00,44.88,27.65,17.26,Direct Web
+TXN-10027,2025-01-22,CLI-009,Echo Market,Standard,Refunds,SKU-A101,1,0.00,0.00,80.00,0.00,2.21,0.00,Customer return - sizing issue
+TXN-10028,2025-01-23,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-E505,25,3000.00,600.00,0.00,43.18,41.60,44.58,Influencer Promo
+TXN-10029,2025-01-24,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,2.25,0.00,11.72,2.10,16.54,Email Newsletter Conversion
+TXN-10030,2025-01-25,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,2.22,0.00,Defective item return - High SKU-B202 return rate
+TXN-10031,2025-01-25,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,4.50,0.00,13.34,5.81,24.52,PPC High CAC Campaign
+TXN-10032,2025-01-26,CLI-009,Echo Market,Standard,Refunds,SKU-C303,1,0.00,0.00,75.00,0.00,4.82,0.00,Defective item return - High SKU-B202 return rate
+TXN-10033,2025-01-26,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,6,540.00,54.00,0.00,7.72,16.26,47.29,Email Newsletter Conversion
+TXN-10034,2025-01-27,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,8,720.00,72.00,0.00,5.92,18.78,27.45,Meta Ad Campaign #12
+TXN-10035,2025-01-28,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,38,3040.00,608.00,0.00,84.87,65.50,57.53,TikTok Paid Ad
+TXN-10036,2025-01-29,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-E505,45,5400.00,540.00,0.00,50.20,95.24,55.45,TikTok Paid Ad
+TXN-10037,2025-01-30,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,3,360.00,36.00,0.00,8.54,7.86,54.36,Google Shopping Ad
+TXN-10038,2025-01-30,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-B202,20,900.00,90.00,0.00,41.98,59.46,29.95,TikTok Paid Ad
+TXN-10039,2025-01-31,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,16,1200.00,180.00,0.00,108.69,31.12,51.75,Meta Ad Campaign #12
+TXN-10040,2025-01-31,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-B202,24,1080.00,108.00,0.00,71.88,49.37,18.12,Quarterly stock order
+TXN-10041,2025-02-01,CLI-006,Apex Goods,Standard,Gross Sales,SKU-E505,2,240.00,0.00,0.00,13.77,4.04,23.68,Google Shopping Ad
+TXN-10042,2025-02-01,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,4,360.00,36.00,0.00,9.36,13.87,20.20,Organic search referral
+TXN-10043,2025-02-02,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,10,750.00,150.00,0.00,94.95,33.81,48.17,Direct Web
+TXN-10044,2025-02-02,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,31,2325.00,465.00,0.00,93.07,54.23,55.50,Organic search referral
+TXN-10045,2025-02-03,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,6,480.00,48.00,0.00,6.92,16.98,32.06,Email Newsletter Conversion
+TXN-10046,2025-02-04,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,45,3600.00,360.00,0.00,62.95,106.19,41.10,Wholesale recurring contract
+TXN-10047,2025-02-04,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,11.59,4.14,25.92,Email Newsletter Conversion
+TXN-10048,2025-02-05,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,5.24,1.99,20.83,Email Newsletter Conversion
+TXN-10049,2025-02-06,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,9.00,5.39,26.57,PPC High CAC Campaign
+TXN-10050,2025-02-06,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-E505,2,240.00,12.00,0.00,14.17,3.49,11.60,Quarterly stock order
+TXN-10051,2025-02-07,CLI-009,Echo Market,Standard,Gross Sales,SKU-D404,3,270.00,0.00,0.00,9.27,9.94,20.04,Direct Web
+TXN-10052,2025-02-08,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,50,3750.00,562.50,0.00,78.77,98.92,34.79,Direct Web
+TXN-10053,2025-02-09,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,44,3300.00,330.00,0.00,52.07,99.71,21.88,Email Newsletter Conversion
+TXN-10054,2025-02-09,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,44,3300.00,495.00,0.00,44.98,139.29,32.53,TikTok Paid Ad
+TXN-10055,2025-02-10,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,5,600.00,60.00,0.00,5.06,11.02,48.91,PPC High CAC Campaign
+TXN-10056,2025-02-10,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,8,640.00,64.00,0.00,13.98,19.81,27.28,Influencer Promo
+TXN-10057,2025-02-11,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,13.41,16.70,59.13,Email Newsletter Conversion
+TXN-10058,2025-02-12,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,2,160.00,16.00,0.00,6.36,4.85,17.26,TikTok Paid Ad
+TXN-10059,2025-02-13,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,34,2550.00,382.50,0.00,60.18,56.57,15.87,TikTok Paid Ad
+TXN-10060,2025-02-14,CLI-006,Apex Goods,Standard,Gross Sales,SKU-A101,1,80.00,0.00,0.00,13.39,2.74,14.44,Quarterly stock order
+TXN-10061,2025-02-15,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,2,90.00,4.50,0.00,14.64,5.87,29.00,Influencer Promo
+TXN-10062,2025-02-16,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,4,360.00,36.00,0.00,11.77,13.67,32.85,Influencer Promo
+TXN-10063,2025-02-17,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,13.06,9.28,23.28,Influencer Promo
+TXN-10064,2025-02-17,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,4,480.00,48.00,0.00,10.06,8.73,53.23,Google Shopping Ad
+TXN-10065,2025-02-18,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-D404,3,270.00,13.50,0.00,12.34,10.29,15.29,Email Newsletter Conversion
+TXN-10066,2025-02-18,CLI-009,Echo Market,Standard,Gross Sales,SKU-E505,2,240.00,0.00,0.00,13.31,3.35,31.80,Quarterly stock order
+TXN-10067,2025-02-19,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,31,2325.00,232.50,0.00,108.08,57.77,24.55,PPC High CAC Campaign
+TXN-10068,2025-02-20,CLI-006,Apex Goods,Standard,Gross Sales,SKU-E505,1,120.00,0.00,0.00,5.86,2.94,21.19,Quarterly stock order
+TXN-10069,2025-02-20,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,41,3075.00,461.25,0.00,47.44,79.67,46.13,Meta Ad Campaign #12
+TXN-10070,2025-02-21,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,32,2400.00,360.00,0.00,66.46,92.98,27.19,Direct Web
+TXN-10071,2025-02-22,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,12.39,6.16,23.92,Quarterly stock order
+TXN-10072,2025-02-23,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,22,1650.00,247.50,0.00,68.87,46.30,46.86,Quarterly stock order
+TXN-10073,2025-02-23,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-E505,28,3360.00,672.00,0.00,91.03,84.16,19.62,Email Newsletter Conversion
+TXN-10074,2025-02-24,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,3,270.00,27.00,0.00,7.52,9.67,20.13,Meta Ad Campaign #12
+TXN-10075,2025-02-25,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,13,975.00,97.50,0.00,104.89,44.18,18.83,Email Newsletter Conversion
+TXN-10076,2025-02-26,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,9.51,2.39,31.22,TikTok Paid Ad
+TXN-10077,2025-02-27,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,7,630.00,63.00,0.00,14.48,13.41,24.50,Google Shopping Ad
+TXN-10078,2025-02-27,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,2.47,0.00,Item damaged in transport
+TXN-10079,2025-02-28,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,28,2100.00,420.00,0.00,96.24,67.43,45.93,Wholesale recurring contract
+TXN-10080,2025-03-01,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-D404,17,1530.00,306.00,0.00,91.81,56.39,52.20,Quarterly stock order
+TXN-10081,2025-03-01,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,3.32,0.00,Item damaged in transport
+TXN-10082,2025-03-02,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,5.80,7.90,34.44,PPC High CAC Campaign
+TXN-10083,2025-03-03,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,7,630.00,63.00,0.00,10.87,10.79,49.41,Influencer Promo
+TXN-10084,2025-03-04,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,40,3000.00,600.00,0.00,113.29,74.52,41.34,PPC High CAC Campaign
+TXN-10085,2025-03-04,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,36,2700.00,405.00,0.00,93.61,115.76,29.84,Organic search referral
+TXN-10086,2025-03-05,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,8,720.00,72.00,0.00,5.37,13.41,26.36,Direct Web
+TXN-10087,2025-03-06,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,7,560.00,56.00,0.00,9.62,11.26,38.33,Direct Web
+TXN-10088,2025-03-07,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,23,1725.00,258.75,0.00,50.48,47.75,54.64,Direct Web
+TXN-10089,2025-03-08,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,3,360.00,36.00,0.00,8.11,4.58,33.36,Email Newsletter Conversion
+TXN-10090,2025-03-09,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-D404,3,270.00,13.50,0.00,9.15,7.39,20.75,Wholesale recurring contract
+TXN-10091,2025-03-10,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-E505,18,2160.00,216.00,0.00,101.81,57.76,30.29,Wholesale recurring contract
+TXN-10092,2025-03-11,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,4,360.00,36.00,0.00,10.80,11.28,53.94,Influencer Promo
+TXN-10093,2025-03-11,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,45,3375.00,675.00,0.00,76.43,96.46,23.49,TikTok Paid Ad
+TXN-10094,2025-03-12,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-D404,12,1080.00,162.00,0.00,96.42,37.47,32.37,PPC High CAC Campaign
+TXN-10095,2025-03-13,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,42,3360.00,672.00,0.00,109.58,136.43,34.81,Organic search referral
+TXN-10096,2025-03-14,CLI-008,Vanguard Supply,Wholesale,Refunds,SKU-C303,1,0.00,0.00,75.00,0.00,2.22,0.00,Customer dissatisfied SKU-B202
+TXN-10097,2025-03-15,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-E505,5,600.00,60.00,0.00,11.27,16.37,36.96,Organic search referral
+TXN-10098,2025-03-16,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,28,2100.00,210.00,0.00,74.72,47.51,43.52,Google Shopping Ad
+TXN-10099,2025-03-17,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,11,825.00,82.50,0.00,103.69,22.95,31.87,Organic search referral
+TXN-10100,2025-03-17,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,21,1680.00,168.00,0.00,46.32,68.08,42.89,Email Newsletter Conversion
+TXN-10101,2025-03-18,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,26,1950.00,292.50,0.00,93.35,85.74,35.94,Wholesale recurring contract
+TXN-10102,2025-03-19,CLI-009,Echo Market,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,4.96,0.00,Customer dissatisfied SKU-B202
+TXN-10103,2025-03-20,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,4,320.00,32.00,0.00,14.99,12.83,19.80,Quarterly stock order
+TXN-10104,2025-03-21,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,10.66,8.61,28.11,Meta Ad Campaign #12
+TXN-10105,2025-03-22,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,24,1800.00,360.00,0.00,57.52,45.13,26.28,Organic search referral
+TXN-10106,2025-03-23,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,29,2320.00,348.00,0.00,86.37,85.98,19.06,Meta Ad Campaign #12
+TXN-10107,2025-03-23,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,3,270.00,27.00,0.00,12.87,9.76,31.46,Email Newsletter Conversion
+TXN-10108,2025-03-24,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,8,720.00,72.00,0.00,14.67,16.72,54.17,PPC High CAC Campaign
+TXN-10109,2025-03-25,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,24,1800.00,360.00,0.00,117.38,74.62,31.46,TikTok Paid Ad
+TXN-10110,2025-03-25,CLI-007,Beacon Direct,VIP,Refunds,SKU-A101,2,0.00,0.00,160.00,0.00,3.11,0.00,Customer dissatisfied SKU-B202
+TXN-10111,2025-03-26,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,3.86,0.00,Refund SKU-B202 quality issue
+TXN-10112,2025-03-27,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,39,2925.00,585.00,0.00,91.94,67.60,17.04,Wholesale recurring contract
+TXN-10113,2025-03-28,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,44,3300.00,330.00,0.00,76.29,125.00,48.44,TikTok Paid Ad
+TXN-10114,2025-03-29,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,13.34,13.66,57.26,Google Shopping Ad
+TXN-10115,2025-03-29,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,5,450.00,45.00,0.00,14.51,16.05,19.47,PPC High CAC Campaign
+TXN-10116,2025-03-30,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,4.50,0.00,14.49,6.30,10.48,Google Shopping Ad
+TXN-10117,2025-03-31,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,31,2325.00,232.50,0.00,102.96,59.22,52.34,Email Newsletter Conversion
+TXN-10118,2025-04-01,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,19,1425.00,285.00,0.00,62.18,65.89,59.44,Meta Ad Campaign #12
+TXN-10119,2025-04-02,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-B202,10,450.00,67.50,0.00,87.11,15.32,26.94,Quarterly stock order
+TXN-10120,2025-04-03,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,12.78,12.63,19.91,PPC High CAC Campaign
+TXN-10121,2025-04-04,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,43,3225.00,483.75,0.00,91.47,67.18,59.94,PPC High CAC Campaign
+TXN-10122,2025-04-05,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,13.99,10.72,21.68,Google Shopping Ad
+TXN-10123,2025-04-05,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,45,3600.00,720.00,0.00,70.47,121.27,28.27,Organic search referral
+TXN-10124,2025-04-06,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,8,640.00,64.00,0.00,12.21,15.44,35.32,Direct Web
+TXN-10125,2025-04-07,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,8.74,3.61,32.92,Wholesale recurring contract
+TXN-10126,2025-04-08,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,4.44,0.00,Refund SKU-B202 quality issue
+TXN-10127,2025-04-09,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,13.68,8.83,34.15,TikTok Paid Ad
+TXN-10128,2025-04-10,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,3.97,0.00,Defective item return - High SKU-B202 return rate
+TXN-10129,2025-04-11,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,13.45,10.35,30.10,TikTok Paid Ad
+TXN-10130,2025-04-11,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,48,3600.00,720.00,0.00,42.32,98.23,49.31,Wholesale recurring contract
+TXN-10131,2025-04-12,CLI-006,Apex Goods,Standard,Refunds,SKU-E505,2,0.00,0.00,240.00,0.00,2.21,0.00,Customer return - sizing issue
+TXN-10132,2025-04-12,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,2,90.00,4.50,0.00,12.22,6.11,23.33,Wholesale recurring contract
+TXN-10133,2025-04-13,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,2,240.00,24.00,0.00,7.72,5.65,36.85,Google Shopping Ad
+TXN-10134,2025-04-14,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,4,360.00,36.00,0.00,6.11,11.43,41.69,TikTok Paid Ad
+TXN-10135,2025-04-15,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,6,540.00,54.00,0.00,5.08,12.62,24.51,Meta Ad Campaign #12
+TXN-10136,2025-04-16,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,5,450.00,45.00,0.00,6.76,11.30,46.67,TikTok Paid Ad
+TXN-10137,2025-04-17,CLI-006,Apex Goods,Standard,Refunds,SKU-A101,2,0.00,0.00,160.00,0.00,2.06,0.00,Customer return - sizing issue
+TXN-10138,2025-04-18,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,50,3750.00,562.50,0.00,49.21,77.09,29.61,Wholesale recurring contract
+TXN-10139,2025-04-18,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,33,2475.00,247.50,0.00,107.56,65.56,41.50,TikTok Paid Ad
+TXN-10140,2025-04-19,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,12.79,4.96,43.50,Organic search referral
+TXN-10141,2025-04-20,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,19,1425.00,142.50,0.00,51.72,36.00,42.11,Google Shopping Ad
+TXN-10142,2025-04-21,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,3.39,0.00,Refund SKU-B202 quality issue
+TXN-10143,2025-04-21,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-E505,50,6000.00,1200.00,0.00,109.14,137.72,21.79,Organic search referral
+TXN-10144,2025-04-22,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,47,3525.00,352.50,0.00,80.59,99.68,35.34,Organic search referral
+TXN-10145,2025-04-23,CLI-005,Lumina Living,VIP,Gross Sales,SKU-A101,6,480.00,48.00,0.00,10.07,14.55,39.94,Influencer Promo
+TXN-10146,2025-04-24,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-B202,4,180.00,18.00,0.00,9.76,7.21,17.78,Influencer Promo
+TXN-10147,2025-04-24,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-A101,3,240.00,0.00,0.00,7.48,7.13,19.86,Meta Ad Campaign #12
+TXN-10148,2025-04-25,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-D404,36,3240.00,486.00,0.00,44.19,99.42,30.06,Influencer Promo
+TXN-10149,2025-04-26,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,13.73,6.50,23.73,Influencer Promo
+TXN-10150,2025-04-27,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,8.10,2.25,29.37,Google Shopping Ad
+TXN-10151,2025-04-28,CLI-009,Echo Market,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.05,0.00,Customer dissatisfied SKU-B202
+TXN-10152,2025-04-28,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,41,3280.00,328.00,0.00,120.00,74.21,28.31,Quarterly stock order
+TXN-10153,2025-04-29,CLI-009,Echo Market,Standard,Gross Sales,SKU-A101,3,240.00,0.00,0.00,6.31,6.76,12.38,Influencer Promo
+TXN-10154,2025-04-29,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,38,2850.00,285.00,0.00,69.14,111.69,58.63,TikTok Paid Ad
+TXN-10155,2025-04-30,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,40,3000.00,300.00,0.00,94.26,105.63,34.83,Organic search referral
+TXN-10156,2025-05-01,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,13.01,5.33,26.25,Quarterly stock order
+TXN-10157,2025-05-01,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,16,1200.00,240.00,0.00,108.09,33.12,49.34,Direct Web
+TXN-10158,2025-05-02,CLI-009,Echo Market,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,4.45,0.00,Customer dissatisfied SKU-B202
+TXN-10159,2025-05-03,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,14.95,6.75,16.27,TikTok Paid Ad
+TXN-10160,2025-05-03,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,2.25,0.00,11.96,1.78,27.05,PPC High CAC Campaign
+TXN-10161,2025-05-04,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,3,360.00,36.00,0.00,10.49,8.86,38.75,Email Newsletter Conversion
+TXN-10162,2025-05-05,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,3,270.00,27.00,0.00,11.39,8.24,17.83,TikTok Paid Ad
+TXN-10163,2025-05-06,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,42,3150.00,630.00,0.00,97.48,87.47,15.07,Quarterly stock order
+TXN-10164,2025-05-06,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,5.68,2.55,21.70,Organic search referral
+TXN-10165,2025-05-07,CLI-009,Echo Market,Standard,Refunds,SKU-A101,2,0.00,0.00,160.00,0.00,4.94,0.00,Customer dissatisfied SKU-B202
+TXN-10166,2025-05-07,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,3,360.00,36.00,0.00,12.72,8.91,29.96,Google Shopping Ad
+TXN-10167,2025-05-08,CLI-009,Echo Market,Standard,Gross Sales,SKU-D404,3,270.00,0.00,0.00,13.11,4.88,28.96,Email Newsletter Conversion
+TXN-10168,2025-05-09,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,2,180.00,18.00,0.00,14.33,5.06,59.51,Organic search referral
+TXN-10169,2025-05-10,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,4,360.00,36.00,0.00,13.62,6.38,44.51,Organic search referral
+TXN-10170,2025-05-11,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,9.96,4.99,32.96,Email Newsletter Conversion
+TXN-10171,2025-05-12,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,6.03,2.16,15.98,Organic search referral
+TXN-10172,2025-05-13,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,12.27,16.62,42.67,Meta Ad Campaign #12
+TXN-10173,2025-05-14,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,4,480.00,48.00,0.00,13.01,11.44,57.88,Direct Web
+TXN-10174,2025-05-15,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,18,1350.00,135.00,0.00,102.28,40.19,32.23,Quarterly stock order
+TXN-10175,2025-05-16,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,33,2475.00,371.25,0.00,101.05,87.38,38.83,PPC High CAC Campaign
+TXN-10176,2025-05-17,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,7,630.00,63.00,0.00,9.99,15.92,40.28,Email Newsletter Conversion
+TXN-10177,2025-05-18,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,6,540.00,54.00,0.00,11.94,20.98,24.01,Wholesale recurring contract
+TXN-10178,2025-05-19,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,11.68,2.92,22.85,Organic search referral
+TXN-10179,2025-05-20,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,7,630.00,63.00,0.00,12.94,17.62,20.46,Email Newsletter Conversion
+TXN-10180,2025-05-21,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,33,2640.00,528.00,0.00,69.51,102.54,39.82,Influencer Promo
+TXN-10181,2025-05-22,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,3.58,0.00,Item damaged in transport
+TXN-10182,2025-05-23,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,3.35,0.00,Refund SKU-B202 quality issue
+TXN-10183,2025-05-23,CLI-006,Apex Goods,Standard,Refunds,SKU-E505,1,0.00,0.00,120.00,0.00,4.30,0.00,Defective item return - High SKU-B202 return rate
+TXN-10184,2025-05-24,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,4,480.00,48.00,0.00,6.62,13.48,25.15,Email Newsletter Conversion
+TXN-10185,2025-05-25,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,6.25,6.32,22.40,Wholesale recurring contract
+TXN-10186,2025-05-25,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,8.38,3.35,9.11,Influencer Promo
+TXN-10187,2025-05-26,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,3.95,0.00,Refund SKU-B202 quality issue
+TXN-10188,2025-05-26,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,7,560.00,56.00,0.00,7.90,23.89,36.73,Direct Web
+TXN-10189,2025-05-27,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,2,160.00,16.00,0.00,9.40,4.94,24.18,Email Newsletter Conversion
+TXN-10190,2025-05-27,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,32,2400.00,360.00,0.00,100.85,80.96,19.78,Email Newsletter Conversion
+TXN-10191,2025-05-28,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,9.18,6.85,32.36,Influencer Promo
+TXN-10192,2025-05-29,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,20,1500.00,225.00,0.00,77.35,65.16,37.38,Direct Web
+TXN-10193,2025-05-29,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,7.81,8.09,30.76,Meta Ad Campaign #12
+TXN-10194,2025-05-30,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,3,270.00,27.00,0.00,12.28,9.08,31.47,Wholesale recurring contract
+TXN-10195,2025-05-31,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,28,2100.00,210.00,0.00,80.34,84.81,27.59,TikTok Paid Ad
+TXN-10196,2025-06-01,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-D404,33,2970.00,445.50,0.00,115.12,99.33,23.96,Direct Web
+TXN-10197,2025-06-01,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,10.19,5.39,32.11,PPC High CAC Campaign
+TXN-10198,2025-06-02,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,49,3675.00,735.00,0.00,87.50,123.22,37.94,Wholesale recurring contract
+TXN-10199,2025-06-03,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,31,2325.00,465.00,0.00,118.39,82.69,50.85,Google Shopping Ad
+TXN-10200,2025-06-04,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,7,840.00,84.00,0.00,10.78,20.60,41.26,Influencer Promo
+TXN-10201,2025-06-04,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,34,2720.00,272.00,0.00,42.53,115.48,19.95,Quarterly stock order
+TXN-10202,2025-06-05,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,13.73,8.92,9.68,PPC High CAC Campaign
+TXN-10203,2025-06-06,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-D404,43,3870.00,580.50,0.00,116.53,104.03,38.99,Organic search referral
+TXN-10204,2025-06-07,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,3,270.00,27.00,0.00,10.58,5.85,58.78,Wholesale recurring contract
+TXN-10205,2025-06-08,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,5,450.00,45.00,0.00,9.80,13.10,57.05,Organic search referral
+TXN-10206,2025-06-09,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,5,450.00,45.00,0.00,13.18,17.05,51.21,TikTok Paid Ad
+TXN-10207,2025-06-09,CLI-005,Lumina Living,VIP,Gross Sales,SKU-A101,4,320.00,32.00,0.00,11.56,11.98,24.63,PPC High CAC Campaign
+TXN-10208,2025-06-10,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,3,270.00,27.00,0.00,11.16,8.02,25.91,Google Shopping Ad
+TXN-10209,2025-06-10,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,11.81,3.55,34.04,Google Shopping Ad
+TXN-10210,2025-06-11,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-D404,40,3600.00,720.00,0.00,100.47,82.98,27.84,Quarterly stock order
+TXN-10211,2025-06-11,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,6,720.00,72.00,0.00,10.35,17.68,57.15,Quarterly stock order
+TXN-10212,2025-06-12,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,35,2800.00,420.00,0.00,114.93,119.85,56.67,Email Newsletter Conversion
+TXN-10213,2025-06-12,CLI-001,Aura Design Co,VIP,Refunds,SKU-E505,1,0.00,0.00,120.00,0.00,4.79,0.00,Customer dissatisfied SKU-B202
+TXN-10214,2025-06-13,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,13.09,6.48,27.74,Quarterly stock order
+TXN-10215,2025-06-14,CLI-003,Summit Outfitters,Wholesale,Refunds,SKU-A101,2,0.00,0.00,160.00,0.00,3.70,0.00,Defective item return - High SKU-B202 return rate
+TXN-10216,2025-06-15,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,2,160.00,16.00,0.00,11.69,3.74,21.33,TikTok Paid Ad
+TXN-10217,2025-06-16,CLI-004,Nova Retailers,Wholesale,Refunds,SKU-C303,2,0.00,0.00,150.00,0.00,4.26,0.00,Customer dissatisfied SKU-B202
+TXN-10218,2025-06-17,CLI-010,Solstice Corp,Wholesale,Refunds,SKU-C303,1,0.00,0.00,75.00,0.00,2.19,0.00,Customer return - sizing issue
+TXN-10219,2025-06-18,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,29,2320.00,464.00,0.00,91.10,98.06,31.54,Google Shopping Ad
+TXN-10220,2025-06-19,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,48,3840.00,576.00,0.00,96.16,159.63,49.08,TikTok Paid Ad
+TXN-10221,2025-06-20,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,48,3600.00,360.00,0.00,75.74,139.56,18.51,Direct Web
+TXN-10222,2025-06-20,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-E505,22,2640.00,528.00,0.00,51.99,47.44,38.42,Direct Web
+TXN-10223,2025-06-21,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,42,3150.00,472.50,0.00,76.27,106.11,35.56,Meta Ad Campaign #12
+TXN-10224,2025-06-22,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,11,825.00,123.75,0.00,105.32,32.91,41.02,Wholesale recurring contract
+TXN-10225,2025-06-23,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,5.32,2.32,28.76,PPC High CAC Campaign
+TXN-10226,2025-06-24,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-D404,8,720.00,72.00,0.00,8.76,22.92,44.78,TikTok Paid Ad
+TXN-10227,2025-06-24,CLI-009,Echo Market,Standard,Refunds,SKU-A101,1,0.00,0.00,80.00,0.00,4.98,0.00,Item damaged in transport
+TXN-10228,2025-06-25,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,29,2175.00,326.25,0.00,73.93,65.50,25.33,Direct Web
+TXN-10229,2025-06-26,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,12,960.00,192.00,0.00,89.19,40.47,55.01,TikTok Paid Ad
+TXN-10230,2025-06-27,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,2.73,0.00,Customer return - sizing issue
+TXN-10231,2025-06-28,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,13,975.00,97.50,0.00,119.48,25.59,56.24,Direct Web
+TXN-10232,2025-06-29,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,30,2250.00,225.00,0.00,110.10,104.14,38.46,Wholesale recurring contract
+TXN-10233,2025-06-30,CLI-005,Lumina Living,VIP,Gross Sales,SKU-B202,7,315.00,31.50,0.00,10.56,11.16,30.50,TikTok Paid Ad
+TXN-10234,2025-07-01,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,6.49,11.26,48.95,TikTok Paid Ad
+TXN-10235,2025-07-03,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,5,450.00,45.00,0.00,10.62,17.18,40.08,Meta Ad Campaign #12
+TXN-10236,2025-07-07,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,22,1650.00,165.00,0.00,70.17,59.62,16.78,Wholesale recurring contract
+TXN-10237,2025-07-09,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,40,3000.00,300.00,0.00,64.26,132.72,24.53,Organic search referral
+TXN-10238,2025-07-11,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,23,1725.00,258.75,0.00,84.17,70.17,32.13,Quarterly stock order
+TXN-10239,2025-07-18,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,23,1725.00,258.75,0.00,73.11,60.38,24.96,Organic search referral
+TXN-10240,2025-07-21,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,22,1650.00,247.50,0.00,70.39,69.67,37.47,Quarterly stock order
+TXN-10241,2025-07-22,CLI-006,Apex Goods,Standard,Gross Sales,SKU-D404,2,180.00,9.00,0.00,6.69,5.88,21.18,Organic search referral
+TXN-10242,2025-07-23,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,12.64,2.32,30.75,Meta Ad Campaign #12
+TXN-10243,2025-07-25,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,2,240.00,24.00,0.00,11.38,6.74,56.07,Influencer Promo
+TXN-10244,2025-07-26,CLI-001,Aura Design Co,VIP,Refunds,SKU-E505,1,0.00,0.00,120.00,0.00,2.05,0.00,Customer dissatisfied SKU-B202
+TXN-10245,2025-07-30,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,2,160.00,16.00,0.00,6.49,3.77,38.69,Direct Web
+TXN-10246,2025-07-31,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,5,450.00,45.00,0.00,10.65,17.40,25.16,PPC High CAC Campaign
+TXN-10247,2025-08-01,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,10.53,1.61,8.26,TikTok Paid Ad
+TXN-10248,2025-08-05,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-E505,12,1440.00,144.00,0.00,112.10,34.61,40.51,Quarterly stock order
+TXN-10249,2025-08-07,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,2,180.00,18.00,0.00,14.29,4.26,58.27,Email Newsletter Conversion
+TXN-10250,2025-08-09,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,6,480.00,48.00,0.00,10.67,19.19,45.47,Quarterly stock order
+TXN-10251,2025-08-12,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,2,90.00,4.50,0.00,8.41,6.08,33.78,Google Shopping Ad
+TXN-10252,2025-08-14,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,5,600.00,60.00,0.00,7.28,13.03,31.89,PPC High CAC Campaign
+TXN-10253,2025-08-18,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,2,180.00,18.00,0.00,6.54,5.85,43.53,Wholesale recurring contract
+TXN-10254,2025-08-19,CLI-006,Apex Goods,Standard,Gross Sales,SKU-D404,2,180.00,0.00,0.00,6.33,3.75,20.12,Google Shopping Ad
+TXN-10255,2025-08-31,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,34,2550.00,255.00,0.00,61.51,69.25,21.57,Email Newsletter Conversion
+TXN-10256,2025-09-01,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,2,180.00,18.00,0.00,7.52,3.99,43.13,Organic search referral
+TXN-10257,2025-09-02,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,10,750.00,112.50,0.00,107.33,22.60,53.80,Organic search referral
+TXN-10258,2025-09-03,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-E505,3,360.00,36.00,0.00,8.21,10.18,24.04,Wholesale recurring contract
+TXN-10259,2025-09-04,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,7,560.00,56.00,0.00,14.68,21.45,29.66,PPC High CAC Campaign
+TXN-10260,2025-09-05,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-B202,6,270.00,27.00,0.00,6.80,18.21,16.21,Direct Web
+TXN-10261,2025-09-06,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,14,1050.00,157.50,0.00,51.13,29.48,26.37,PPC High CAC Campaign
+TXN-10262,2025-09-06,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,14,1120.00,168.00,0.00,78.34,32.22,37.80,Influencer Promo
+TXN-10263,2025-09-07,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,4,320.00,32.00,0.00,10.94,13.32,19.92,Direct Web
+TXN-10264,2025-09-07,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,49,3675.00,367.50,0.00,118.69,139.89,32.98,Influencer Promo
+TXN-10265,2025-09-08,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,12.47,7.85,45.94,Direct Web
+TXN-10266,2025-09-08,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,47,3525.00,705.00,0.00,52.06,164.28,36.72,Direct Web
+TXN-10267,2025-09-09,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.94,0.00,Item damaged in transport
+TXN-10268,2025-09-10,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,8.00,9.36,11.11,Google Shopping Ad
+TXN-10269,2025-09-10,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,10.52,6.49,19.51,Email Newsletter Conversion
+TXN-10270,2025-09-11,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,7,560.00,56.00,0.00,8.96,20.82,54.74,TikTok Paid Ad
+TXN-10271,2025-09-12,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,12.52,9.35,17.82,Wholesale recurring contract
+TXN-10272,2025-09-13,CLI-009,Echo Market,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.34,0.00,Item damaged in transport
+TXN-10273,2025-09-14,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,11.17,6.25,27.06,PPC High CAC Campaign
+TXN-10274,2025-09-15,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,30,2250.00,225.00,0.00,64.43,55.98,46.20,Quarterly stock order
+TXN-10275,2025-09-16,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,9.87,12.87,56.36,Email Newsletter Conversion
+TXN-10276,2025-09-17,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,18,1440.00,144.00,0.00,107.36,49.30,53.95,Organic search referral
+TXN-10277,2025-09-17,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,5,600.00,60.00,0.00,10.05,12.45,45.81,Direct Web
+TXN-10278,2025-09-18,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,11,825.00,82.50,0.00,42.62,21.45,27.99,Wholesale recurring contract
+TXN-10279,2025-09-19,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,45,3375.00,675.00,0.00,85.82,91.61,39.44,Google Shopping Ad
+TXN-10280,2025-09-19,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,6.02,6.32,28.29,TikTok Paid Ad
+TXN-10281,2025-09-20,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,8,960.00,96.00,0.00,9.39,27.90,49.90,Google Shopping Ad
+TXN-10282,2025-09-21,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-E505,50,6000.00,900.00,0.00,89.29,153.48,51.61,Email Newsletter Conversion
+TXN-10283,2025-09-22,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,44,3300.00,330.00,0.00,118.32,91.75,40.77,Organic search referral
+TXN-10284,2025-09-22,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,13.67,3.51,31.38,Wholesale recurring contract
+TXN-10285,2025-09-23,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,4.50,0.00,11.28,4.50,10.04,Wholesale recurring contract
+TXN-10286,2025-09-24,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,8.27,3.01,28.90,PPC High CAC Campaign
+TXN-10287,2025-09-24,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,8.98,6.87,30.27,Direct Web
+TXN-10288,2025-09-25,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,13.94,9.07,9.24,Organic search referral
+TXN-10289,2025-09-26,CLI-008,Vanguard Supply,Wholesale,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,3.37,0.00,Item damaged in transport
+TXN-10290,2025-09-27,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,27,2160.00,216.00,0.00,60.03,60.58,55.67,Organic search referral
+TXN-10291,2025-09-28,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,8,640.00,64.00,0.00,9.29,13.46,19.28,Quarterly stock order
+TXN-10292,2025-09-29,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.03,0.00,Customer dissatisfied SKU-B202
+TXN-10293,2025-09-30,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,5.89,9.34,19.64,TikTok Paid Ad
+TXN-10294,2025-09-30,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,5.68,2.63,24.48,Email Newsletter Conversion
+TXN-10295,2025-10-01,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,13.60,3.35,10.71,PPC High CAC Campaign
+TXN-10296,2025-10-02,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,37,2775.00,416.25,0.00,59.82,103.20,26.17,Email Newsletter Conversion
+TXN-10297,2025-10-02,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,11,825.00,165.00,0.00,56.44,29.85,23.49,Wholesale recurring contract
+TXN-10298,2025-10-03,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,3,360.00,36.00,0.00,8.86,5.95,43.71,PPC High CAC Campaign
+TXN-10299,2025-10-04,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-B202,5,225.00,22.50,0.00,9.21,12.96,22.77,Influencer Promo
+TXN-10300,2025-10-05,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.65,0.00,Customer return - sizing issue
+TXN-10301,2025-10-06,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,6,480.00,48.00,0.00,9.24,13.83,43.82,TikTok Paid Ad
+TXN-10302,2025-10-06,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,10.36,6.84,25.13,Email Newsletter Conversion
+TXN-10303,2025-10-07,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,2.25,0.00,6.16,2.72,9.49,TikTok Paid Ad
+TXN-10304,2025-10-07,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,10,800.00,80.00,0.00,116.24,25.46,50.23,PPC High CAC Campaign
+TXN-10305,2025-10-08,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,27,2160.00,432.00,0.00,101.71,42.09,51.32,Google Shopping Ad
+TXN-10306,2025-10-08,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,6,540.00,54.00,0.00,9.96,15.13,17.49,Google Shopping Ad
+TXN-10307,2025-10-09,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,16,1280.00,256.00,0.00,58.27,40.28,16.98,Google Shopping Ad
+TXN-10308,2025-10-09,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,5,600.00,60.00,0.00,6.79,17.10,16.59,Email Newsletter Conversion
+TXN-10309,2025-10-10,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,7,560.00,56.00,0.00,7.71,11.59,31.78,Organic search referral
+TXN-10310,2025-10-10,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,5.69,7.29,15.62,TikTok Paid Ad
+TXN-10311,2025-10-11,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.60,0.00,Refund SKU-B202 quality issue
+TXN-10312,2025-10-11,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,4,360.00,36.00,0.00,14.72,13.98,49.91,Influencer Promo
+TXN-10313,2025-10-12,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,4.50,0.00,8.46,6.36,31.68,Direct Web
+TXN-10314,2025-10-12,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.31,0.00,Refund SKU-B202 quality issue
+TXN-10315,2025-10-13,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,5.93,10.03,55.38,Wholesale recurring contract
+TXN-10316,2025-10-13,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,10.05,8.32,18.65,Google Shopping Ad
+TXN-10317,2025-10-14,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-B202,4,180.00,18.00,0.00,13.51,13.41,32.68,Wholesale recurring contract
+TXN-10318,2025-10-15,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,2.25,0.00,6.09,1.71,20.14,Influencer Promo
+TXN-10319,2025-10-15,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,13.52,3.36,29.81,Wholesale recurring contract
+TXN-10320,2025-10-16,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,19,1425.00,142.50,0.00,117.47,43.56,17.20,Quarterly stock order
+TXN-10321,2025-10-17,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,38,3040.00,608.00,0.00,59.99,92.12,51.18,Direct Web
+TXN-10322,2025-10-18,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,3,360.00,36.00,0.00,6.98,6.90,45.88,Email Newsletter Conversion
+TXN-10323,2025-10-19,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-A101,1,80.00,4.00,0.00,13.09,1.68,30.88,PPC High CAC Campaign
+TXN-10324,2025-10-19,CLI-006,Apex Goods,Standard,Refunds,SKU-A101,1,0.00,0.00,80.00,0.00,4.77,0.00,Item damaged in transport
+TXN-10325,2025-10-20,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,8.54,16.58,27.37,Email Newsletter Conversion
+TXN-10326,2025-10-20,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,49,3675.00,735.00,0.00,91.78,122.39,54.73,Quarterly stock order
+TXN-10327,2025-10-21,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,12.95,10.44,29.11,Direct Web
+TXN-10328,2025-10-22,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,5.26,5.39,8.79,Email Newsletter Conversion
+TXN-10329,2025-10-23,CLI-005,Lumina Living,VIP,Gross Sales,SKU-E505,4,480.00,48.00,0.00,15.00,13.79,19.51,Influencer Promo
+TXN-10330,2025-10-23,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-A101,24,1920.00,384.00,0.00,68.38,76.28,53.03,TikTok Paid Ad
+TXN-10331,2025-10-24,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,32,2400.00,480.00,0.00,96.28,70.51,40.54,Meta Ad Campaign #12
+TXN-10332,2025-10-25,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-D404,44,3960.00,594.00,0.00,79.23,73.94,25.47,Email Newsletter Conversion
+TXN-10333,2025-10-26,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,14.19,3.19,16.74,Email Newsletter Conversion
+TXN-10334,2025-10-27,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,17,1275.00,255.00,0.00,116.84,38.20,57.39,Organic search referral
+TXN-10335,2025-10-28,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-D404,3,270.00,0.00,0.00,6.74,10.31,26.73,Organic search referral
+TXN-10336,2025-10-29,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,6.27,5.92,33.62,Wholesale recurring contract
+TXN-10337,2025-10-29,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-E505,12,1440.00,144.00,0.00,65.46,37.41,42.51,Influencer Promo
+TXN-10338,2025-10-30,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,6.68,3.27,10.40,Organic search referral
+TXN-10339,2025-10-31,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,12.20,1.60,19.83,Google Shopping Ad
+TXN-10340,2025-10-31,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-D404,5,450.00,45.00,0.00,10.46,8.51,36.58,Organic search referral
+TXN-10341,2025-11-01,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,12,900.00,135.00,0.00,65.50,40.84,18.34,Meta Ad Campaign #12
+TXN-10342,2025-11-01,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,14,1120.00,224.00,0.00,67.04,48.59,55.20,Google Shopping Ad
+TXN-10343,2025-11-01,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,6,720.00,72.00,0.00,6.57,10.22,24.25,TikTok Paid Ad
+TXN-10344,2025-11-01,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,44,3300.00,495.00,0.00,63.79,74.44,32.68,Wholesale recurring contract
+TXN-10345,2025-11-02,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,37,2775.00,277.50,0.00,105.91,101.76,36.61,Wholesale recurring contract
+TXN-10346,2025-11-02,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,4.93,0.00,Item damaged in transport
+TXN-10347,2025-11-02,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,8.88,6.73,18.30,Direct Web
+TXN-10348,2025-11-02,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,39,3120.00,468.00,0.00,106.97,102.51,21.80,Quarterly stock order
+TXN-10349,2025-11-03,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,4.91,0.00,Refund SKU-B202 quality issue
+TXN-10350,2025-11-03,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-E505,36,4320.00,864.00,0.00,85.82,70.97,28.45,PPC High CAC Campaign
+TXN-10351,2025-11-03,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,6,480.00,48.00,0.00,14.00,18.61,45.49,Influencer Promo
+TXN-10352,2025-11-03,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-D404,21,1890.00,189.00,0.00,104.68,36.80,34.05,Quarterly stock order
+TXN-10353,2025-11-04,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-B202,8,360.00,36.00,0.00,7.58,26.57,56.14,Influencer Promo
+TXN-10354,2025-11-04,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,4.57,0.00,Refund SKU-B202 quality issue
+TXN-10355,2025-11-04,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,49,3675.00,735.00,0.00,102.53,84.53,21.73,Direct Web
+TXN-10356,2025-11-04,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,16,1200.00,120.00,0.00,102.36,49.14,54.04,Influencer Promo
+TXN-10357,2025-11-05,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,6,480.00,48.00,0.00,9.73,11.07,33.13,Influencer Promo
+TXN-10358,2025-11-05,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,12,900.00,135.00,0.00,95.24,19.18,36.38,Organic search referral
+TXN-10359,2025-11-05,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,8,720.00,72.00,0.00,8.11,25.49,53.62,Wholesale recurring contract
+TXN-10360,2025-11-06,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,7.69,7.00,25.43,Organic search referral
+TXN-10361,2025-11-06,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-D404,41,3690.00,738.00,0.00,105.68,103.75,22.15,Organic search referral
+TXN-10362,2025-11-06,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,8,720.00,72.00,0.00,13.79,12.46,23.67,Direct Web
+TXN-10363,2025-11-06,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,39,2925.00,292.50,0.00,96.37,79.87,52.06,Organic search referral
+TXN-10364,2025-11-07,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,2,160.00,16.00,0.00,8.72,5.38,22.99,Quarterly stock order
+TXN-10365,2025-11-07,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,20,1500.00,225.00,0.00,62.81,45.46,22.33,Google Shopping Ad
+TXN-10366,2025-11-07,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,24,1800.00,360.00,0.00,94.22,48.92,33.43,Quarterly stock order
+TXN-10367,2025-11-07,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,11.47,13.51,15.38,Email Newsletter Conversion
+TXN-10368,2025-11-08,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,27,2025.00,303.75,0.00,108.13,65.29,24.82,TikTok Paid Ad
+TXN-10369,2025-11-08,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,6,540.00,54.00,0.00,5.07,20.99,58.49,Google Shopping Ad
+TXN-10370,2025-11-08,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,8.36,6.16,16.78,Google Shopping Ad
+TXN-10371,2025-11-09,CLI-005,Lumina Living,VIP,Gross Sales,SKU-C303,3,225.00,22.50,0.00,10.17,5.94,17.55,Email Newsletter Conversion
+TXN-10372,2025-11-09,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,18,1350.00,270.00,0.00,92.43,62.91,26.67,Meta Ad Campaign #12
+TXN-10373,2025-11-09,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,6,480.00,48.00,0.00,13.16,13.12,47.10,Influencer Promo
+TXN-10374,2025-11-10,CLI-009,Echo Market,Standard,Gross Sales,SKU-C303,3,225.00,0.00,0.00,13.41,9.76,12.89,Email Newsletter Conversion
+TXN-10375,2025-11-10,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,14.47,9.90,25.67,Email Newsletter Conversion
+TXN-10376,2025-11-10,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,29,2175.00,326.25,0.00,69.73,77.46,35.87,Organic search referral
+TXN-10377,2025-11-10,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,10.00,9.70,18.31,Quarterly stock order
+TXN-10378,2025-11-11,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-B202,3,135.00,13.50,0.00,9.09,7.92,55.80,Organic search referral
+TXN-10379,2025-11-11,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-B202,15,675.00,101.25,0.00,90.48,27.80,43.55,Organic search referral
+TXN-10380,2025-11-11,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,8,960.00,96.00,0.00,10.76,14.53,50.33,Email Newsletter Conversion
+TXN-10381,2025-11-12,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,35,2800.00,420.00,0.00,70.67,55.14,23.97,PPC High CAC Campaign
+TXN-10382,2025-11-12,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,11.27,5.99,26.73,Meta Ad Campaign #12
+TXN-10383,2025-11-13,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,6,540.00,54.00,0.00,6.67,18.89,28.42,Wholesale recurring contract
+TXN-10384,2025-11-13,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,6,540.00,54.00,0.00,9.34,17.24,21.02,Organic search referral
+TXN-10385,2025-11-13,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,35,2625.00,262.50,0.00,57.95,121.44,24.50,Quarterly stock order
+TXN-10386,2025-11-14,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,12,900.00,135.00,0.00,101.70,32.96,41.73,Wholesale recurring contract
+TXN-10387,2025-11-14,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,2,240.00,24.00,0.00,11.90,4.67,32.11,Meta Ad Campaign #12
+TXN-10388,2025-11-15,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,7,630.00,63.00,0.00,8.01,19.76,44.81,Meta Ad Campaign #12
+TXN-10389,2025-11-15,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,5,450.00,45.00,0.00,10.12,13.68,27.72,Google Shopping Ad
+TXN-10390,2025-11-15,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,12.03,6.27,9.06,Organic search referral
+TXN-10391,2025-11-15,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,40,3000.00,450.00,0.00,40.22,113.73,55.81,Quarterly stock order
+TXN-10392,2025-11-16,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,42,3150.00,315.00,0.00,112.38,117.12,35.55,Google Shopping Ad
+TXN-10393,2025-11-16,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,8,720.00,72.00,0.00,13.74,25.64,31.21,Email Newsletter Conversion
+TXN-10394,2025-11-16,CLI-006,Apex Goods,Standard,Gross Sales,SKU-A101,1,80.00,0.00,0.00,8.29,3.29,33.79,Email Newsletter Conversion
+TXN-10395,2025-11-16,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,8,720.00,72.00,0.00,6.83,18.41,58.30,Organic search referral
+TXN-10396,2025-11-17,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,6.13,14.46,17.64,Email Newsletter Conversion
+TXN-10397,2025-11-17,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-D404,46,4140.00,828.00,0.00,54.50,103.94,31.14,PPC High CAC Campaign
+TXN-10398,2025-11-17,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-B202,5,225.00,22.50,0.00,6.13,11.61,17.07,PPC High CAC Campaign
+TXN-10399,2025-11-18,CLI-006,Apex Goods,Standard,Refunds,SKU-E505,1,0.00,0.00,120.00,0.00,4.93,0.00,Customer dissatisfied SKU-B202
+TXN-10400,2025-11-18,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,8.46,8.56,18.39,PPC High CAC Campaign
+TXN-10401,2025-11-18,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,13.52,3.24,10.02,PPC High CAC Campaign
+TXN-10402,2025-11-19,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,9.03,1.97,20.40,TikTok Paid Ad
+TXN-10403,2025-11-19,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-D404,30,2700.00,270.00,0.00,99.62,46.07,33.15,PPC High CAC Campaign
+TXN-10404,2025-11-19,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,2,240.00,24.00,0.00,14.63,5.55,55.05,Influencer Promo
+TXN-10405,2025-11-20,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,31,2325.00,348.75,0.00,105.33,98.85,29.94,Meta Ad Campaign #12
+TXN-10406,2025-11-20,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,33,2475.00,495.00,0.00,49.12,99.62,24.98,PPC High CAC Campaign
+TXN-10407,2025-11-20,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,5.46,5.48,11.79,Google Shopping Ad
+TXN-10408,2025-11-20,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,14.30,6.86,35.57,Google Shopping Ad
+TXN-10409,2025-11-21,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,4.32,0.00,Item damaged in transport
+TXN-10410,2025-11-21,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-B202,41,1845.00,184.50,0.00,98.90,106.86,34.48,Direct Web
+TXN-10411,2025-11-22,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,21,1575.00,315.00,0.00,53.89,65.74,19.66,Influencer Promo
+TXN-10412,2025-11-22,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,34,2550.00,382.50,0.00,113.27,102.84,27.31,Influencer Promo
+TXN-10413,2025-11-22,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,7.99,5.81,31.24,Direct Web
+TXN-10414,2025-11-22,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,14.81,5.60,33.87,Email Newsletter Conversion
+TXN-10415,2025-11-23,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,10.71,5.67,19.27,Influencer Promo
+TXN-10416,2025-11-23,CLI-009,Echo Market,Standard,Gross Sales,SKU-E505,1,120.00,6.00,0.00,5.53,1.61,15.21,Email Newsletter Conversion
+TXN-10417,2025-11-23,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,19,1520.00,152.00,0.00,56.32,49.06,31.14,Wholesale recurring contract
+TXN-10418,2025-11-23,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-E505,24,2880.00,576.00,0.00,71.11,60.52,50.86,Direct Web
+TXN-10419,2025-11-24,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,7,630.00,63.00,0.00,8.88,23.89,58.91,Black Friday / Cyber Weekend Promotion
+TXN-10420,2025-11-24,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,12.81,3.24,30.41,Black Friday / Cyber Weekend Promotion
+TXN-10421,2025-11-24,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,4,180.00,0.00,0.00,7.94,7.42,26.43,Black Friday / Cyber Weekend Promotion
+TXN-10422,2025-11-24,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,25,2000.00,300.00,0.00,43.25,51.46,26.89,Black Friday / Cyber Weekend Promotion
+TXN-10423,2025-11-25,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,58,4350.00,870.00,0.00,115.00,91.63,56.79,Black Friday / Cyber Weekend Promotion
+TXN-10424,2025-11-25,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-E505,43,5160.00,774.00,0.00,103.19,111.81,18.28,Black Friday / Cyber Weekend Promotion
+TXN-10425,2025-11-26,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,4,180.00,9.00,0.00,10.43,9.23,17.43,Black Friday / Cyber Weekend Promotion
+TXN-10426,2025-11-26,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,42,3150.00,315.00,0.00,116.02,114.94,36.37,Black Friday / Cyber Weekend Promotion
+TXN-10427,2025-11-26,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,4,180.00,0.00,0.00,7.40,11.14,32.80,Black Friday / Cyber Weekend Promotion
+TXN-10428,2025-11-26,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,45,3375.00,506.25,0.00,113.27,152.55,32.36,Black Friday / Cyber Weekend Promotion
+TXN-10429,2025-11-27,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,12,1080.00,108.00,0.00,8.75,37.27,35.05,Black Friday / Cyber Weekend Promotion
+TXN-10430,2025-11-27,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,6,720.00,72.00,0.00,10.14,20.38,22.53,Black Friday / Cyber Weekend Promotion
+TXN-10431,2025-11-27,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,4,180.00,0.00,0.00,13.65,9.39,10.81,Black Friday / Cyber Weekend Promotion
+TXN-10432,2025-11-27,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,14.40,8.98,12.15,Black Friday / Cyber Weekend Promotion
+TXN-10433,2025-11-28,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,4.38,0.00,Refund SKU-B202 quality issue
+TXN-10434,2025-11-28,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,9.04,6.40,18.52,Black Friday / Cyber Weekend Promotion
+TXN-10435,2025-11-28,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,4,180.00,0.00,0.00,12.01,6.58,33.06,Black Friday / Cyber Weekend Promotion
+TXN-10436,2025-11-29,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,3,270.00,27.00,0.00,7.82,10.06,32.16,Black Friday / Cyber Weekend Promotion
+TXN-10437,2025-11-29,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,4,480.00,48.00,0.00,12.47,12.37,53.23,Black Friday / Cyber Weekend Promotion
+TXN-10438,2025-11-30,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-C303,15,1125.00,225.00,0.00,109.98,26.74,16.88,Black Friday / Cyber Weekend Promotion
+TXN-10439,2025-11-30,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,22,1650.00,247.50,0.00,56.80,65.62,47.67,Black Friday / Cyber Weekend Promotion
+TXN-10440,2025-11-30,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,63,4725.00,472.50,0.00,52.88,122.32,52.56,Black Friday / Cyber Weekend Promotion
+TXN-10441,2025-12-01,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,4.55,0.00,Refund SKU-B202 quality issue
+TXN-10442,2025-12-01,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,14,1050.00,157.50,0.00,55.79,37.26,57.82,Google Shopping Ad
+TXN-10443,2025-12-02,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,28,2240.00,448.00,0.00,112.01,59.80,35.28,Google Shopping Ad
+TXN-10444,2025-12-02,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,19,1425.00,285.00,0.00,69.16,40.52,34.27,Influencer Promo
+TXN-10445,2025-12-02,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,7,840.00,84.00,0.00,7.77,15.53,45.58,TikTok Paid Ad
+TXN-10446,2025-12-03,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,29,2175.00,326.25,0.00,48.71,80.94,18.69,Direct Web
+TXN-10447,2025-12-03,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,6,540.00,54.00,0.00,7.63,19.64,18.44,Quarterly stock order
+TXN-10448,2025-12-03,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,7.13,4.72,15.04,Influencer Promo
+TXN-10449,2025-12-04,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,35,2625.00,262.50,0.00,98.66,72.87,35.91,Influencer Promo
+TXN-10450,2025-12-04,CLI-009,Echo Market,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,3.99,0.00,Refund SKU-B202 quality issue
+TXN-10451,2025-12-04,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,20,1600.00,160.00,0.00,115.90,56.38,58.55,Influencer Promo
+TXN-10452,2025-12-04,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,41,3075.00,307.50,0.00,61.15,80.69,45.09,Google Shopping Ad
+TXN-10453,2025-12-05,CLI-006,Apex Goods,Standard,Gross Sales,SKU-A101,3,240.00,0.00,0.00,11.34,6.14,28.03,Direct Web
+TXN-10454,2025-12-05,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,34,2550.00,382.50,0.00,92.27,107.81,38.25,Influencer Promo
+TXN-10455,2025-12-05,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,5,400.00,40.00,0.00,13.17,10.95,50.67,Organic search referral
+TXN-10456,2025-12-05,CLI-010,Solstice Corp,Wholesale,Refunds,SKU-D404,1,0.00,0.00,90.00,0.00,2.69,0.00,Refund SKU-B202 quality issue
+TXN-10457,2025-12-06,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,4,360.00,36.00,0.00,12.17,6.95,25.37,Influencer Promo
+TXN-10458,2025-12-06,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,5.22,1.59,23.48,TikTok Paid Ad
+TXN-10459,2025-12-06,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,46,3680.00,368.00,0.00,53.31,153.87,38.25,Meta Ad Campaign #12
+TXN-10460,2025-12-06,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,2,160.00,16.00,0.00,14.47,3.87,42.29,Wholesale recurring contract
+TXN-10461,2025-12-07,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-E505,19,2280.00,456.00,0.00,89.86,47.91,22.55,Email Newsletter Conversion
+TXN-10462,2025-12-07,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,5.17,5.09,32.55,Google Shopping Ad
+TXN-10463,2025-12-07,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,14.02,8.10,54.50,PPC High CAC Campaign
+TXN-10464,2025-12-08,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,13.97,9.15,25.53,Meta Ad Campaign #12
+TXN-10465,2025-12-08,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,4.50,0.00,12.90,4.52,23.90,PPC High CAC Campaign
+TXN-10466,2025-12-08,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,40,3000.00,300.00,0.00,62.66,130.14,33.39,Google Shopping Ad
+TXN-10467,2025-12-08,CLI-004,Nova Retailers,Wholesale,Refunds,SKU-C303,1,0.00,0.00,75.00,0.00,3.73,0.00,Customer return - sizing issue
+TXN-10468,2025-12-09,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,8,960.00,96.00,0.00,9.09,13.71,34.17,Organic search referral
+TXN-10469,2025-12-09,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-D404,46,4140.00,621.00,0.00,62.04,131.62,48.97,Influencer Promo
+TXN-10470,2025-12-09,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,10.59,7.40,59.48,Organic search referral
+TXN-10471,2025-12-09,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,18,1350.00,270.00,0.00,99.83,43.08,46.47,Google Shopping Ad
+TXN-10472,2025-12-10,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,4.40,0.00,Refund SKU-B202 quality issue
+TXN-10473,2025-12-10,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-A101,8,640.00,64.00,0.00,13.23,19.55,42.01,Google Shopping Ad
+TXN-10474,2025-12-11,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,11.14,7.63,27.21,TikTok Paid Ad
+TXN-10475,2025-12-11,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,21,1575.00,315.00,0.00,75.12,39.97,44.56,PPC High CAC Campaign
+TXN-10476,2025-12-12,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,6,540.00,54.00,0.00,11.98,16.38,45.33,Direct Web
+TXN-10477,2025-12-12,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,4.34,0.00,Customer dissatisfied SKU-B202
+TXN-10478,2025-12-12,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,2,160.00,16.00,0.00,14.19,5.20,47.68,Google Shopping Ad
+TXN-10479,2025-12-12,CLI-009,Echo Market,Standard,Gross Sales,SKU-C303,1,75.00,0.00,0.00,9.55,2.31,8.13,Quarterly stock order
+TXN-10480,2025-12-13,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,6,480.00,48.00,0.00,8.40,10.40,38.10,Wholesale recurring contract
+TXN-10481,2025-12-13,CLI-005,Lumina Living,VIP,Gross Sales,SKU-E505,4,480.00,48.00,0.00,14.66,10.51,49.65,PPC High CAC Campaign
+TXN-10482,2025-12-14,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-A101,40,3200.00,320.00,0.00,45.40,110.69,59.74,Wholesale recurring contract
+TXN-10483,2025-12-14,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,32,2400.00,480.00,0.00,40.78,101.26,26.17,Direct Web
+TXN-10484,2025-12-14,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,8.14,5.81,23.49,PPC High CAC Campaign
+TXN-10485,2025-12-15,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,25,1875.00,281.25,0.00,58.34,79.25,52.64,Quarterly stock order
+TXN-10486,2025-12-15,CLI-006,Apex Goods,Standard,Refunds,SKU-B202,1,0.00,0.00,45.00,0.00,4.03,0.00,Item damaged in transport
+TXN-10487,2025-12-16,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,2,240.00,24.00,0.00,8.71,4.26,55.42,PPC High CAC Campaign
+TXN-10488,2025-12-16,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,42,3150.00,472.50,0.00,57.77,111.44,17.44,TikTok Paid Ad
+TXN-10489,2025-12-16,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,6,480.00,48.00,0.00,8.94,17.24,22.87,Organic search referral
+TXN-10490,2025-12-16,CLI-002,Urban Pulse,Standard,Gross Sales,SKU-B202,1,45.00,0.00,0.00,10.81,2.15,24.55,TikTok Paid Ad
+TXN-10491,2025-12-17,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,40,3200.00,640.00,0.00,69.27,99.90,24.47,Organic search referral
+TXN-10492,2025-12-17,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,11.86,9.39,27.46,Influencer Promo
+TXN-10493,2025-12-17,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-B202,19,855.00,171.00,0.00,77.84,28.87,33.97,Email Newsletter Conversion
+TXN-10494,2025-12-18,CLI-009,Echo Market,Standard,Gross Sales,SKU-B202,2,90.00,0.00,0.00,5.48,3.40,12.41,Influencer Promo
+TXN-10495,2025-12-18,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,50,3750.00,375.00,0.00,99.57,100.98,31.21,PPC High CAC Campaign
+TXN-10496,2025-12-19,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,4,360.00,36.00,0.00,6.99,10.61,44.21,Influencer Promo
+TXN-10497,2025-12-19,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,30,2400.00,480.00,0.00,79.00,89.19,55.03,Direct Web
+TXN-10498,2025-12-19,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,11.41,10.07,33.98,Email Newsletter Conversion
+TXN-10499,2025-12-19,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-A101,15,1200.00,120.00,0.00,58.26,32.01,28.11,Organic search referral
+TXN-10500,2025-12-20,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,38,2850.00,427.50,0.00,81.67,91.22,22.53,Influencer Promo
+TXN-10501,2025-12-20,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,4,480.00,48.00,0.00,7.11,9.18,19.30,Google Shopping Ad
+TXN-10502,2025-12-20,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,35,2625.00,525.00,0.00,48.31,95.77,18.79,Google Shopping Ad
+TXN-10503,2025-12-21,CLI-005,Lumina Living,VIP,Gross Sales,SKU-D404,5,450.00,45.00,0.00,6.31,15.89,16.29,Email Newsletter Conversion
+TXN-10504,2025-12-21,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,9.45,10.32,26.84,Direct Web
+TXN-10505,2025-12-21,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,50,4000.00,800.00,0.00,81.88,138.95,28.93,TikTok Paid Ad
+TXN-10506,2025-12-22,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-D404,29,2610.00,391.50,0.00,60.78,61.11,15.00,TikTok Paid Ad
+TXN-10507,2025-12-22,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,10,800.00,160.00,0.00,115.76,24.54,15.41,PPC High CAC Campaign
+TXN-10508,2025-12-22,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,8,640.00,64.00,0.00,10.48,15.02,54.70,Meta Ad Campaign #12
+TXN-10509,2025-12-23,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,7,560.00,56.00,0.00,13.28,13.59,18.56,TikTok Paid Ad
+TXN-10510,2025-12-23,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,49,3675.00,735.00,0.00,62.77,146.31,51.40,Wholesale recurring contract
+TXN-10511,2025-12-23,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,6.10,7.23,35.37,Wholesale recurring contract
+TXN-10512,2025-12-24,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,19,1425.00,142.50,0.00,41.77,65.45,27.70,Direct Web
+TXN-10513,2025-12-24,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,24,1920.00,192.00,0.00,41.18,46.43,33.91,Email Newsletter Conversion
+TXN-10514,2025-12-24,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,12,900.00,135.00,0.00,107.48,40.84,17.52,Google Shopping Ad
+TXN-10515,2025-12-24,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,13.17,9.47,20.49,Wholesale recurring contract
+TXN-10516,2025-12-25,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-B202,12,540.00,54.00,0.00,98.83,20.26,44.97,PPC High CAC Campaign
+TXN-10517,2025-12-25,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,29,2175.00,326.25,0.00,90.33,45.95,57.18,Email Newsletter Conversion
+TXN-10518,2025-12-25,CLI-009,Echo Market,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.60,0.00,Customer return - sizing issue
+TXN-10519,2025-12-25,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,37,2775.00,416.25,0.00,53.39,75.93,20.38,Meta Ad Campaign #12
+TXN-10520,2025-12-26,CLI-001,Aura Design Co,VIP,Gross Sales,SKU-E505,7,840.00,84.00,0.00,11.88,12.67,49.69,PPC High CAC Campaign
+TXN-10521,2025-12-26,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,49,3675.00,551.25,0.00,44.78,136.67,46.56,Meta Ad Campaign #12
+TXN-10522,2025-12-27,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,45,3600.00,720.00,0.00,104.44,106.98,23.68,Organic search referral
+TXN-10523,2025-12-27,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,2,160.00,16.00,0.00,12.07,5.24,39.42,PPC High CAC Campaign
+TXN-10524,2025-12-28,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-C303,30,2250.00,450.00,0.00,62.03,94.88,56.15,PPC High CAC Campaign
+TXN-10525,2025-12-28,CLI-009,Echo Market,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.89,0.00,Customer dissatisfied SKU-B202
+TXN-10526,2025-12-28,CLI-009,Echo Market,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,4.20,0.00,Customer return - sizing issue
+TXN-10527,2025-12-29,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,0.00,0.00,6.90,8.60,28.67,TikTok Paid Ad
+TXN-10528,2025-12-29,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,30,2400.00,240.00,0.00,81.86,49.00,52.58,Google Shopping Ad
+TXN-10529,2025-12-29,CLI-003,Summit Outfitters,Wholesale,Gross Sales,SKU-A101,16,1280.00,192.00,0.00,47.90,42.27,52.63,Quarterly stock order
+TXN-10530,2025-12-29,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-C303,26,1950.00,195.00,0.00,57.66,76.33,15.59,Organic search referral
+TXN-10531,2025-12-30,CLI-008,Vanguard Supply,Wholesale,Gross Sales,SKU-D404,50,4500.00,450.00,0.00,84.64,168.82,33.72,Organic search referral
+TXN-10532,2025-12-30,CLI-006,Apex Goods,Standard,Gross Sales,SKU-B202,3,135.00,6.75,0.00,13.34,4.97,13.83,Google Shopping Ad
+TXN-10533,2025-12-31,CLI-002,Urban Pulse,Standard,Refunds,SKU-B202,2,0.00,0.00,90.00,0.00,2.57,0.00,Refund SKU-B202 quality issue
+TXN-10534,2025-12-31,CLI-004,Nova Retailers,Wholesale,Gross Sales,SKU-E505,45,5400.00,810.00,0.00,101.30,119.39,45.35,Google Shopping Ad
+TXN-10535,2025-12-31,CLI-007,Beacon Direct,VIP,Gross Sales,SKU-A101,3,240.00,24.00,0.00,9.02,6.53,22.12,Direct Web
+TXN-10536,2025-12-31,CLI-010,Solstice Corp,Wholesale,Gross Sales,SKU-C303,30,2250.00,450.00,0.00,107.59,69.74,43.50,Organic search referral
