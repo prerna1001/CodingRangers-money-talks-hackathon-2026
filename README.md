@@ -18,7 +18,7 @@ Our frontend relies on React. Our backend relies on LangGraph, written in Python
 
 ### How It Works
 
-(Work in progress)
+Utilizing Langgraph for a multi-agent workflow to analyze data and create visuals showcasing variations of data and reporting. 
 
 ### How to Run and Use It
 
