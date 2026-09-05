@@ -59,18 +59,9 @@ Target users: startup founders, fractional CFOs, finance operators, and RevOps t
 
 ## System Architecture
 
-```text
-┌─────────────────┐        upload CSV, request analysis        ┌──────────────────┐
-│  React Frontend │ ───────────────────────────────────────────▶│  FastAPI Backend │
-│  (Vite, React19)│◀─────────────────────────────────────────── │                  │
-└─────────────────┘        analysis JSON, chat reply, audio     └──────────────────┘
-        │                                                                 │
-        │ renders                                                        │ calls
-        ▼                                                                 ▼
- Executive Summary · Waterfall · Driver Table                    ElevenLabs TTS API
- Evidence Drawer · Chat Panel · Memory/RAG Panels                (audio briefing)
- Stress Test Panel · Scenario Simulator · PDF Export
-```
+<img width="963" height="617" alt="Screenshot 2026-09-05 at 3 29 56 PM" src="https://github.com/user-attachments/assets/a089a4eb-78b1-4a56-8206-bb82ff24c2eb" />
+
+
 
 ## Tech Stack
 
