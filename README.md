@@ -10,7 +10,7 @@ We have build a website where you can upload some transactional data, and then a
 
 ### Key Features
 
-Month over month revenue increases and decreases on graphs and charts. Analayzing confidence estimates, data quality, sources of variation and citing evidence as estimates
+Month over month revenue increases and decreases on graphs and charts. Analyzing confidence estimates, data quality, sources of variation and citing evidence as estimates
 
 ### Tech Stack
 
