@@ -15,6 +15,7 @@ backend/.chroma/
 backend/.cache/
 backend/ledgerlight_memory.db
 backend/.env
+backend/venv
 
 # Frontend
 node_modules/
