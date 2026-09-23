@@ -1,18 +1,23 @@
-.driver-table-wrap h3 {
-  font-size: 15px;
-  margin-bottom: 2px;
+.panel-heading--table {
+  margin-top: 2px;
 }
 
-.driver-table__subtitle {
-  font-size: 12.5px;
+.driver-table__count {
   color: var(--text-dim);
-  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .driver-table__scroll {
   overflow-x: auto;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
 }
 
 .driver-table {
@@ -26,10 +31,10 @@
   text-align: left;
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0;
   color: var(--text-dim);
-  padding: 10px 14px;
-  background: var(--bg-alt);
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--surface-raised) 78%, var(--bg));
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
@@ -43,11 +48,21 @@
 
 .driver-table tbody tr {
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .driver-table tbody tr:hover {
-  background: var(--accent-bg);
+  background: color-mix(in srgb, var(--accent-bg) 70%, transparent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.driver-table tbody tr:has(.driver-table__empty) {
+  cursor: default;
+}
+
+.driver-table tbody tr:has(.driver-table__empty):hover {
+  background: transparent;
+  box-shadow: none;
 }
 
 .driver-table tbody tr:last-child td {
@@ -56,17 +71,82 @@
 
 .driver-table__driver-name {
   color: var(--text-h);
-  font-weight: 500;
+  font-weight: 700;
   white-space: normal;
 }
 
+.driver-table__empty {
+  color: var(--text-dim);
+  text-align: center;
+  padding: 26px 14px;
+}
+
+.driver-table__account {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.driver-table__account span {
+  color: var(--text-h);
+  font-weight: 700;
+}
+
+.driver-table__account small {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.change-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 62px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.change-pill--up {
+  color: var(--accent-strong);
+  background: var(--accent-bg);
+}
+
+.change-pill--down {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
 .confidence-pill {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 24px;
   font-family: var(--mono);
   font-size: 11.5px;
   background: var(--code-bg);
-  padding: 2px 8px;
   border-radius: 999px;
   color: var(--text-h);
+}
+
+.confidence-pill span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: -1;
+  background: linear-gradient(90deg, var(--accent-bg), rgba(90, 141, 255, 0.18));
+}
+
+.confidence-pill b {
+  font-weight: 900;
 }
 
 .evidence-drawer-overlay {
@@ -79,7 +159,7 @@
 }
 
 .evidence-drawer {
-  width: min(420px, 90vw);
+  width: min(460px, 92vw);
   height: 100%;
   background: var(--surface-raised);
   border-left: 1px solid var(--border);
@@ -100,6 +180,7 @@
 
 .evidence-drawer__header h4 {
   font-size: 16px;
+  color: var(--text-h);
   margin-bottom: 2px;
 }
 
@@ -135,6 +216,7 @@
   color: var(--text-dim);
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .evidence-drawer__source code {
@@ -152,12 +234,14 @@
 
 .evidence-item {
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 12px 14px;
+  background: color-mix(in srgb, var(--surface-raised) 94%, var(--bg));
 }
 
 .evidence-item__top {
   display: flex;
+  gap: 12px;
   justify-content: space-between;
   font-size: 13.5px;
   font-weight: 500;
@@ -176,4 +260,10 @@
 .evidence-item__memo {
   font-size: 12.5px;
   color: var(--text);
+}
+
+@media (max-width: 720px) {
+  .driver-table__scroll {
+    margin-inline: -4px;
+  }
 }

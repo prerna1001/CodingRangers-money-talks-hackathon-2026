@@ -1,0 +1,9 @@
+period_id,start_date,end_date,account_id,account_name,account_type,amount
+2026-07,2026-07-01,2026-07-31,4000,Gross sales,revenue,240000
+2026-07,2026-07-01,2026-07-31,4050,Refunds,revenue,-12000
+2026-07,2026-07-01,2026-07-31,6100,Paid ads,opex,48000
+2026-07,2026-07-01,2026-07-31,5200,Fulfillment costs,cogs,36000
+2026-08,2026-08-01,2026-08-31,4000,Gross sales,revenue,286000
+2026-08,2026-08-01,2026-08-31,4050,Refunds,revenue,-28000
+2026-08,2026-08-01,2026-08-31,6100,Paid ads,opex,72000
+2026-08,2026-08-01,2026-08-31,5200,Fulfillment costs,cogs,47000

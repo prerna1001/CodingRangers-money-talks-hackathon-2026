@@ -1,0 +1,175 @@
+{
+  "run_id": "run_fixture_0001",
+  "company_id": "demo_saas",
+  "current_period": "2026-08",
+  "prior_period": "2026-07",
+  "profile": {
+    "company_profile": {
+      "company_id": "demo_saas",
+      "company_name": "DemoCo",
+      "industry": "B2B SaaS",
+      "business_model": "subscription",
+      "fiscal_year_start_month": 1,
+      "reporting_basis": "accrual",
+      "base_currency": "USD",
+      "primary_revenue_streams": ["SMB subscriptions", "Enterprise subscriptions", "Professional services"],
+      "known_seasonality": ["Q4 enterprise renewals", "summer SMB slowdown"],
+      "materiality_threshold_usd": 5000,
+      "materiality_threshold_pct": 0.05
+    },
+    "periods": [
+      { "period_id": "2026-07", "start_date": "2026-07-01", "end_date": "2026-07-31" },
+      { "period_id": "2026-08", "start_date": "2026-08-01", "end_date": "2026-08-31" }
+    ],
+    "available_files": [
+      { "file_id": "saas_transactions_2026_08", "type": "transaction_csv", "period_id": "2026-08", "sha256": "fixture", "row_count": 5120 }
+    ],
+    "entity_aliases": {
+      "vendor:aws": ["AWS", "Amazon Web Services", "AMZN AWS"]
+    },
+    "normalization_report": ["fixture profile -- no normalization performed"]
+  },
+  "qa_report": {
+    "status": "pass_with_warnings",
+    "data_quality_score": 0.87,
+    "reconciliation": {
+      "by_account": [
+        { "account_id": "4000", "summary": 183000.0, "transactions": 182750.0, "difference": 250.0, "difference_pct": 0.0014, "status": "pass" }
+      ],
+      "worst_difference_pct": 0.0014
+    },
+    "warnings": [
+      { "code": "missing_counterparty", "message": "12 transactions (0.9% of revenue dollars) missing customer_name", "severity": "low" },
+      { "code": "uncategorized_vendor", "message": "Marketing rose 41% with 3 uncategorized vendors ($8.2K)", "severity": "medium" }
+    ],
+    "blocking_issues": [],
+    "safe_to_analyze": true
+  },
+  "facts": [
+    {
+      "fact_id": "f_rev_mom_change",
+      "kind": "variance",
+      "label": "Subscription revenue, month over month",
+      "value": 28000.0,
+      "unit": "USD",
+      "formatted": "+$28.0K",
+      "pct": 0.1806,
+      "basis": { "current": { "period": "2026-08", "value": 183000.0 }, "prior": { "period": "2026-07", "value": 155000.0 } },
+      "significance": { "trailing_mean": 4200.0, "trailing_sd": 6100.0, "z": 3.9, "outside_control_limits": true },
+      "evidence_txn_ids": ["txn_2026_08_004173", "txn_2026_08_004174"],
+      "evidence_count": 412,
+      "confidence": 0.91
+    },
+    {
+      "fact_id": "f_drv_enterprise_expansion",
+      "kind": "driver",
+      "label": "Enterprise subscription expansion",
+      "value": 42000.0,
+      "unit": "USD",
+      "formatted": "+$42.0K",
+      "pct": null,
+      "basis": null,
+      "significance": null,
+      "evidence_txn_ids": ["txn_2026_08_004173", "txn_2026_08_004521", "txn_2026_08_004988"],
+      "evidence_count": 3,
+      "confidence": 0.91
+    },
+    {
+      "fact_id": "f_drv_smb_churn",
+      "kind": "driver",
+      "label": "SMB churn",
+      "value": -9000.0,
+      "unit": "USD",
+      "formatted": "-$9.0K",
+      "pct": null,
+      "basis": null,
+      "significance": null,
+      "evidence_txn_ids": ["txn_2026_07_002991"],
+      "evidence_count": 1,
+      "confidence": 0.85
+    },
+    {
+      "fact_id": "f_drv_services_decline",
+      "kind": "driver",
+      "label": "Professional services revenue decline",
+      "value": -5000.0,
+      "unit": "USD",
+      "formatted": "-$5.0K",
+      "pct": null,
+      "basis": null,
+      "significance": null,
+      "evidence_txn_ids": [],
+      "evidence_count": 6,
+      "confidence": 0.78
+    },
+    {
+      "fact_id": "f_concentration_top3",
+      "kind": "concentration",
+      "label": "Top 3 customers, share of gross revenue increase",
+      "value": 64.0,
+      "unit": "pct",
+      "formatted": "64%",
+      "pct": 0.64,
+      "basis": null,
+      "significance": null,
+      "evidence_txn_ids": ["txn_2026_08_004173", "txn_2026_08_004521", "txn_2026_08_004988"],
+      "evidence_count": 3,
+      "confidence": 0.91
+    },
+    {
+      "fact_id": "f_hosting_mom_change",
+      "kind": "variance",
+      "label": "Cloud hosting, month over month",
+      "value": 6400.0,
+      "unit": "USD",
+      "formatted": "+$6.4K",
+      "pct": 0.22,
+      "basis": { "current": { "period": "2026-08", "value": 35500.0 }, "prior": { "period": "2026-07", "value": 29100.0 } },
+      "significance": { "trailing_mean": 1200.0, "trailing_sd": 900.0, "z": 5.7, "outside_control_limits": true },
+      "evidence_txn_ids": ["txn_2026_08_005011"],
+      "evidence_count": 412,
+      "confidence": 0.88
+    },
+    {
+      "fact_id": "f_hosting_usage_timing",
+      "kind": "anomaly",
+      "label": "Hosting usage increase began before product launch",
+      "value": 14.0,
+      "unit": "days_before_launch",
+      "formatted": "14 days before launch",
+      "pct": null,
+      "basis": null,
+      "significance": null,
+      "evidence_txn_ids": ["txn_2026_08_005011"],
+      "evidence_count": 412,
+      "confidence": 0.83
+    }
+  ],
+  "memories": [
+    {
+      "memory_id": "mem_q_end_renewals",
+      "company_id": "demo_saas",
+      "memory_type": "business_pattern",
+      "content": "Enterprise renewals spike in the last month of each quarter.",
+      "scope": { "accounts": ["4000"], "counterparties": [], "categories": ["enterprise_subscription"] },
+      "evidence_run_ids": ["run_0142", "run_0161"],
+      "corroboration_count": 2,
+      "contradiction_count": 0,
+      "confidence": 0.82,
+      "status": "confirmed",
+      "created_at": "2026-06-30T12:04:00Z",
+      "last_reinforced_at": "2026-06-30T12:04:00Z",
+      "source": "system",
+      "user_edited": false
+    }
+  ],
+  "retrieved": [
+    {
+      "chunk_id": "chunk_prior_report_07",
+      "source": "prior_analysis_report:2026-07",
+      "text": "July's enterprise expansion was driven by Northwind Labs adding 20 seats mid-month.",
+      "relevance_score": 0.86,
+      "metadata": { "period_id": "2026-07" }
+    }
+  ]
+}

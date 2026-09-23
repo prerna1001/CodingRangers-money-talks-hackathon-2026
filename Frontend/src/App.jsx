@@ -36,14 +36,17 @@ function App() {
     }
   }
 
-  const handleUploaded = async () => {
+  // `uploaded` is the array of /api/upload responses (UploadCard passes it
+  // through). analyzeRun splits them into transaction vs period-summary ids;
+  // with none, the backend falls back to its built-in demo dataset.
+  const handleUploaded = async (uploaded) => {
     timelineDoneRef.current = false
     analysisRef.current = null
     setPhase('analyzing')
     setAnalysis(null)
     setError(null)
     try {
-      const res = await analyzeRun()
+      const res = await analyzeRun(uploaded)
       analysisRef.current = res
       setAnalysis(res)
       tryEnterDashboard()

@@ -1,0 +1,11 @@
+{
+  "company_id": "demo_healthcare",
+  "current_period": "2026-08",
+  "prior_period": "2026-07",
+  "expected": {
+    "patient_revenue_change": 4000,
+    "billing_adjustment_change": -13000,
+    "contractor_labor_change": 23000,
+    "missing_counterparty_present": false
+  }
+}

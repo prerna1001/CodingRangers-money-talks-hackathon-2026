@@ -23,10 +23,25 @@ const TABS = [
 
 export default function Dashboard({ analysis, onReset }) {
   const [tab, setTab] = useState('summary')
+  const periods = analysis?.periods ?? {}
+  const prior = periods.prior ?? { label: 'Prior', revenue: 0 }
+  const current = periods.current ?? { label: 'Current', revenue: 0 }
+  const drivers = Array.isArray(analysis?.drivers) ? analysis.drivers : []
+  const waterfall = Array.isArray(analysis?.waterfall) ? analysis.waterfall : []
+  const agentTimeline = Array.isArray(analysis?.agent_timeline) ? analysis.agent_timeline : []
 
-  const revenueChangePct = Math.round(
-    ((analysis.periods.current.revenue - analysis.periods.prior.revenue) / analysis.periods.prior.revenue) * 100,
-  )
+  const priorRevenue = Number(prior.revenue) || 0
+  const currentRevenue = Number(current.revenue) || 0
+  const revenueChangePct = priorRevenue
+    ? Math.round(((currentRevenue - priorRevenue) / priorRevenue) * 100)
+    : 0
+  const normalizedAnalysis = {
+    ...analysis,
+    periods: { prior, current },
+    drivers,
+    waterfall,
+    agent_timeline: agentTimeline,
+  }
 
   return (
     <div className="dashboard">
@@ -49,20 +64,19 @@ export default function Dashboard({ analysis, onReset }) {
       </div>
 
       <div className="dashboard__panel">
-        {tab === 'summary' && <ExecutiveSummary analysis={analysis} />}
+        {tab === 'summary' && <ExecutiveSummary analysis={normalizedAnalysis} />}
         {tab === 'drivers' && (
-          <>
-            <WaterfallChart waterfall={analysis.waterfall} />
-            <div className="dashboard__spacer" />
-            <DriverTable drivers={analysis.drivers} />
-          </>
+          <div className="dashboard__drivers-grid">
+            <WaterfallChart waterfall={waterfall} drivers={drivers} />
+            <DriverTable drivers={drivers} />
+          </div>
         )}
-        {tab === 'pipeline' && <PipelinePanel steps={analysis.agent_timeline} />}
+        {tab === 'pipeline' && <PipelinePanel steps={agentTimeline} />}
         {tab === 'memory' && <MemoryPanel />}
         {tab === 'rag' && <RagPanel />}
         {tab === 'stress' && <StressTestPanel />}
         {tab === 'scenarios' && <ScenarioSimulator baselinePct={revenueChangePct} />}
-        {tab === 'report' && <ReportPanel analysis={analysis} />}
+        {tab === 'report' && <ReportPanel analysis={normalizedAnalysis} />}
       </div>
     </div>
   )
