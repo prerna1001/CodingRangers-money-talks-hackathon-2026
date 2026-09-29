@@ -1,8 +1,8 @@
 """The server-rendered login screen served at `GET /`.
 
-Kept out of main.py so the route wiring there stays readable. The page is
-static apart from the signed-in branch, which renders the Auth0 profile and
-then hands the browser off to the original application.
+Kept out of main.py so the route wiring there stays readable. A signed-in
+visitor never reaches this page -- `/` answers them with a 302 to the
+application instead.
 """
 
 from __future__ import annotations
@@ -70,46 +70,6 @@ h1 {
     color: #cbd5e0;
     margin: 0 0 1.6rem;
 }
-.success {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #68d391;
-    background: rgba(104, 211, 145, 0.12);
-    border: 1px solid rgba(104, 211, 145, 0.3);
-    border-radius: 999px;
-    padding: 0.5rem 1.1rem;
-    margin-bottom: 1.75rem;
-}
-.profile {
-    background: rgba(45, 49, 60, 0.75);
-    border: 1px solid rgba(148, 163, 184, 0.12);
-    border-radius: 18px;
-    padding: 2rem 1.5rem;
-    margin-bottom: 2rem;
-}
-.profile-image {
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    border: 3px solid #00a8cc;
-    box-shadow: 0 0 0 6px rgba(0, 168, 204, 0.14);
-    object-fit: cover;
-    margin-bottom: 1.1rem;
-}
-.profile-name {
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: #f7fafc;
-    margin-bottom: 0.35rem;
-}
-.profile-email {
-    font-size: 1rem;
-    color: #a0aec0;
-    word-break: break-all;
-}
 .button {
     padding: 1rem 2.6rem;
     font-size: 1.05rem;
@@ -134,15 +94,6 @@ h1 {
 .button.login:hover {
     transform: translateY(-4px) scale(1.03);
     box-shadow: 0 16px 34px rgba(0, 168, 204, 0.35);
-}
-.button.logout {
-    background: #fc8181;
-    color: #1a1e27;
-}
-.button.logout:hover {
-    background: #e53e3e;
-    transform: translateY(-4px) scale(1.03);
-    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
 }
 .meta {
     margin-top: 2rem;
@@ -199,37 +150,6 @@ def login_page(login_url: str, app_url: str) -> str:
         <p class="meta">
             Redirects to <code>{escape(app_url)}</code> once authenticated.
         </p>
-        """,
-    )
-
-
-def signed_in_page(user: dict | None, app_url: str) -> str:
-    user = user or {}
-    name = user.get("name") or user.get("nickname") or "Signed-in user"
-    email = user.get("email", "")
-    picture = user.get("picture") or (
-        "data:image/svg+xml;utf8,"
-        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'>"
-        "<rect width='96' height='96' fill='%232d313c'/>"
-        "<circle cx='48' cy='38' r='16' fill='%2363b3ed'/>"
-        "<path d='M16 88c6-20 18-30 32-30s26 10 32 30z' fill='%2363b3ed'/>"
-        "</svg>"
-    )
-    return _page(
-        f"Signed in as {name} | Ledgerlight",
-        f"""
-        <h1>Ledgerlight</h1>
-        <div class="success">&#10003; Successfully authenticated</div>
-        <div class="profile">
-            <img src="{escape(picture, quote=True)}" alt="{escape(name)}" class="profile-image">
-            <div class="profile-name">{escape(name)}</div>
-            <div class="profile-email">{escape(email)}</div>
-        </div>
-        <p class="meta">Loading your workspace&hellip;</p>
-        <script>window.location.replace({escape(app_url, quote=True)});</script>
-        <noscript>
-            <a href="{escape(app_url, quote=True)}" class="button login">Open App</a>
-        </noscript>
         """,
     )
 

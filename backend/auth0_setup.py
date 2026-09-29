@@ -22,6 +22,7 @@ from __future__ import annotations
 import os
 import secrets
 from typing import Any
+from urllib.parse import unquote, urlparse
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, Response, status
@@ -75,6 +76,60 @@ AUTH0_ENABLED = not _MISSING
 # serve the ledger to anonymous callers. AUTH0_REQUIRED=0 is the deliberate
 # escape hatch for local work before the tenant exists.
 AUTH0_REQUIRED = _env_bool("AUTH0_REQUIRED", True) if AUTH0_ENABLED else False
+
+# Written by the frontend (Frontend/src/App.jsx, useAuthGate) just before it
+# sends the browser off to sign in. Cookies ignore ports, so a cookie set on
+# localhost:5173 is sent to localhost:8000 too, which is what makes this
+# survive the Auth0 round trip.
+APP_ORIGIN_COOKIE = "ledgerlight_app_origin"
+
+# Redirect targets are restricted to these. Anything else is ignored and we
+# fall back to APP_URL: this endpoint is a redirect, so honouring an arbitrary
+# origin would be an open redirect (a phishing primitive). Loopback is allowed
+# because Vite picks a different port whenever 5173 is taken, and that is the
+# whole reason this function exists.
+_LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
+
+
+def _origin_of(raw: str | None) -> str | None:
+    """Reduce a URL to ``scheme://host:port``, or None if it isn't one."""
+    if not raw:
+        return None
+    try:
+        parsed = urlparse(raw.strip())
+    except ValueError:
+        return None
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        return None
+    return f"{parsed.scheme}://{parsed.netloc}"
+
+
+def _is_trusted_app_origin(origin: str | None) -> bool:
+    if not origin:
+        return False
+    if origin in {_origin_of(APP_URL), _origin_of(APP_BASE_URL)}:
+        return True
+    parsed = urlparse(origin)
+    return parsed.scheme == "http" and parsed.hostname in _LOOPBACK_HOSTS
+
+
+def resolve_app_url(request: Request) -> str:
+    """Where a completed sign-in should send the browser.
+
+    Priority: the origin the browser actually came from, then APP_URL. The
+    cookie is written by the frontend before it redirects to login; the
+    Referer is a weaker second signal and only honoured when it agrees with
+    the allowlist, since the Auth0 callback's own Referer points at Auth0.
+    """
+    candidates = [
+        unquote(request.cookies.get(APP_ORIGIN_COOKIE, "")),
+        request.headers.get("referer", ""),
+    ]
+    for candidate in candidates:
+        origin = _origin_of(candidate)
+        if _is_trusted_app_origin(origin):
+            return f"{origin}/"
+    return f"{APP_URL}/"
 
 
 def _load_sdk():

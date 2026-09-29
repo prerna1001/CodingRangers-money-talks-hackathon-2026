@@ -12,11 +12,11 @@ from __future__ import annotations
 
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 import auth0_setup
 from api.routes import analyze, health, memory, reports, scenarios, stress_tests, upload, voice
-from login_page import login_page, setup_required_page, signed_in_page
+from login_page import login_page, setup_required_page
 
 app = FastAPI(title="Ledgerlight API", version="0.1.0")
 
@@ -57,7 +57,9 @@ async def home(request: Request, response: Response):
 
     The callback sends the browser here, because the SDK only accepts a
     ``returnTo`` on the backend's own origin -- so this route is what forwards
-    a completed sign-in on to the Ledgerlight frontend.
+    a completed sign-in on to the Ledgerlight frontend. The forward is a plain
+    302 rather than a meta-refresh or a script: it works with JS disabled and
+    cannot break on quoting the URL into a string literal.
     """
     if not auth0_setup.AUTH0_ENABLED:
         return setup_required_page(
@@ -70,8 +72,7 @@ async def home(request: Request, response: Response):
             auth0_setup.status_summary()["login_url"], auth0_setup.APP_URL
         )
 
-    user = await auth0_setup.current_user(request, response)
-    return signed_in_page(user, auth0_setup.APP_URL)
+    return RedirectResponse(auth0_setup.resolve_app_url(request), status_code=302)
 
 
 @app.get("/profile")
