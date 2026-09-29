@@ -3,6 +3,23 @@
 
 import { API_ENDPOINTS } from '../constants/api'
 
+// GET /api/auth/status — the boot gate. Never 401s (by design, see
+// backend/auth0_setup.py), so this resolves for anonymous callers too and is
+// what tells the UI whether to render the app or send the browser to sign in.
+// The response also carries the absolute login/logout URLs: the backend is a
+// different origin than Vite's dev server and only /api is proxied, so
+// /auth/* has to be addressed in full.
+export async function fetchAuthStatus() {
+  const res = await fetch(API_ENDPOINTS.authStatus, { credentials: 'same-origin' })
+
+  if (!res.ok) {
+    const detail = await res.json().catch(() => null)
+    throw new Error(detail?.detail || `Auth status failed with status ${res.status}`)
+  }
+
+  return res.json()
+}
+
 // POST /api/upload — the file is sent as real multipart form-data (the
 // standard way to upload a file), not embedded as JSON text. The backend
 // parses it into canonical transactions and returns { file_id, sha256,

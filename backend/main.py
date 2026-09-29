@@ -53,16 +53,25 @@ app.include_router(scenarios.router, prefix="/api", tags=["scenarios"], dependen
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, response: Response):
     """Login screen for anonymous visitors; the original application for
-    everyone who already has a session."""
+    everyone who already has a session.
+
+    The callback sends the browser here, because the SDK only accepts a
+    ``returnTo`` on the backend's own origin -- so this route is what forwards
+    a completed sign-in on to the Ledgerlight frontend.
+    """
     if not auth0_setup.AUTH0_ENABLED:
-        return setup_required_page(auth0_setup.status_summary()["missing_env"], auth0_setup.APP_URL)
+        return setup_required_page(
+            auth0_setup.status_summary()["missing_env"], auth0_setup.APP_URL
+        )
 
     session = await auth0_setup.current_session(request, response)
     if not session:
-        return login_page("/auth/login", auth0_setup.APP_URL)
+        return login_page(
+            auth0_setup.status_summary()["login_url"], auth0_setup.APP_URL
+        )
 
     user = await auth0_setup.current_user(request, response)
-    return signed_in_page(user, "/auth/logout", auth0_setup.APP_URL)
+    return signed_in_page(user, auth0_setup.APP_URL)
 
 
 @app.get("/profile")
@@ -81,10 +90,10 @@ async def profile(
 
 
 @app.get("/api/auth/status")
-async def auth_status():
-    """Unauthenticated by design: the frontend calls this on boot to decide
-    whether to show a sign-in button or go straight to the dashboard."""
-    return auth0_setup.status_summary()
+async def auth_status(request: Request, response: Response):
+    """Public by design and never 401s: the frontend calls this on boot to
+    decide whether to render the app or bounce the browser to sign in."""
+    return await auth0_setup.auth_status(request, response)
 
 
 if __name__ == "__main__":
