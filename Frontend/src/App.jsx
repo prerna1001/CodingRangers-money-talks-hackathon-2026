@@ -32,6 +32,13 @@ function useAuthGate() {
       .then((status) => {
         if (cancelled) return
         if (status.auth_required && !status.authenticated) {
+          // Record where the visitor came from so /auth/callback can send
+          // them back here even though Vite is on a different port than the
+          // backend. Cookies ignore ports, so localhost is enough to carry
+          // this across the Auth0 round trip.
+          document.cookie =
+            `ledgerlight_app_origin=${encodeURIComponent(window.location.origin)}` +
+            '; path=/; max-age=600; SameSite=Lax'
           window.location.replace(status.login_url)
           return
         }
