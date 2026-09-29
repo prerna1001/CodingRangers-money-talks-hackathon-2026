@@ -51,6 +51,25 @@
   color: var(--text-dim);
 }
 
+/* Only rendered once the backend confirms a session (App.jsx useAuthGate),
+   so it doubles as "you are signed in" plus the way out. */
+.page__signout {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.page__signout:hover {
+  color: var(--text-h);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
 .page__main {
   flex: 1;
   display: flex;
