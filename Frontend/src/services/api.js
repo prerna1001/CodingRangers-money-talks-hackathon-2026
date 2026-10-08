@@ -3,9 +3,10 @@
 
 import { API_ENDPOINTS } from '../constants/api'
 
-// GET /api/auth/status — the boot gate. Never 401s (by design, see
-// backend/auth0_setup.py), so this resolves for anonymous callers too and is
-// what tells the UI whether to render the app or send the browser to sign in.
+// GET /api/auth/status — the session probe every route relies on. Never 401s
+// (by design, see backend/auth0_setup.py), so it resolves for anonymous
+// callers too and is what tells the homepage which CTA to show and the /app
+// guard whether to let the visitor in.
 // The response also carries the absolute login/logout URLs: the backend is a
 // different origin than Vite's dev server and only /api is proxied, so
 // /auth/* has to be addressed in full.

@@ -13,8 +13,8 @@ are real values, `AUTH0_ENABLED` flips to True and:
   * `SessionMiddleware` is installed (it signs the SDK's session cookie),
   * `/auth/login`, `/auth/callback`, `/auth/logout` are mounted,
   * `require_session` gates the existing `/api/*` routers,
-  * `GET /` renders the login screen, and a signed-in user is forwarded to
-    the original application (the Vite frontend, see `APP_URL`).
+  * `GET /` forwards browsers to the frontend homepage (the Vite app at
+    `APP_URL`), where the public homepage owns the sign-in button.
 """
 
 from __future__ import annotations
@@ -77,10 +77,12 @@ AUTH0_ENABLED = not _MISSING
 # escape hatch for local work before the tenant exists.
 AUTH0_REQUIRED = _env_bool("AUTH0_REQUIRED", True) if AUTH0_ENABLED else False
 
-# Written by the frontend (Frontend/src/App.jsx, useAuthGate) just before it
+# Written by the frontend (Frontend/src/pages/HomePage.jsx) just before it
 # sends the browser off to sign in. Cookies ignore ports, so a cookie set on
 # localhost:5173 is sent to localhost:8000 too, which is what makes this
-# survive the Auth0 round trip.
+# survive the Auth0 round trip. The value carries a path as well as an origin
+# (e.g. http://localhost:5173/app) so a completed sign-in lands on the app
+# rather than back on the homepage.
 APP_ORIGIN_COOKIE = "ledgerlight_app_origin"
 
 # Redirect targets are restricted to these. Anything else is ignored and we
@@ -113,22 +115,47 @@ def _is_trusted_app_origin(origin: str | None) -> bool:
     return parsed.scheme == "http" and parsed.hostname in _LOOPBACK_HOSTS
 
 
+def _trusted_app_target(raw: str | None) -> str | None:
+    """Reduce a URL to ``scheme://host[:port]/path`` if it points at the
+    frontend, or None. Query and fragment are dropped; so is a path starting
+    with ``//``, which some browsers would re-parse as a protocol-relative
+    URL. The backend's own origin is rejected: a Referer from /auth/callback
+    would otherwise bounce the browser straight back here in a redirect loop.
+    """
+    if not raw:
+        return None
+    try:
+        parsed = urlparse(raw.strip())
+    except ValueError:
+        return None
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        return None
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    if not _is_trusted_app_origin(origin) or origin == _origin_of(APP_BASE_URL):
+        return None
+    path = parsed.path or "/"
+    if not path.startswith("/") or path.startswith("//"):
+        return None
+    return f"{origin}{path}"
+
+
 def resolve_app_url(request: Request) -> str:
     """Where a completed sign-in should send the browser.
 
-    Priority: the origin the browser actually came from, then APP_URL. The
-    cookie is written by the frontend before it redirects to login; the
-    Referer is a weaker second signal and only honoured when it agrees with
-    the allowlist, since the Auth0 callback's own Referer points at Auth0.
+    Priority: the URL the browser actually came from (the origin cookie the
+    homepage wrote before redirecting to login, path included so /app
+    survives the round trip), then the Referer as a weaker second signal,
+    then APP_URL. Only frontend targets count -- the Auth0 callback's own
+    Referer points at this backend.
     """
     candidates = [
         unquote(request.cookies.get(APP_ORIGIN_COOKIE, "")),
         request.headers.get("referer", ""),
     ]
     for candidate in candidates:
-        origin = _origin_of(candidate)
-        if _is_trusted_app_origin(origin):
-            return f"{origin}/"
+        target = _trusted_app_target(candidate)
+        if target:
+            return target
     return f"{APP_URL}/"
 
 
@@ -218,7 +245,7 @@ async def require_session(request: Request, response: Response) -> dict[str, Any
 
 async def current_session(request: Request, response: Response) -> dict[str, Any] | None:
     """Like `require_session` but never raises -- used by `GET /` to decide
-    between the login screen and the application redirect."""
+    between the frontend homepage redirect and the application redirect."""
     if not AUTH0_ENABLED:
         return None
     try:
@@ -262,8 +289,9 @@ def status_summary() -> dict[str, Any]:
 async def auth_status(request: Request, response: Response) -> dict[str, Any]:
     """/api/auth/status, including whether *this* caller has a session.
 
-    Never raises: the frontend calls it on boot precisely to find out whether
-    it is allowed to render, so a 401 here would be a deadlock.
+    Never raises: the frontend calls it on every page load to pick the
+    homepage CTA and to decide whether /app may open, so a 401 here would be
+    a deadlock.
     """
     summary = status_summary()
     if not AUTH0_ENABLED:

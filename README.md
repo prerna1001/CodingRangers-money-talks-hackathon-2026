@@ -184,11 +184,15 @@ APP_BASE_URL=http://localhost:8000   # backend, serves /auth/callback
 APP_URL=http://localhost:5173        # frontend, loaded after sign-in
 ```
 
-Restart uvicorn and browse to <http://localhost:8000>. Anonymous visitors get
-the login screen; `Log In` runs the Auth0 round trip and the callback drops you
-on the Ledgerlight frontend at `APP_URL`, where the session cookie authorises
-every `/api/*` call. The cookie is a `localhost` cookie, so the Vite proxy
-forwards it without any frontend change.
+Restart uvicorn, start the Vite dev server, and browse to
+<http://localhost:5173>. The homepage is public: anonymous visitors see a
+`Log in` button, signed-in visitors see `Navigate to app`. `Log in` runs the
+Auth0 round trip and the callback drops you on the app at
+<http://localhost:5173/app>, where the session cookie authorises every
+`/api/*` call. Every other path (`/app` included) bounces signed-out visitors
+back to the homepage — sign-in only ever starts from a click. Signing out
+returns to the homepage as well. The cookie is a `localhost` cookie, so the
+Vite proxy forwards it without any frontend change.
 
 While the tenant values are still placeholders the backend logs which ones are
 missing, serves `/` as a setup checklist, and leaves `/api/*` open so the
