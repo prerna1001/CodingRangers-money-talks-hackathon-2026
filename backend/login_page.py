@@ -1,8 +1,9 @@
-"""The server-rendered login screen served at `GET /`.
+"""Server-rendered fallback pages served at `GET /` when Auth0 is not
+configured yet.
 
-Kept out of main.py so the route wiring there stays readable. A signed-in
-visitor never reaches this page -- `/` answers them with a 302 to the
-application instead.
+The sign-in flow itself now starts on the frontend homepage
+(localhost:5173), so the only page left here is the setup checklist.
+Kept out of main.py so the route wiring there stays readable.
 """
 
 from __future__ import annotations
@@ -135,23 +136,6 @@ def _page(title: str, body: str) -> str:
     </div>
 </body>
 </html>"""
-
-
-def login_page(login_url: str, app_url: str) -> str:
-    return _page(
-        "Sign in | Ledgerlight",
-        f"""
-        <h1>Ledgerlight</h1>
-        <p class="subtitle">Sign in to load your financial intelligence workspace.</p>
-        <div class="action-card">
-            <p class="action-text">Get started by signing in to your account</p>
-            <a href="{escape(login_url, quote=True)}" class="button login">Log In</a>
-        </div>
-        <p class="meta">
-            Redirects to <code>{escape(app_url)}</code> once authenticated.
-        </p>
-        """,
-    )
 
 
 def setup_required_page(missing: list[str], app_url: str) -> str:

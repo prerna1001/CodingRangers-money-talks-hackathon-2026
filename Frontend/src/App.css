@@ -51,7 +51,7 @@
   color: var(--text-dim);
 }
 
-/* Only rendered once the backend confirms a session (App.jsx useAuthGate),
+/* Only rendered behind RequireAuth (signed in confirmed by the backend),
    so it doubles as "you are signed in" plus the way out. */
 .page__signout {
   font-size: 13px;
@@ -84,6 +84,48 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.home__main {
+  align-items: center;
+}
+
+.home__card {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  padding: 44px 36px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.home__title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text-h);
+  letter-spacing: -0.01em;
+}
+
+.home__lead {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.home__cta {
+  margin-top: 6px;
+  padding: 11px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 @media (max-width: 640px) {

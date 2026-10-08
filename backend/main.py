@@ -4,8 +4,8 @@ Run with: .venv/Scripts/python.exe -m uvicorn main:app --reload
 
 The `/api/*` routers below are the original Ledgerlight surface and are
 unchanged. Auth0 gates them: with a configured tenant every one of them
-requires a session, and `GET /` serves the login screen that hands off to the
-original application once the callback completes.
+requires a session, and `GET /` forwards browsers to the frontend -- the
+public homepage at APP_URL, where sign-in starts on demand.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 import auth0_setup
 from api.routes import analyze, health, memory, reports, scenarios, stress_tests, upload, voice
-from login_page import login_page, setup_required_page
+from login_page import setup_required_page
 
 app = FastAPI(title="Ledgerlight API", version="0.1.0")
 
@@ -52,14 +52,17 @@ app.include_router(scenarios.router, prefix="/api", tags=["scenarios"], dependen
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, response: Response):
-    """Login screen for anonymous visitors; the original application for
-    everyone who already has a session.
+    """Forwards browsers to the frontend.
 
-    The callback sends the browser here, because the SDK only accepts a
-    ``returnTo`` on the backend's own origin -- so this route is what forwards
-    a completed sign-in on to the Ledgerlight frontend. The forward is a plain
-    302 rather than a meta-refresh or a script: it works with JS disabled and
-    cannot break on quoting the URL into a string literal.
+    Two callers land here: the Auth0 callback (the SDK only accepts a
+    ``returnTo`` on the backend's own origin, so this route is what sends a
+    completed sign-in on to the Vite app -- the origin cookie it carries picks
+    the path, normally /app), and anyone who types localhost:8000 by hand or
+    arrives here after signing out, who is sent to the public homepage at
+    APP_URL instead of a login screen that no longer exists.
+
+    Plain 302s rather than a meta-refresh or a script: they work with JS
+    disabled and cannot break on quoting a URL into a string literal.
     """
     if not auth0_setup.AUTH0_ENABLED:
         return setup_required_page(
@@ -68,9 +71,7 @@ async def home(request: Request, response: Response):
 
     session = await auth0_setup.current_session(request, response)
     if not session:
-        return login_page(
-            auth0_setup.status_summary()["login_url"], auth0_setup.APP_URL
-        )
+        return RedirectResponse(f"{auth0_setup.APP_URL}/", status_code=302)
 
     return RedirectResponse(auth0_setup.resolve_app_url(request), status_code=302)
 
@@ -92,8 +93,8 @@ async def profile(
 
 @app.get("/api/auth/status")
 async def auth_status(request: Request, response: Response):
-    """Public by design and never 401s: the frontend calls this on boot to
-    decide whether to render the app or bounce the browser to sign in."""
+    """Public by design and never 401s: the frontend calls this to decide
+    which homepage CTA to show and whether /app may open."""
     return await auth0_setup.auth_status(request, response)
 
 
