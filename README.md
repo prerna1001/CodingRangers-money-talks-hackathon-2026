@@ -160,6 +160,45 @@ npm run dev
 
 The frontend expects the backend at the URL configured in [`src/constants/api.js`](Frontend/src/constants/api.js), with CORS already allowed for `http://localhost:5173`.
 
+## Auth0 sign-in
+
+The API is gated behind Auth0. `backend/auth0_setup.py` owns the wiring;
+`backend/main.py` mounts it and leaves the original `/api/*` routers untouched.
+
+Create a **Regular Web Application** in your Auth0 tenant and set:
+
+| Setting | Value |
+| --- | --- |
+| Allowed Callback URLs | `http://localhost:8000/auth/callback` |
+| Allowed Logout URLs | `http://localhost:8000` |
+| Allowed Web Origins | `http://localhost:8000` |
+
+Then fill in `backend/.env`:
+
+```bash
+AUTH0_DOMAIN=your-tenant.us.auth0.com
+AUTH0_CLIENT_ID=...
+AUTH0_CLIENT_SECRET=...
+SESSION_SECRET=...        # openssl rand -hex 64
+APP_BASE_URL=http://localhost:8000   # backend, serves /auth/callback
+APP_URL=http://localhost:5173        # frontend, loaded after sign-in
+```
+
+Restart uvicorn, start the Vite dev server, and browse to
+<http://localhost:5173>. The homepage is public: anonymous visitors see a
+`Log in` button, signed-in visitors see `Navigate to app`. `Log in` runs the
+Auth0 round trip and the callback drops you on the app at
+<http://localhost:5173/app>, where the session cookie authorises every
+`/api/*` call. Every other path (`/app` included) bounces signed-out visitors
+back to the homepage — sign-in only ever starts from a click. Signing out
+returns to the homepage as well. The cookie is a `localhost` cookie, so the
+Vite proxy forwards it without any frontend change.
+
+While the tenant values are still placeholders the backend logs which ones are
+missing, serves `/` as a setup checklist, and leaves `/api/*` open so the
+existing demo and test flows keep working. Set `AUTH0_REQUIRED=0` to force
+that open mode even with a configured tenant.
+
 ## Team
 
 Coding Rangers — Maximor Money Operations Track, 2026.

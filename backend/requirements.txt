@@ -11,6 +11,13 @@ rank-bm25>=0.2
 python-multipart>=0.0.12
 python-dotenv>=1.0
 
+# --- Auth0 (login gate for the whole API) ---
+# itsdangerous is required by starlette's SessionMiddleware, which the Auth0
+# FastAPI SDK needs for its session/transaction cookies. Omitting it makes
+# auth fail at runtime with ModuleNotFoundError, not at install time.
+auth0-fastapi>=1.0.0b11
+itsdangerous>=2.2
+
 # --- Codex's half: analytics, data, persistence, eval ---
 pandas>=2.2
 numpy>=2.0
