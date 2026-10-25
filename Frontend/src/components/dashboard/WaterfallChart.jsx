@@ -49,8 +49,9 @@ export default function WaterfallChart({ waterfall, drivers = [], onSelectDriver
     .map((d) => `${d.label} ${d.isTotal ? ledgerMoney(d.end) : ledgerChange(d.delta)}`)
     .join(', ')
 
-  // Classic stacked-bar waterfall: an invisible "base" bar lifts each
-  // visible bar to where the running total stood before that step.
+  // Stacked-bar waterfall: under each driver bar sits the revenue carried
+  // forward from the steps before it, in a soft tint, so no bar floats
+  // over empty space.
   const build = (t) => ({
     ...baseOption(t),
     grid: { left: 8, right: 8, top: 36, bottom: 8, containLabel: true },
@@ -75,7 +76,7 @@ export default function WaterfallChart({ waterfall, drivers = [], onSelectDriver
         type: 'bar',
         stack: 'waterfall',
         silent: true,
-        itemStyle: { color: 'transparent' },
+        itemStyle: { color: t.chartCarry, borderRadius: 2 },
         emphasis: { disabled: true },
         tooltip: { show: false },
         data: data.map((d) => (d.isTotal ? 0 : Math.min(d.start, d.end))),
@@ -133,6 +134,7 @@ export default function WaterfallChart({ waterfall, drivers = [], onSelectDriver
       </div>
       <div className="waterfall-chart__legend">
         <span><i style={{ background: 'var(--chart-total)' }} /> Period total</span>
+        <span><i style={{ background: 'var(--chart-carry)' }} /> Carried forward</span>
         <span><i style={{ background: 'var(--chart-up)' }} /> Increase</span>
         <span><i style={{ background: 'var(--chart-down)' }} /> Decrease</span>
       </div>

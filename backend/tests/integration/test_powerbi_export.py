@@ -150,6 +150,36 @@ def test_every_visual_field_exists_in_the_model(finished_run):
                         assert (entities[ref["Expression"]["SourceRef"]["Source"]], ref["Property"]) in columns
 
 
+def test_overview_has_percent_pie_and_thousands(finished_run):
+    archive = _package(finished_run)
+    for theme_key in REPORT_THEMES:
+        report = json.loads(archive.read(f"reports/Ledgerlight {theme_key}.Report/report.json"))
+        overview = [json.loads(c["config"])["singleVisual"] for c in report["sections"][0]["visualContainers"]]
+        pie = next(v for v in overview if v["visualType"] == "pieChart")
+        assert "percent of total" in pie["objects"]["labels"][0]["properties"]["labelStyle"]["expr"]["Literal"]["Value"]
+        for visual in overview:
+            if visual["visualType"] in ("columnChart", "clusteredBarChart"):
+                units = visual["objects"]["labels"][0]["properties"]["labelDisplayUnits"]
+                assert units["expr"]["Literal"]["Value"] == "1000D"
+        # The bridge is stacked columns whose carried-forward series fills the
+        # space under each driver bar; no floating bars over empty space.
+        bridge_visual = next(v for v in overview if v["visualType"] == "columnChart")
+        fills = {d["selector"]["metadata"] for d in bridge_visual["objects"]["dataPoint"]}
+        assert "Sum(BridgeChart.chart_carried)" in fills
+
+    workbook = load_workbook(io.BytesIO(archive.read(f"data/Ledgerlight_{finished_run}.xlsx")))
+    bridge = _sheet_rows(workbook, "Bridge")
+    assert all("%)" in row["bridge_label"] for row in bridge if row["bridge_type"] != "start")
+    chart = _sheet_rows(workbook, "BridgeChart")
+    summary = _sheet_rows(workbook, "Summary")[0]
+    assert chart[0]["chart_total"] == summary["from_revenue"] and chart[-1]["chart_total"] == summary["to_revenue"]
+    for row in chart[1:-1]:
+        # Each driver column stands on the running total, which ties to the close.
+        assert row["chart_carried"] is not None
+    assert round(chart[-2]["chart_carried"] + (chart[-2]["chart_increase"] or 0), 2) == round(summary["to_revenue"], 2)
+    assert all(row["driver_label"].endswith(("%)", "(new)")) for row in _sheet_rows(workbook, "Drivers"))
+
+
 def test_powerbi_package_is_one_ready_to_import_workbook(finished_run):
     archive = _package(finished_run)
     workbook_name = f"data/Ledgerlight_{finished_run}.xlsx"

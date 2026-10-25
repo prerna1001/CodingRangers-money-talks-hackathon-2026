@@ -14,7 +14,8 @@
         powerquery/<Table>.pq         Power Query script per CSV
     themes/                           the report themes as JSON
 
-Tables: Summary, Bridge, Drivers, Evidence, Facts, Transactions, PeriodLines.
+Tables: Summary, Bridge, BridgeChart, Drivers, Evidence, Facts, Transactions,
+PeriodLines.
 Evidence is flattened (each fact beside every transaction that proves it)
 and the only column names shared between tables are fact_id and txn_id, so
 nothing has to be linked by hand. Bridge is waterfall-ready: numbered bars,
@@ -68,13 +69,25 @@ SHEETS: dict[str, dict[str, str]] = {
     "Bridge": {
         "bar": "text",
         "bridge_line": "text",
+        "bridge_label": "text",
         "bridge_type": "text",
         "bridge_amount": "money",
         "bridge_order": "int",
     },
+    # The bridge as stacked columns: revenue carried forward under each
+    # driver's increase or decrease, with both period totals as full bars.
+    "BridgeChart": {
+        "chart_step": "text",
+        "chart_order": "int",
+        "chart_carried": "money",
+        "chart_increase": "money",
+        "chart_decrease": "money",
+        "chart_total": "money",
+    },
     "Drivers": {
         "rank": "int",
         "driver": "text",
+        "driver_label": "text",
         "driver_account": "text",
         "driver_prior": "money",
         "driver_current": "money",
@@ -195,7 +208,8 @@ linked to the transactions that prove it.
 Pages
 -----
   Overview                headline, six KPI cards, revenue waterfall,
-                          change by driver, drivers table
+                          share-of-movement pie, change by driver,
+                          drivers table (chart figures in thousands, $K)
   Evidence                pick a fact, see the exact transactions behind it
   Trend and transactions  account totals by period, every transaction
 
@@ -214,6 +228,7 @@ Tables
 ------
   Summary       headline, periods, revenue, scores, numbers verified
   Bridge        opening revenue and each driver, in bar order
+  BridgeChart   the bridge as stacked columns: carried forward + change
   Drivers       the ranked driver table
   Evidence      each fact beside each transaction that proves it
   Facts         every computed fact
@@ -239,6 +254,34 @@ def _rows(state: RunState) -> dict[str, list[dict[str, Any]]]:
     def bar_label(step: dict) -> str:
         return f"{step['name']} revenue" if step["type"] == "start" else step["name"]
 
+    # Chart axis labels carry the percentage, so it shows on the bar itself:
+    # bridge steps as a share of opening revenue, drivers as their own change.
+    def bridge_label(step: dict) -> str:
+        if step["type"] == "start" or not prior["revenue"]:
+            return bar_label(step)
+        return f"{bar_label(step)} ({step['value'] / abs(prior['revenue']):+.1%})"
+
+    def chart_rows() -> list[dict]:
+        rows, running = [], 0.0
+        for index, step in enumerate(waterfall):
+            row = {"chart_step": bridge_label(step) if step["type"] != "end" else f"{step['name']} revenue",
+                   "chart_order": index + 1, "chart_carried": None, "chart_increase": None,
+                   "chart_decrease": None, "chart_total": None}
+            if step["type"] in ("start", "end"):
+                row["chart_total"] = step["value"]
+                running = step["value"]
+            elif step["value"] >= 0:
+                row["chart_carried"], row["chart_increase"] = running, step["value"]
+                running += step["value"]
+            else:
+                running += step["value"]
+                row["chart_carried"], row["chart_decrease"] = running, -step["value"]
+            rows.append(row)
+        return rows
+
+    def driver_label(d: dict) -> str:
+        return f"{d['driver']} (new)" if not d["prior"] else f"{d['driver']} ({d['share_of_change_pct']:+.1f}%)"
+
     return {
         "Summary": [
             {
@@ -261,16 +304,19 @@ def _rows(state: RunState) -> dict[str, list[dict[str, Any]]]:
             {
                 "bar": f"{index + 1:0{width}d}  {bar_label(step)}",
                 "bridge_line": bar_label(step),
+                "bridge_label": bridge_label(step),
                 "bridge_type": step["type"],
                 "bridge_amount": step["value"],
                 "bridge_order": index + 1,
             }
             for index, step in enumerate(bars)
         ],
+        "BridgeChart": chart_rows(),
         "Drivers": [
             {
                 "rank": index + 1,
                 "driver": d["driver"],
+                "driver_label": driver_label(d),
                 "driver_account": d["account"],
                 "driver_prior": d["prior"],
                 "driver_current": d["current"],

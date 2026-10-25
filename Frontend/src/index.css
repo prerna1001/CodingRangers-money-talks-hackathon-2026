@@ -29,6 +29,7 @@
   --chart-up: #2a8a5c;
   --chart-down: #c8453a;
   --chart-total: #16233a;
+  --chart-carry: #d6dce3;
   --chart-grid: rgba(22, 35, 58, 0.09);
   --code-bg: #e8ece6;
 
@@ -80,6 +81,7 @@
     --chart-up: #4cb886;
     --chart-down: #f07a6d;
     --chart-total: #d5dde5;
+    --chart-carry: #2c3946;
     --chart-grid: rgba(232, 237, 242, 0.08);
     --code-bg: #111920;
 

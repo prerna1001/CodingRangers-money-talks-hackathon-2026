@@ -10,7 +10,7 @@ echarts.use([BarChart, LineChart, GridComponent, TooltipComponent, LegendCompone
 
 const TOKEN_NAMES = [
   'text', 'text-h', 'text-dim', 'border', 'border-strong', 'surface', 'surface-raised',
-  'accent', 'up', 'danger', 'chart-up', 'chart-down', 'chart-total', 'chart-grid', 'sans',
+  'accent', 'up', 'danger', 'chart-up', 'chart-down', 'chart-total', 'chart-carry', 'chart-grid', 'sans',
 ]
 
 // Charts draw with the same CSS tokens as the rest of the page, so they

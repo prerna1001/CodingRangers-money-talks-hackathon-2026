@@ -9,11 +9,13 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from pptx import Presentation
+from pptx.enum.chart import XL_CHART_TYPE
 
 from api.routes.analyze import _RUNS
 from graph.workflow import run_pipeline
@@ -64,3 +66,30 @@ def test_unknown_theme_and_run_are_rejected(finished_run):
     client = TestClient(app)
     assert client.get(f"/api/runs/{finished_run}/pitch-deck", params={"theme": "neon"}).status_code == 422
     assert client.get("/api/runs/run_missing/pitch-deck").status_code == 404
+
+
+def test_slides_address_review_comments(finished_run):
+    response = TestClient(app).get(f"/api/runs/{finished_run}/pitch-deck")
+    slides = list(Presentation(io.BytesIO(response.content)).slides)
+
+    def texts(slide):
+        return " ".join(shape.text_frame.text for shape in slide.shapes if shape.has_text_frame)
+
+    # Slide 3: waterfall with % labels plus key / non-key drivers, increases vs decreases.
+    bridge = next(shape.chart for shape in slides[2].shapes if shape.has_chart)
+    assert any("%)" in name for name in bridge.plots[0].categories)
+    assert '"K"' in bridge.value_axis.tick_labels.number_format
+    assert "INCREASES" in texts(slides[2]) and "DECREASES" in texts(slides[2]) and "KEY" in texts(slides[2])
+
+    # Slide 4: graphs instead of the table, including a pie with percentages.
+    assert not any(shape.has_table for shape in slides[3].shapes)
+    pie = next(shape.chart for shape in slides[3].shapes
+               if shape.has_chart and shape.chart.chart_type == XL_CHART_TYPE.PIE)
+    assert pie.plots[0].data_labels.show_percentage
+
+    # Slide 6: three columns, one of them recommendations.
+    for heading in ("Key findings", "Risks and caveats", "Recommendations"):
+        assert heading in texts(slides[5])
+
+    # Thousands, never millions.
+    assert not re.search(r"\$[\d.,]+M\b", " ".join(texts(slide) for slide in slides))
