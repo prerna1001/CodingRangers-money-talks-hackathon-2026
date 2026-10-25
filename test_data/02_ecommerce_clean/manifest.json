@@ -1,0 +1,11 @@
+{
+  "company_id": "demo_ecommerce",
+  "current_period": "2026-08",
+  "prior_period": "2026-07",
+  "expected": {
+    "gross_sales_change": 46000,
+    "refund_change": -5000,
+    "top_expense_driver": "Meta Ads",
+    "large_refund_present": false
+  }
+}

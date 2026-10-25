@@ -1,0 +1,7 @@
+txn_id,posted_date,period_id,account_id,account_name,account_type,category,counterparty_name,counterparty_type,amount,currency,memo
+jul_patient_rev,2026-07-31,2026-07,4000,Patient revenue,revenue,patient_revenue,Patients,customer,132000,USD,Patient services
+jul_adjustments,2026-07-31,2026-07,4060,Billing adjustments,revenue,billing_adjustments,PayerOne,customer,-9000,USD,Denied claims
+jul_contract_labor,2026-07-25,2026-07,6200,Contractor labor,opex,contractor_labor,LocumWorks,vendor,18000,USD,Locum staff
+aug_patient_rev,2026-08-31,2026-08,4000,Patient revenue,revenue,patient_revenue,Patients,customer,136000,USD,Patient services
+aug_adjustments,2026-08-31,2026-08,4060,Billing adjustments,revenue,billing_adjustments,PayerOne,customer,-22000,USD,Denied claims from one payer
+aug_contract_labor,2026-08-25,2026-08,6200,Contractor labor,opex,contractor_labor,LocumWorks,vendor,41000,USD,Staffing shortage coverage

@@ -1,0 +1,7 @@
+period_id,start_date,end_date,account,account_type,amount
+2026-07,2026-07-01,2026-07-31,Online sales,revenue,215000
+2026-07,2026-07-01,2026-07-31,Paid media,opex,19000
+2026-07,2026-07-01,2026-07-31,Fulfillment costs,cogs,28000
+2026-08,2026-08-01,2026-08-31,Online sales,revenue,289000
+2026-08,2026-08-01,2026-08-31,Paid media,opex,35000
+2026-08,2026-08-01,2026-08-31,Fulfillment costs,cogs,42000

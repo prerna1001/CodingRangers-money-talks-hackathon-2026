@@ -1,0 +1,82 @@
+.memory-panel__stat {
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.memory-panel__stat strong {
+  color: var(--text-h);
+}
+
+.memory-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1.5px solid var(--text-h);
+}
+
+.memory-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  transition: opacity 0.2s ease;
+}
+
+.memory-item--deleting {
+  opacity: 0.4;
+}
+
+.memory-item__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.memory-item__type {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.memory-item__content {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-h);
+  margin-bottom: 8px;
+  max-width: 70ch;
+}
+
+.memory-item__footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.memory-item__evidence {
+  flex: 1;
+  min-width: 0;
+}
+
+.memory-item__delete {
+  border: none;
+  background: transparent;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.memory-item__delete:hover:not(:disabled) {
+  background: var(--danger-bg);
+}
+
+.memory-item__delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

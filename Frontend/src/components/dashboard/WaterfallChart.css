@@ -1,0 +1,59 @@
+.waterfall-chart {
+  min-width: 0;
+}
+
+.waterfall-chart__badge,
+.driver-table__count {
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding-top: 6px;
+}
+
+.waterfall-chart__frame {
+  position: relative;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 0;
+}
+
+.waterfall-chart__empty {
+  padding: 48px 24px;
+  color: var(--text-dim);
+  font-size: 14px;
+  text-align: center;
+}
+
+.waterfall-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.waterfall-chart__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.waterfall-chart__legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* Many drivers on a phone: let the chart keep a readable width and scroll. */
+@media (max-width: 720px) {
+  .waterfall-chart__frame {
+    overflow-x: auto;
+  }
+
+  .waterfall-chart__frame .echart {
+    min-width: 640px;
+  }
+}
