@@ -189,6 +189,12 @@ class AvailableFile(BaseModel):
     period_id: str
     sha256: str | None = None
     row_count: int | None = None
+    source_format: str | None = None
+    mime_type: str | None = None
+    classification: str | None = None
+    review_status: str | None = None
+    ocr_confidence: float | None = None
+    page_count: int | None = None
 
 
 class CompanyProfileCore(BaseModel):
@@ -201,6 +207,7 @@ class CompanyProfileCore(BaseModel):
     base_currency: str = "USD"
     primary_revenue_streams: list[str] = Field(default_factory=list)
     known_seasonality: list[str] = Field(default_factory=list)
+    business_context: str = ""
     materiality_threshold_usd: float = 5000.0
     materiality_threshold_pct: float = 0.05
 

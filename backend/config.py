@@ -38,7 +38,7 @@ _MODEL_FULL = {
     "normalization": "nvidia/nemotron-3.5-lightning-30b-a3b",
     "memory_relevance": "nvidia/nemotron-3.5-lightning-30b-a3b",
     "rag_rerank": "nvidia/nemotron-3.5-lightning-30b-a3b",
-    "analyst": "nvidia/nemotron-3-super-120b-a12b",
+    "analyst": "openai/gpt-oss-120b",
     "guardrail": "openai/gpt-oss-safeguard-20b",
     "stress_test": "nvidia/nemotron-3.5-lightning-30b-a3b",
     "report_writer": "nvidia/nemotron-3-super-120b-a12b",
@@ -87,10 +87,10 @@ LLM_ROUTES = {
         "provider": os.getenv("LLM_PROVIDER_RAG_RERANK", "openrouter"),
         "model": os.getenv("LLM_MODEL_RAG_RERANK", "nvidia/nemotron-3.5-lightning:free"),
     },
-    # The main CFO explanation should showcase the NVIDIA sponsor model.
+    # The main CFO explanation uses the strongest Groq-hosted reasoning model.
     "analyst": {
-        "provider": os.getenv("LLM_PROVIDER_ANALYST", "nvidia"),
-        "model": os.getenv("LLM_MODEL_ANALYST", "nvidia/nemotron-3-super-120b-a12b"),
+        "provider": os.getenv("LLM_PROVIDER_ANALYST", "groq"),
+        "model": os.getenv("LLM_MODEL_ANALYST", "openai/gpt-oss-120b"),
     },
     # Guardrail review is small but important; Groq is fast and isolated from
     # the analyst provider so one provider's limits do not pause every agent.

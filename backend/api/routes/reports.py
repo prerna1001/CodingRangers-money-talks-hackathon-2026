@@ -12,6 +12,9 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Response
 
 from api.routes.analyze import get_run_or_404
+from services.pitch_deck import PALETTES as PITCH_THEMES
+from services.pitch_deck import build_pitch_deck
+from services.powerbi_export import build_powerbi_zip
 
 router = APIRouter()
 
@@ -32,6 +35,32 @@ def get_board_update(run_id: str) -> dict:
     if not board_update:
         raise HTTPException(status_code=404, detail=f"No board update available for run {run_id}")
     return {"run_id": run_id, "board_update": board_update}
+
+
+@router.get("/runs/{run_id}/powerbi")
+def get_powerbi_package(run_id: str) -> Response:
+    """Zip of the run's tables, Power Query scripts and theme for loading
+    into Power BI Desktop (services/powerbi_export.py)."""
+    state = get_run_or_404(run_id)
+    return Response(
+        content=build_powerbi_zip(state),
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="ledgerlight_{run_id}_powerbi.zip"'},
+    )
+
+
+@router.get("/runs/{run_id}/pitch-deck")
+def get_pitch_deck(run_id: str, theme: str = "finance") -> Response:
+    """Seven-slide PowerPoint pitch deck for the run, in the corporate navy
+    ("finance") or executive dark ("dark") theme (services/pitch_deck.py)."""
+    if theme not in PITCH_THEMES:
+        raise HTTPException(status_code=422, detail=f"theme must be one of: {', '.join(PITCH_THEMES)}")
+    state = get_run_or_404(run_id)
+    return Response(
+        content=build_pitch_deck(state, theme),
+        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        headers={"Content-Disposition": f'attachment; filename="ledgerlight_{run_id}_pitch_{theme}.pptx"'},
+    )
 
 
 @router.post("/reports/{run_id}/pdf")

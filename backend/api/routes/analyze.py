@@ -29,6 +29,9 @@ from sse_starlette.sse import EventSourceResponse
 from api.presenters import to_frontend_analysis
 from graph.events import EVENT_BUS
 from graph.workflow import run_pipeline
+from services.injection_filter import sanitize
+from services.rag_store import Document
+from services.reference_store import add as add_reference_document
 from models.schemas import (
     CanonicalTransaction,
     CompanyProfileCore,
@@ -59,6 +62,11 @@ class AnalyzeRequest(BaseModel):
     transaction_file_ids: list[str] = []
     period_summary_file_ids: list[str] = []
     known_aliases: dict[str, list[str]] = {}
+    industry: str = "unknown"
+    business_model: str = "unknown"
+    primary_revenue_streams: list[str] = []
+    known_seasonality: list[str] = []
+    business_context: str = ""
 
 
 def _derive_period_summaries(transactions: list[CanonicalTransaction]) -> list[PeriodSummary]:
@@ -114,8 +122,8 @@ def _infer_periods(summaries: list[PeriodSummary]) -> tuple[str, str] | None:
 
 def _load_uploaded_dataset(
     request: "AnalyzeRequest",
-) -> tuple[list[CanonicalTransaction], list[PeriodSummary], CompanyProfileCore]:
-    from api.routes.upload import get_uploaded_period_summaries, get_uploaded_transactions
+) -> tuple[list[CanonicalTransaction], list[PeriodSummary], CompanyProfileCore, list]:
+    from api.routes.upload import get_available_files, get_uploaded_period_summaries, get_uploaded_transactions
 
     transactions = get_uploaded_transactions(request.transaction_file_ids)
     period_summaries = get_uploaded_period_summaries(request.period_summary_file_ids)
@@ -126,13 +134,17 @@ def _load_uploaded_dataset(
     profile_core = CompanyProfileCore(
         company_id=request.company_id,
         company_name=request.company_name or request.company_id,
-        industry="unknown",
-        business_model="unknown",
+        industry=request.industry,
+        business_model=request.business_model,
+        primary_revenue_streams=request.primary_revenue_streams,
+        known_seasonality=request.known_seasonality,
+        business_context=sanitize(request.business_context, max_len=4_000),
     )
-    return transactions, period_summaries, profile_core
+    file_ids = [*request.transaction_file_ids, *request.period_summary_file_ids]
+    return transactions, period_summaries, profile_core, get_available_files(file_ids)
 
 
-def _load_demo_fixture() -> tuple[list[CanonicalTransaction], list[PeriodSummary], CompanyProfileCore]:
+def _load_demo_fixture() -> tuple[list[CanonicalTransaction], list[PeriodSummary], CompanyProfileCore, list]:
     data = json.loads((_FIXTURES_DIR / "saas_2026_08_transactions.json").read_text())
     transactions = [CanonicalTransaction(**t) for t in data["transactions"]]
     period_summaries = [PeriodSummary(**p) for p in data["period_summaries"]]
@@ -144,7 +156,7 @@ def _load_demo_fixture() -> tuple[list[CanonicalTransaction], list[PeriodSummary
         primary_revenue_streams=["SMB subscriptions", "Enterprise subscriptions", "Professional services"],
         known_seasonality=["Q4 enterprise renewals", "summer SMB slowdown"],
     )
-    return transactions, period_summaries, profile_core
+    return transactions, period_summaries, profile_core, []
 
 
 async def _execute_pipeline(run_id: str, **kwargs) -> None:
@@ -166,7 +178,7 @@ async def analyze(request: AnalyzeRequest) -> dict:
     prior_period = request.prior_period
 
     if request.transaction_file_ids or request.period_summary_file_ids:
-        transactions, period_summaries, profile_core = _load_uploaded_dataset(request)
+        transactions, period_summaries, profile_core, available_files = _load_uploaded_dataset(request)
         # Uploaded data won't necessarily cover the request's default periods,
         # so take the two most recent periods actually present. An explicit
         # period pair in the request still wins if it matches the data.
@@ -184,9 +196,19 @@ async def analyze(request: AnalyzeRequest) -> dict:
                 )
             current_period, prior_period = inferred
     else:
-        transactions, period_summaries, profile_core = _load_demo_fixture()
+        transactions, period_summaries, profile_core, available_files = _load_demo_fixture()
 
     run_id = f"run_{uuid.uuid4().hex[:12]}"
+    if profile_core.business_context:
+        add_reference_document(
+            request.company_id,
+            Document(
+                chunk_id=f"run:{run_id}:business_context",
+                source="user_business_context",
+                text=profile_core.business_context,
+                metadata={"run_id": run_id, "kind": "user_context"},
+            ),
+        )
     _RUNS[run_id] = {"status": "running", "state": None, "error": None}
 
     asyncio.create_task(
@@ -198,6 +220,7 @@ async def analyze(request: AnalyzeRequest) -> dict:
             company_profile_core=profile_core,
             transactions=transactions,
             period_summaries=period_summaries,
+            available_files=available_files,
             known_aliases=request.known_aliases or {"vendor:aws": ["AWS", "Amazon Web Services", "AMZN AWS"]},
         )
     )

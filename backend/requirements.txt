@@ -16,6 +16,15 @@ pandas>=2.2
 numpy>=2.0
 sqlalchemy>=2.0
 rapidfuzz>=3.9
+openpyxl>=3.1
+python-docx>=1.1
+python-pptx>=1.0
+PyMuPDF>=1.24
+Pillow>=10.4
+
+# Local OCR is optional at install time because models are large. The
+# ingestion service exposes an actionable error when no local engine exists.
+paddleocr>=3.0
 
 # --- shared ---
 pytest>=8.3

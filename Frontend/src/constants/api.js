@@ -14,5 +14,7 @@ export const API_ENDPOINTS = {
   memoryDelete: (memoryId) => `/api/memory/${memoryId}`,
   stressTestsRun: '/api/stress-tests/run',
   reportPdf: (runId) => `/api/reports/${runId}/pdf`,
+  powerbi: (runId) => `/api/runs/${runId}/powerbi`,
+  pitchDeck: (runId, theme) => `/api/runs/${runId}/pitch-deck?theme=${theme}`,
   voice: (runId) => `/api/voice/${runId}`,
 }

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import UploadCard from './components/UploadCard'
 import AgentTimeline from './components/AgentTimeline'
 import Dashboard from './components/dashboard/Dashboard'
+import Tick from './components/Tick'
 import { analyzeRun } from './services/api'
 import './App.css'
 
@@ -39,14 +40,14 @@ function App() {
   // `uploaded` is the array of /api/upload responses (UploadCard passes it
   // through). analyzeRun splits them into transaction vs period-summary ids;
   // with none, the backend falls back to its built-in demo dataset.
-  const handleUploaded = async (uploaded) => {
+  const handleUploaded = async (payload) => {
     timelineDoneRef.current = false
     analysisRef.current = null
     setPhase('analyzing')
     setAnalysis(null)
     setError(null)
     try {
-      const res = await analyzeRun(uploaded)
+      const res = await analyzeRun(payload.uploads, payload.context)
       analysisRef.current = res
       setAnalysis(res)
       tryEnterDashboard()
@@ -71,18 +72,19 @@ function App() {
 
   return (
     <div className="page">
+      <a className="skip-link" href="#main">Skip to content</a>
       <header className="page__header">
         <div className="brand">
-          <span className="brand__mark">FE</span>
-          <span className="brand__name">FinOps Explain AI</span>
+          <span className="brand__mark"><Tick /></span>
+          <span className="brand__name">Ledgerlight</span>
         </div>
-        <span className="page__tagline">Money operations, explained with evidence</span>
+        <span className="page__tagline">Every variance explained and traced to its transactions</span>
       </header>
 
-      <main className="page__main">
+      <main className="page__main" id="main" tabIndex={-1}>
         {phase === 'upload' && (
           <div className="page__stack">
-            {error && <div className="banner banner--error">{error}</div>}
+            {error && <div className="banner banner--error" role="alert">{error}</div>}
             <UploadCard onUploaded={handleUploaded} />
           </div>
         )}

@@ -62,6 +62,7 @@ from models.schemas import (
 from services import grounding
 from services.memory_store import MemoryStore
 from services.rag_store import Document, RagStore
+from services.reference_store import for_company as uploaded_reference_documents
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +103,8 @@ def _seed_rag_store_if_empty(store: RagStore, state: RunState) -> None:
     """
     if store.backend != "empty":
         return
-    store.add_documents(
+    documents = uploaded_reference_documents(state["company_id"])
+    documents.extend(
         [
             Document(
                 chunk_id="chunk_prior_report_seed",
@@ -118,6 +120,7 @@ def _seed_rag_store_if_empty(store: RagStore, state: RunState) -> None:
             ),
         ]
     )
+    store.add_documents(documents)
 
 
 # ---------------------------------------------------------------------------
@@ -206,35 +209,40 @@ def node_analytics(state: RunState) -> dict:
 
 
 def node_analyst(state: RunState) -> dict:
-    with agent_step(
-        state["run_id"], "analyst", detail=f"Explaining {len(state['facts'])} fact(s)"
-    ) as step:
-        applications = memory_agent.apply_memories(state["memories"], state["facts"], state["transactions"])
-        hints = memory_agent.to_memory_influence(applications)
+    try:
+        with agent_step(
+            state["run_id"], "analyst", detail=f"Explaining {len(state['facts'])} fact(s)"
+        ) as step:
+            applications = memory_agent.apply_memories(state["memories"], state["facts"], state["transactions"])
+            hints = memory_agent.to_memory_influence(applications)
 
-        revision_feedback = None
-        guardrail_result = state.get("guardrail_result")
-        if guardrail_result is not None and guardrail_result.status == GuardrailStatus.NEEDS_REVISION:
-            revision_feedback = guardrail_result.revision_feedback
+            revision_feedback = None
+            guardrail_result = state.get("guardrail_result")
+            if guardrail_result is not None and guardrail_result.status == GuardrailStatus.NEEDS_REVISION:
+                revision_feedback = guardrail_result.revision_feedback
 
-        token_usage_delta: dict[str, int] = {}
-        explanation, _response = analyst_agent.generate_explanation(
-            profile=state["profile"],
-            facts=state["facts"],
-            retrieved=state["retrieved"],
-            memories=state["memories"],
-            memory_influence_hints=hints,
-            qa_report=state["qa_report"],
-            revision_feedback=revision_feedback,
-            token_usage=token_usage_delta,
-        )
-        step.output_summary = explanation.headline
-    return {
-        "explanation": explanation,
-        "timeline": [step.entry],
-        "timings": {"analyst": step.entry.duration_ms},
-        "token_usage": token_usage_delta,
-    }
+            token_usage_delta: dict[str, int] = {}
+            explanation, _response = analyst_agent.generate_explanation(
+                profile=state["profile"],
+                facts=state["facts"],
+                retrieved=state["retrieved"],
+                memories=state["memories"],
+                memory_influence_hints=hints,
+                qa_report=state["qa_report"],
+                revision_feedback=revision_feedback,
+                token_usage=token_usage_delta,
+            )
+            step.output_summary = explanation.headline
+        return {
+            "explanation": explanation,
+            "timeline": [step.entry],
+            "timings": {"analyst": step.entry.duration_ms},
+            "token_usage": token_usage_delta,
+        }
+    except Exception as exc:  # Provider outages must not turn a valid data run into a 500.
+        fallback = node_template_fallback(state)
+        fallback["errors"] = [f"Analyst unavailable; used deterministic fact report: {exc}"]
+        return fallback
 
 
 def node_guardrail(state: RunState) -> dict:

@@ -1,0 +1,17 @@
+date,account,account_type,category,counterparty_name,counterparty_type,amount,currency,memo
+2026-07-03,Gross sales,revenue,subscription,Northstar Health,customer,80000,USD,July enterprise subscription renewal
+2026-07-07,Gross sales,revenue,subscription,Orbit Logistics,customer,65000,USD,July enterprise subscription renewal
+2026-07-12,Gross sales,revenue,subscription,Acme Retail,customer,55000,USD,July SMB subscription revenue
+2026-07-19,Gross sales,revenue,subscription,Other SMB customers,customer,40000,USD,July recurring revenue
+2026-07-09,Paid ads,opex,demand_generation,Meta Ads,vendor,30000,USD,July paid social campaigns
+2026-07-22,Paid ads,opex,demand_generation,Google Ads,vendor,18000,USD,July search campaigns
+2026-07-10,Fulfillment costs,cogs,shipping,ShipBob,vendor,36000,USD,July fulfillment invoices
+2026-07-26,Refunds,revenue,returns,Shopify,other,-12000,USD,July customer refunds
+2026-08-03,Gross sales,revenue,subscription,Northstar Health,customer,112000,USD,August enterprise expansion
+2026-08-07,Gross sales,revenue,subscription,Orbit Logistics,customer,82000,USD,August enterprise expansion
+2026-08-12,Gross sales,revenue,subscription,Acme Retail,customer,52000,USD,August SMB subscription revenue
+2026-08-19,Gross sales,revenue,subscription,Other SMB customers,customer,40000,USD,August recurring revenue
+2026-08-09,Paid ads,opex,demand_generation,Meta Ads,vendor,47000,USD,August paid social campaigns
+2026-08-22,Paid ads,opex,demand_generation,Google Ads,vendor,25000,USD,August search campaigns
+2026-08-10,Fulfillment costs,cogs,shipping,ShipBob,vendor,47000,USD,August fulfillment invoices
+2026-08-26,Refunds,revenue,returns,Shopify,other,-17000,USD,August customer refunds
