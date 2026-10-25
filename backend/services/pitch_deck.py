@@ -6,10 +6,13 @@ team, a client, senior leadership:
 
     1  Title and headline result
     2  Problem and approach
-    3  Revenue bridge            (waterfall chart)
-    4  Driver analysis           (bar chart + ranked table)
+    3  Revenue bridge            (waterfall + key drivers, increases vs decreases)
+    4  Driver analysis           (driver bar chart + key vs non-key pie)
+
+Money is shown in thousands ($183K, never $0.18M) and chart labels carry
+percentages, matching the Power BI report.
     5  Trust and evidence        (quality metrics + agent run chart)
-    6  Conclusions and risks
+    6  Findings, risks, recommendations (three columns)
     7  Future work and next steps
 
 Charts are native PowerPoint charts, not pictures, so they stay editable
@@ -28,7 +31,7 @@ from typing import Any
 from pptx import Presentation
 from pptx.chart.data import CategoryChartData
 from pptx.dml.color import RGBColor
-from pptx.enum.chart import XL_CHART_TYPE, XL_LABEL_POSITION, XL_TICK_LABEL_POSITION
+from pptx.enum.chart import XL_CHART_TYPE, XL_LABEL_POSITION, XL_LEGEND_POSITION, XL_TICK_LABEL_POSITION
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.oxml.ns import qn
@@ -63,6 +66,8 @@ class Palette:
     bad: str
     on_accent: str
     series: tuple[str, ...]
+    slices: tuple[str, ...]  # pie slices for key drivers: no greys (non-key) or reds (losses)
+    carry: str               # waterfall: revenue carried forward under each driver bar
 
 
 PALETTES = {
@@ -70,11 +75,13 @@ PALETTES = {
         key="finance", label="Corporate Navy", page="F3F5F8", card="FFFFFF", border="DDE3EA",
         text="1F2A44", muted="5B6778", accent="1F3864", accent_2="2E75B6", good="2E7D32", bad="C62828",
         on_accent="FFFFFF", series=("1F3864", "2E75B6", "00A3A1", "F2A900", "7F8C9D", "C0504D"),
+        slices=("1F3864", "2E75B6", "00A3A1", "F2A900", "70AD47", "8064A2"), carry="D3DBE6",
     ),
     "dark": Palette(
         key="dark", label="Executive Dark", page="0E1621", card="16212E", border="26364A",
         text="E6EDF5", muted="9AA8B8", accent="5B9BD5", accent_2="2BB3A3", good="3FB97A", bad="E5534B",
         on_accent="0E1621", series=("5B9BD5", "2BB3A3", "F2C14E", "A5B4C8", "E86A5F", "7CC47F"),
+        slices=("5B9BD5", "2BB3A3", "F2C14E", "B18CE0", "7CC47F", "4E79A7"), carry="2B3B50",
     ),
 }
 
@@ -88,12 +95,17 @@ def _rgb(hex_color: str) -> RGBColor:
 # ---------------------------------------------------------------------------
 
 
+# Chart labels and axes in thousands ($183K), matching the Power BI report.
+# Excel scales by 1,000 per trailing comma in a number format.
+CHART_K = '[>=10000]$#,##0,"K";$#,##0.0,"K"'
+AXIS_K = '$#,##0,"K"'
+
+
 def _money(value: float, signed: bool = False) -> str:
+    """Thousands, never millions: $1,250K rather than $1.25M."""
     sign = "-" if value < 0 else ("+" if signed else "")
     v = abs(value)
-    if v >= 1_000_000:
-        body = f"${v / 1_000_000:,.2f}M"
-    elif v >= 10_000:
+    if v >= 10_000:
         body = f"${v / 1_000:,.0f}K"
     elif v >= 1_000:
         body = f"${v / 1_000:,.1f}K"
@@ -235,7 +247,7 @@ class _Deck:
         chart.has_legend = legend
         chart.has_title = False
 
-    def style_axes(self, chart, *, value_format='$#,##0', gridlines=True):
+    def style_axes(self, chart, *, value_format=AXIS_K, gridlines=True):
         cat, val = chart.category_axis, chart.value_axis
         cat.format.line.color.rgb = _rgb(self.p.border)
         cat.tick_labels.font.size = Pt(10)
@@ -306,11 +318,18 @@ def _merge_timeline(timeline: list[dict]) -> list[dict]:
 
 
 def _bridge_chart(deck: _Deck, slide, x, y, w, h, waterfall: list[dict]):
-    """Waterfall as a stacked column: an invisible base lifts each floating bar."""
+    """Waterfall as a stacked column. Under each driver bar sits the revenue
+    carried forward from the steps before it, in a soft tint, so no bar
+    floats over empty space. Driver bars carry their share of opening
+    revenue in the axis label."""
     cats, base, up, down, total = [], [], [], [], []
     running = 0.0
+    opening = waterfall[0]["value"] if waterfall else 0
     for step in waterfall:
-        cats.append(_clip(step["name"], 22))
+        name = _clip(step["name"], 22)
+        if step["type"] not in ("start", "end") and opening:
+            name += f" ({_pct(step['value'] / abs(opening) * 100, True)})"
+        cats.append(name)
         value = step["value"]
         if step["type"] in ("start", "end"):
             base.append(None); up.append(None); down.append(None); total.append(value)
@@ -332,18 +351,15 @@ def _bridge_chart(deck: _Deck, slide, x, y, w, h, waterfall: list[dict]):
     plot = chart.plots[0]
     plot.gap_width = 45
     plot.overlap = 100
-    fills = {"Base": None, "Total": deck.p.accent, "Increase": deck.p.good, "Decrease": deck.p.bad}
+    fills = {"Base": deck.p.carry, "Total": deck.p.accent, "Increase": deck.p.good, "Decrease": deck.p.bad}
     for series in plot.series:
-        fill = fills[series.name]
-        if fill is None:
-            series.format.fill.background()
-            series.format.line.fill.background()
-            continue
         series.format.fill.solid()
-        series.format.fill.fore_color.rgb = _rgb(fill)
+        series.format.fill.fore_color.rgb = _rgb(fills[series.name])
+        if series.name == "Base":
+            continue  # its value is the previous bar's, so no label
         labels = series.data_labels
         labels.show_value = True
-        labels.number_format = '$#,##0;-$#,##0;;'
+        labels.number_format = CHART_K
         labels.number_format_is_linked = False
         labels.font.size = Pt(10)
         labels.font.bold = True
@@ -361,35 +377,175 @@ def _bridge_chart(deck: _Deck, slide, x, y, w, h, waterfall: list[dict]):
     chart.category_axis.tick_label_position = XL_TICK_LABEL_POSITION.LOW
 
 
-def _driver_chart(deck: _Deck, slide, x, y, w, h, drivers: list[dict]):
-    top = drivers[:8]
+# A key driver is one of the fewest drivers that together explain this share
+# of the total movement (Pareto); everything after that is non-key.
+KEY_SHARE = 0.8
+
+
+def _growth(d: dict | None) -> str:
+    """A driver's change against its own prior-period total."""
+    if not d:
+        return ""
+    return "new" if not d["prior"] else _pct(d["share_of_change_pct"], True)
+
+
+def _pareto(rows: list[dict], value_key: str) -> list[dict]:
+    """Sort by size of movement and add share (of total movement) and key."""
+    ordered = sorted(rows, key=lambda r: -abs(r[value_key]))
+    total = sum(abs(r[value_key]) for r in ordered) or 1.0
+    covered, out = 0.0, []
+    for r in ordered:
+        share = abs(r[value_key]) / total
+        out.append({**r, "share": share, "key": covered < KEY_SHARE})
+        covered += share
+    return out
+
+
+def _classify_drivers(drivers: list[dict], transactions: list) -> list[dict]:
+    """Drivers with kind (revenue or cost), favourable (revenue up / cost down),
+    share of total movement and key flag."""
+    kinds = {t.account_name: t.account_type.value for t in transactions}
+    rows = []
+    for d in drivers:
+        kind = "revenue" if kinds.get(d["account"]) == "revenue" else "cost"
+        rows.append({**d, "kind": kind, "favourable": (d["amount"] >= 0) == (kind == "revenue")})
+    return _pareto(rows, "amount")
+
+
+def _driver_chart(deck: _Deck, slide, x, y, w, h, rows: list[dict]):
+    """Change per driver. Colour says favourable or not, a star marks key
+    drivers, and each label pairs the amount with the driver's own % change."""
+    top = rows[:8]
     data = CategoryChartData()
-    data.categories = [_clip(d["driver"], 24) for d in top]
-    data.add_series("Change", [d["amount"] for d in top])
-    frame = slide.shapes.add_chart(XL_CHART_TYPE.BAR_CLUSTERED, x, y, w, h, data)
-    chart = frame.chart
+    data.categories = [("★ " if r["key"] else "") + _clip(r["driver"], 24) for r in top]
+    data.add_series("Change", [r["amount"] for r in top])
+    chart = slide.shapes.add_chart(XL_CHART_TYPE.BAR_CLUSTERED, x, y, w, h, data).chart
     deck.style_chart(chart)
-    deck.style_axes(chart, value_format='$#,##0;-$#,##0')
+    deck.style_axes(chart)
     chart.category_axis.reverse_order = True
     chart.category_axis.tick_label_position = XL_TICK_LABEL_POSITION.LOW
+    chart.category_axis.tick_labels.font.size = Pt(11)
     chart.value_axis.visible = False
     chart.value_axis.has_major_gridlines = False
     plot = chart.plots[0]
-    plot.gap_width = 55
+    plot.gap_width = 45
     series = plot.series[0]
     series.invert_if_negative = False
-    for index, driver in enumerate(top):
+    for index, r in enumerate(top):
         point = series.points[index]
         point.format.fill.solid()
-        point.format.fill.fore_color.rgb = _rgb(deck.p.good if driver["amount"] >= 0 else deck.p.bad)
-    labels = series.data_labels
-    labels.show_value = True
-    labels.number_format = '$#,##0;-$#,##0'
+        point.format.fill.fore_color.rgb = _rgb(deck.p.good if r["favourable"] else deck.p.bad)
+        label = point.data_label
+        label.position = XL_LABEL_POSITION.OUTSIDE_END
+        run = label.text_frame.paragraphs[0].add_run()
+        run.text = f"{_money(r['amount'], True)}  |  {_growth(r)}"
+        run.font.size = Pt(10)
+        run.font.bold = True
+        run.font.color.rgb = _rgb(deck.p.text)
+    # Outside labels clip at the plot edge; leave room for them.
+    high = max((r["amount"] for r in top), default=0)
+    low = min((r["amount"] for r in top), default=0)
+    if high > 0:
+        chart.value_axis.maximum_scale = high * 1.55
+    if low < 0:
+        chart.value_axis.minimum_scale = low * 1.55
+
+
+def _movement_pie(deck: _Deck, slide, x, y, w, h, rows: list[dict]):
+    """Each key driver's share of the total movement, non-key drivers as one
+    grey slice. Sizes are absolute so a decrease gets a slice too."""
+    keys = [r for r in rows if r["key"]]
+    rest = [r for r in rows if not r["key"]]
+    slices = [(_clip(r["driver"], 26), r["share"], deck.p.slices[i % len(deck.p.slices)])
+              for i, r in enumerate(keys)]
+    if rest:
+        slices.append((f"Non-key drivers ({len(rest)})", sum(r["share"] for r in rest), deck.p.muted))
+    data = CategoryChartData()
+    data.categories = [name for name, _, _ in slices]
+    data.add_series("Share of movement", [share for _, share, _ in slices])
+    chart = slide.shapes.add_chart(XL_CHART_TYPE.PIE, x, y, w, h, data).chart
+    deck.style_chart(chart, legend=True)
+    chart.legend.position = XL_LEGEND_POSITION.RIGHT
+    chart.legend.include_in_layout = False
+    chart.legend.font.size = Pt(10)
+    chart.legend.font.color.rgb = _rgb(deck.p.text)
+    series = chart.plots[0].series[0]
+    for index, (_, _, colour) in enumerate(slices):
+        point = series.points[index]
+        point.format.fill.solid()
+        point.format.fill.fore_color.rgb = _rgb(colour)
+        point.format.line.color.rgb = _rgb(deck.p.card)
+    chart.plots[0].has_data_labels = True
+    labels = chart.plots[0].data_labels
+    labels.show_percentage = True
+    labels.show_value = False
+    labels.show_category_name = False
+    labels.number_format = "0%"
     labels.number_format_is_linked = False
-    labels.position = XL_LABEL_POSITION.OUTSIDE_END
-    labels.font.size = Pt(10)
+    labels.position = XL_LABEL_POSITION.CENTER
+    labels.font.size = Pt(11)
     labels.font.bold = True
-    labels.font.color.rgb = _rgb(deck.p.text)
+    labels.font.color.rgb = _rgb("FFFFFF")
+
+
+def _recommendations(rows: list[dict], revenue_growth: float, revenue_rows: list[dict]) -> list[str]:
+    """Actions that follow from the numbers; nothing here is model-written."""
+    recs = []
+    lead = next((r for r in revenue_rows if r["value"] > 0), None)
+    if lead:
+        recs.append(f"Scale {_clip(lead['name'], 30)}: {lead['share']:.0%} of the revenue movement "
+                    f"({_money(lead['value'], True)}). Confirm it repeats next period before planning on it.")
+    drag = next((r for r in revenue_rows if r["value"] < 0), None)
+    if drag:
+        recs.append(f"Recover {_clip(drag['name'], 30)} ({_money(drag['value'], True)}): review the decline "
+                    f"with the account owner and set a recovery target.")
+    cost = next((r for r in rows if r["kind"] == "cost" and r["amount"] > 0), None)
+    if cost and cost["prior"] and _pace(cost["share_of_change_pct"] / 100, revenue_growth) == "faster than":
+        recs.append(f"Contain {_clip(cost['driver'], 30)}: up {_growth(cost)}, faster than revenue "
+                    f"({_pct(revenue_growth * 100, True)}). Review unit costs and contract terms.")
+    elif cost:
+        recs.append(f"Hold {_clip(cost['driver'], 30)} ({_growth(cost)}) at or below revenue growth to protect "
+                    "margin as volume rises.")
+    if lead and lead["share"] > 0.6:
+        recs.append(f"Reduce concentration: one driver carries {lead['share']:.0%} of the movement; "
+                    "build the next growth channel.")
+    keys = [r for r in revenue_rows if r["key"]]
+    if keys:
+        recs.append(f"Track the {len(keys)} key revenue driver{'s' if len(keys) != 1 else ''} monthly; together "
+                    f"they carry {sum(r['share'] for r in keys):.0%} of the movement.")
+    if any(r["confidence"] < 0.8 for r in rows):
+        recs.append("Validate the low-confidence drivers with account owners before external use.")
+    else:
+        recs.append("Sign off the key drivers with account owners, then share externally.")
+    return recs[:4]
+
+
+def _pace(rate: float, revenue_growth: float) -> str:
+    """How a growth rate compares with revenue's, with half a point of slack."""
+    if abs(rate - revenue_growth) < 0.005:
+        return "in line with"
+    return "faster than" if rate > revenue_growth else "slower than"
+
+
+def _derived_risks(rows: list[dict], revenue_rows: list[dict], revenue_growth: float) -> list[str]:
+    """Risks that follow from the driver figures, alongside the model's caveats."""
+    risks = []
+    lead = next((r for r in revenue_rows if r["value"] > 0), None)
+    if lead and lead["share"] >= 0.5:
+        risks.append(f"Concentration: {_clip(lead['name'], 30)} alone is {lead['share']:.0%} of the movement.")
+    new = [r["driver"] for r in rows if r["kind"] == "revenue" and not r["prior"] and r["amount"] > 0]
+    if new:
+        risks.append(f"{', '.join(_clip(n, 24) for n in new[:2])} {'is' if len(new) == 1 else 'are'} new this period; "
+                     "one period of revenue is not yet a trend.")
+    cost = [r for r in rows if r["kind"] == "cost" and r["amount"] > 0 and r["prior"]]
+    if cost:
+        c = cost[0]
+        risks.append(f"Margin: {_clip(c['driver'], 24)} costs rose {_growth(c)}, "
+                     f"{_pace(c['share_of_change_pct'] / 100, revenue_growth)} revenue.")
+    low = [r["driver"] for r in rows if r["confidence"] < 0.8]
+    if low:
+        risks.append(f"Lower confidence on {', '.join(_clip(n, 20) for n in low[:2])}; check the evidence first.")
+    return risks
 
 
 def _agent_chart(deck: _Deck, slide, x, y, w, h, timeline: list[dict]):
@@ -443,8 +599,21 @@ def build_pitch_deck(state: RunState, theme: str = "finance") -> bytes:
     n_evidence = sum(len(f.evidence_txn_ids) for f in state.get("facts", []))
     timeline = _merge_timeline(a["agent_timeline"])
     verified = a["grounding_badge"] or "n/a"
-    risks = a["risks_or_caveats"]
+    risks = list(dict.fromkeys(a["risks_or_caveats"]))  # the model can repeat a caveat
     follow_ups = a["follow_up_questions"]
+    growth = change / prior["revenue"] if prior["revenue"] else 0.0
+    rows = _classify_drivers(drivers, state.get("transactions", []))
+    by_name = {d["driver"]: d for d in drivers}
+    revenue_rows = _pareto([{**x, "growth": _growth(by_name.get(x["name"]))} for x in steps], "value")
+    rev_keys = [r for r in revenue_rows if r["key"]]
+    up_total = sum(x["value"] for x in gains)
+    down_total = sum(x["value"] for x in losses)
+    keys = [r for r in rows if r["key"]]
+    key_cover = sum(r["share"] for r in keys)
+    cost_d = [r for r in rows if r["kind"] == "cost"]
+    cost_change = sum(r["amount"] for r in cost_d)
+    cost_prior = sum(r["prior"] for r in cost_d)
+    cost_growth = cost_change / cost_prior if cost_prior else 0.0
 
     # ---- 1. Title -------------------------------------------------------
     s = deck.prs.slides.add_slide(deck.blank)
@@ -539,76 +708,115 @@ def build_pitch_deck(state: RunState, theme: str = "finance") -> bytes:
               f"{_clip(best['name'], 30)} was the largest lift" if best else
               f"Revenue moved {_money(change, True)} ({_pct(change_pct, True)}) between the two periods")
     s = deck.slide("Analysis  |  Revenue bridge", title3, run_label)
-    deck.card(s, MARGIN, Inches(1.8), Inches(8.5), Inches(5.0))
-    _bridge_chart(deck, s, MARGIN + Inches(0.1), Inches(1.9), Inches(8.3), Inches(4.5), a["waterfall"])
-    deck.text(s, MARGIN + Inches(0.25), Inches(6.47), Inches(8.0), Inches(0.25),
-              "Green adds revenue, red reduces it. Vertical axis is truncated to make the movements visible.",
+    deck.card(s, MARGIN, Inches(1.8), Inches(7.4), Inches(5.0))
+    _bridge_chart(deck, s, MARGIN + Inches(0.1), Inches(1.9), Inches(7.2), Inches(4.5), a["waterfall"])
+    deck.text(s, MARGIN + Inches(0.25), Inches(6.47), Inches(7.0), Inches(0.25),
+              "Grey is revenue carried forward; green adds, red reduces. % is against opening revenue.",
               size=10, color=p.muted)
-    rx = MARGIN + Inches(8.8)
+    rx = MARGIN + Inches(7.7)
     rw = SLIDE_W - MARGIN - rx
-    deck.panel_title(s, rx, Inches(1.8), rw, "How to read it")
-    reading = [
-        (f"Starts at {_money(prior['revenue'])} in {prior['label']} and ends at {_money(current['revenue'])} "
-         f"in {current['label']}.", {"bullet": True, "space_after": 8}),
-    ]
-    if best:
-        reading.append((f"Biggest lift: {_clip(best['name'], 34)}, {_money(best['value'], True)}.",
-                        {"bullet": True, "space_after": 8}))
-    if worst:
-        reading.append((f"Biggest drag: {_clip(worst['name'], 34)}, {_money(worst['value'], True)}.",
-                        {"bullet": True, "space_after": 8}))
-    other = next((x for x in steps if x["name"] == "Other"), None)
-    reading.append((
-        f"Unattributed remainder is shown as 'Other' ({_money(other['value'], True)}), never hidden."
-        if other else "Drivers fully explain the movement; no unattributed remainder.",
-        {"bullet": True, "space_after": 8}))
-    deck.text(s, rx, Inches(2.3), rw, Inches(3.0), reading, size=13, line_spacing=1.05)
-    deck.card(s, rx, Inches(5.4), rw, Inches(1.4))
-    deck.text(s, rx + Inches(0.2), Inches(5.52), rw - Inches(0.4), Inches(0.3), "SO WHAT", size=10, bold=True,
-              color=p.muted)
-    sowhat = (f"{len(gains)} driver{'s' if len(gains) != 1 else ''} added revenue and {len(losses)} reduced it; "
-              f"the net effect is {_money(change, True)}.")
-    deck.text(s, rx + Inches(0.2), Inches(5.82), rw - Inches(0.4), Inches(0.9), sowhat, size=13, bold=True,
+    deck.panel_title(s, rx, Inches(1.8), rw, "Key drivers: increases vs decreases")
+    tile_w = (rw - Inches(0.15)) / 2
+    for i, (label, value, n, k_tone) in enumerate((("Increases", up_total, len(gains), p.good),
+                                                  ("Decreases", down_total, len(losses), p.bad))):
+        x = rx + i * (tile_w + Inches(0.15))
+        deck.card(s, x, Inches(2.3), tile_w, Inches(1.0))
+        deck.rect(s, x, Inches(2.3), Inches(0.06), Inches(1.0), k_tone)
+        deck.text(s, x + Inches(0.2), Inches(2.38), tile_w - Inches(0.3), Inches(0.25), f"{label.upper()} ({n})",
+                  size=9, bold=True, color=p.muted)
+        deck.text(s, x + Inches(0.2), Inches(2.6), tile_w - Inches(0.3), Inches(0.4),
+                  _money(value, True) if value else "$0", size=20, bold=True, color=k_tone if value else p.muted)
+        if prior["revenue"]:
+            deck.text(s, x + Inches(0.2), Inches(3.0), tile_w - Inches(0.3), Inches(0.25),
+                      f"{_pct(value / prior['revenue'] * 100, True)} of opening revenue", size=9, color=p.muted)
+    shown = revenue_rows[:4]
+    if len(revenue_rows) > 4:
+        rest = revenue_rows[3:]
+        shown = revenue_rows[:3] + [{"name": f"{len(rest)} other drivers", "value": sum(r["value"] for r in rest),
+                                      "share": sum(r["share"] for r in rest), "key": False, "growth": ""}]
+    bar_w = rw - Inches(1.45)
+    chip_w = Inches(0.8)
+    for i, r in enumerate(shown):
+        y = Inches(3.5) + i * Inches(0.56)
+        r_tone = p.good if r["value"] >= 0 else p.bad
+        deck.text(s, rx, y, rw - chip_w - Inches(1.05), Inches(0.26), _clip(r["name"], 24), size=12, bold=True)
+        chip_x = rx + rw - chip_w - Inches(0.95)
+        deck.rect(s, chip_x, y + Inches(0.02), chip_w, Inches(0.22), p.accent if r["key"] else None,
+                  None if r["key"] else p.border, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
+        deck.text(s, chip_x, y + Inches(0.045), chip_w, Inches(0.2), "KEY" if r["key"] else "NON-KEY", size=8,
+                  bold=True, color=p.on_accent if r["key"] else p.muted, align=PP_ALIGN.CENTER)
+        deck.text(s, rx + rw - Inches(0.9), y, Inches(0.9), Inches(0.26), _money(r["value"], True), size=12,
+                  bold=True, color=r_tone, align=PP_ALIGN.RIGHT)
+        deck.rect(s, rx, y + Inches(0.34), bar_w, Inches(0.08), p.border)
+        deck.rect(s, rx, y + Inches(0.34), max(int(bar_w * r["share"]), Emu(12700)), Inches(0.08),
+                  r_tone if r["key"] else p.muted)
+        detail = f"{r['share']:.0%}" + (f"  |  {r['growth']}" if r["growth"] else "")
+        deck.text(s, rx + bar_w + Inches(0.1), y + Inches(0.28), Inches(1.35), Inches(0.2), detail, size=9,
+                  color=p.muted, align=PP_ALIGN.RIGHT)
+    deck.card(s, rx, Inches(5.8), rw, Inches(1.0))
+    deck.text(s, rx + Inches(0.2), Inches(5.88), rw - Inches(0.4), Inches(0.25),
+              "SO WHAT  (bar = share of movement  |  change vs own prior)", size=9, bold=True, color=p.muted)
+    non_key = len(revenue_rows) - len(rev_keys)
+    sowhat = (f"{len(rev_keys)} key driver{'s' if len(rev_keys) != 1 else ''} explain "
+              f"{sum(r['share'] for r in rev_keys):.0%} of the movement; "
+              + (f"{non_key} non-key make up the rest." if non_key else "there are no non-key drivers.")
+              if rev_keys else f"Net effect {_money(change, True)}; no single driver dominates.")
+    deck.text(s, rx + Inches(0.2), Inches(6.15), rw - Inches(0.4), Inches(0.6), sowhat, size=12.5, bold=True,
               color=tone, line_spacing=1.0)
+    other = next((x for x in steps if x["name"] == "Other"), None)
     deck.notes(s, "Walk the chart left to right: opening revenue, each driver's contribution, closing revenue. "
-                  "Green bars add revenue, red bars subtract. The bars tie exactly to both endpoints.")
+                  "Green bars add revenue, red bars subtract; they tie exactly to both endpoints. On the right, "
+                  "increases are compared with decreases, then each driver is ranked by its share of the movement. "
+                  f"Key drivers are the fewest that together explain {KEY_SHARE:.0%} of it. "
+                  + (f"Unattributed remainder is shown as 'Other' ({_money(other['value'], True)}), never hidden."
+                     if other else "Drivers fully explain the movement; no unattributed remainder."))
 
     # ---- 4. Drivers -----------------------------------------------------
-    lead = drivers[0] if drivers else None
-    title4 = (f"{_clip(lead['driver'], 28)} alone accounts for {_money(lead['amount'], True)} of the movement"
-              if lead else "Driver analysis")
+    title4 = (f"{len(keys)} of {len(rows)} drivers explain {key_cover:.0%} of the movement"
+              + ("; costs grew faster than revenue" if cost_d and cost_change > 0 and cost_growth > growth else "")
+              if rows else "Driver analysis")
     s = deck.slide("Analysis  |  Drivers", title4, run_label)
-    deck.panel_title(s, MARGIN, Inches(1.8), Inches(5.6), "Change by driver, largest first")
-    deck.card(s, MARGIN, Inches(2.25), Inches(5.6), Inches(4.55))
-    if drivers:
-        _driver_chart(deck, s, MARGIN + Inches(0.05), Inches(2.3), Inches(5.5), Inches(4.45), drivers)
-    tx = MARGIN + Inches(5.9)
-    tw = SLIDE_W - MARGIN - tx
-    deck.panel_title(s, tx, Inches(1.8), tw, "Ranked drivers with confidence")
-    rows = [["Driver", "Account", "Prior", "Change", "% chg", "Conf."]]
-    for d in drivers[:8]:
-        rows.append([_clip(d["driver"], 22), _clip(d["account"], 20), _money(d["prior"]),
-                     _money(d["amount"], True), _pct(d["share_of_change_pct"], True), f"{d['confidence'] * 100:.0f}%"])
-    deck.table(s, tx, Inches(2.3), tw, rows, [2.3, 2.1, 1.2, 1.3, 1.1, 0.9], row_h=0.38, align_right_from=2)
-    note_y = Inches(2.3) + Inches(0.38 * len(rows)) + Inches(0.12)
-    deck.text(s, tx, note_y, tw, Inches(0.5),
-              "Prior is the driver's own total in the earlier period; % chg is measured against it. "
-              "Confidence reflects how completely evidence supports each figure.",
-              size=10, color=p.muted, line_spacing=1.0)
-    if drivers and change:
-        top3 = sum(d["amount"] for d in drivers[:3])
-        share = top3 / change * 100
-        avg_conf = sum(d["confidence"] for d in drivers) / len(drivers) * 100
-        card_y = max(note_y + Inches(0.6), Inches(5.35))
-        deck.card(s, tx, card_y, tw, Inches(6.8) - card_y)
-        deck.rect(s, tx, card_y, Inches(0.06), Inches(6.8) - card_y, p.accent_2)
-        deck.text(s, tx + Inches(0.25), card_y + Inches(0.1), tw - Inches(0.4), Inches(0.25), "CONCENTRATION",
-                  size=10, bold=True, color=p.muted)
-        deck.text(s, tx + Inches(0.25), card_y + Inches(0.38), tw - Inches(0.4), Inches(6.8) - card_y - Inches(0.4),
-                  f"The top three drivers explain {share:.0f}% of the net change across {len(drivers)} drivers; "
-                  f"average confidence is {avg_conf:.0f}%.", size=13, bold=True, line_spacing=1.0)
-    deck.notes(s, "Drivers are counterparties or revenue lines whose totals moved most. Each carries a confidence "
-                  "score derived from its evidence; low-confidence rows deserve a human look before external use.")
+    lw = Inches(6.9)
+    deck.panel_title(s, MARGIN, Inches(1.8), lw, "Change by driver: favourable vs unfavourable")
+    deck.card(s, MARGIN, Inches(2.25), lw, Inches(3.6))
+    if rows:
+        _driver_chart(deck, s, MARGIN + Inches(0.05), Inches(2.3), lw - Inches(0.1), Inches(3.15), rows)
+    deck.text(s, MARGIN + Inches(0.2), Inches(5.5), lw - Inches(0.4), Inches(0.3),
+              "\u2605 key driver. Green is favourable (revenue up or cost down), red unfavourable. "
+              "% is change against the driver's own prior period.", size=9, color=p.muted)
+    rx = MARGIN + lw + Inches(0.3)
+    rw = SLIDE_W - MARGIN - rx
+    deck.panel_title(s, rx, Inches(1.8), rw, "Share of total movement: key vs non-key")
+    deck.card(s, rx, Inches(2.25), rw, Inches(3.6))
+    if rows:
+        _movement_pie(deck, s, rx + Inches(0.05), Inches(2.35), rw - Inches(0.1), Inches(3.4), rows)
+    avg_conf = sum(r["confidence"] for r in rows) / len(rows) * 100 if rows else 0
+    rev_d = [r for r in rows if r["kind"] == "revenue"]
+    rev_change = sum(r["amount"] for r in rev_d)
+    tiles = [
+        ("Key drivers", f"{len(keys)} of {len(rows)}",
+         f"{key_cover:.0%} of all movement; average confidence {avg_conf:.0f}%", p.accent_2),
+        ("Revenue drivers", _money(rev_change, True),
+         f"{sum(r['amount'] > 0 for r in rev_d)} up, {sum(r['amount'] < 0 for r in rev_d)} down",
+         p.good if rev_change >= 0 else p.bad),
+        ("Cost drivers", _money(cost_change, True) if cost_d else "None",
+         (f"{_pct(cost_growth * 100, True)} vs prior; {'unfavourable' if cost_change > 0 else 'favourable'}"
+          if cost_d else "no cost movement in the top drivers"), p.bad if cost_change > 0 else p.good),
+    ]
+    tile_w = (CONTENT_W - Inches(0.4)) / 3
+    for i, (label, value, sub, k_tone) in enumerate(tiles):
+        x = MARGIN + i * (tile_w + Inches(0.2))
+        deck.card(s, x, Inches(6.0), tile_w, Inches(0.8))
+        deck.rect(s, x, Inches(6.0), Inches(0.06), Inches(0.8), k_tone)
+        deck.text(s, x + Inches(0.2), Inches(6.08), tile_w - Inches(0.3), Inches(0.22), label.upper(), size=9,
+                  bold=True, color=p.muted)
+        deck.text(s, x + Inches(0.2), Inches(6.3), Inches(1.4), Inches(0.42), value, size=19, bold=True, color=k_tone)
+        deck.text(s, x + Inches(1.65), Inches(6.32), tile_w - Inches(1.8), Inches(0.42), sub, size=10,
+                  line_spacing=1.0, anchor=MSO_ANCHOR.MIDDLE)
+    deck.notes(s, "The chart compares every driver: bar length is the dollar change, colour is whether it helps "
+                  "or hurts, and the label adds its % change against its own prior period. The pie shows how "
+                  "concentrated the movement is: key drivers individually, the rest grouped. Revenue and cost "
+                  "drivers are kept apart in the tiles so a cost increase is never read as good news.")
 
     # ---- 5. Trust and evidence ------------------------------------------
     s = deck.slide("Assurance", "Every number is verified against source data before it reaches a slide", run_label)
@@ -643,43 +851,45 @@ def build_pitch_deck(state: RunState, theme: str = "finance") -> bytes:
     deck.notes(s, f"Assurance. {verified}. Data quality {a['data_quality_score'] * 100:.0f}%, overall confidence "
                   f"{a['confidence'] * 100:.0f}%. This is the answer to 'can I trust this?'.")
 
-    # ---- 6. Conclusions and risks ---------------------------------------
-    s = deck.slide("Conclusions", "What leadership should take away, and what to keep in mind", run_label)
-    findings = [
-        (f"Revenue {'rose' if change >= 0 else 'fell'} {_money(abs(change))} ({_pct(abs(change_pct))}) to "
-         f"{_money(current['revenue'])}."),
+    # ---- 6. Conclusions, risks and recommendations ---------------------
+    s = deck.slide("Conclusions", "What we found, what could change it, and what we recommend", run_label)
+    findings = [f"Revenue {'rose' if change >= 0 else 'fell'} {_money(abs(change))} ({_pct(abs(change_pct))}) to "
+                f"{_money(current['revenue'])}."]
+    if rev_keys:
+        names = ", ".join(_clip(r["name"], 24) for r in rev_keys[:3])
+        findings.append(f"Key revenue driver{'s' if len(rev_keys) > 1 else ''}: {names}, "
+                        f"{sum(r['share'] for r in rev_keys):.0%} of the movement.")
+    findings.append(f"Largest drag: {_clip(worst['name'], 30)} at {_money(worst['value'], True)}." if worst else
+                    f"No revenue driver declined; increases total {_money(up_total, True)}.")
+    if cost_d:
+        findings.append(f"Costs in the top drivers moved {_money(cost_change, True)} ({_pct(cost_growth * 100, True)}), "
+                        f"{_pace(cost_growth, growth)} revenue ({_pct(growth * 100, True)}).")
+    findings.append(f"Evidence-backed: {verified.lower()}, data quality {a['data_quality_score'] * 100:.0f}%.")
+    # Figure-based risks first; the model's caveats fill the rest.
+    all_risks = _derived_risks(rows, revenue_rows, growth) + [_clip(r, 150) for r in risks]
+    columns = [
+        ("Key findings", findings, p.accent),
+        ("Risks and caveats", all_risks[:4] or ["No material caveats were raised for this run."], p.bad),
+        ("Recommendations", _recommendations(rows, growth, revenue_rows), p.good),
     ]
-    if best:
-        findings.append(f"{_clip(best['name'], 40)} was the largest positive driver at {_money(best['value'], True)}.")
-    if worst:
-        findings.append(f"{_clip(worst['name'], 40)} was the largest drag at {_money(worst['value'], True)}.")
-    if drivers and change:
-        findings.append(f"The top three drivers explain {sum(d['amount'] for d in drivers[:3]) / change * 100:.0f}% "
-                        f"of the change across {len(drivers)} drivers, so growth is concentrated.")
-    findings.append(f"The explanation is evidence-backed: {verified.lower()}, data quality {a['data_quality_score'] * 100:.0f}%.")
-    lw = Inches(6.1)
-    deck.panel_title(s, MARGIN, Inches(1.85), lw, "Key findings")
-    for i, text in enumerate(findings[:5]):
-        y = Inches(2.35) + i * Inches(0.88)
-        deck.rect(s, MARGIN, y, Inches(0.42), Inches(0.42), p.accent, shape=MSO_SHAPE.OVAL)
-        deck.text(s, MARGIN, y + Inches(0.07), Inches(0.42), Inches(0.3), str(i + 1), size=13, bold=True,
-                  color=p.on_accent, align=PP_ALIGN.CENTER)
-        deck.text(s, MARGIN + Inches(0.65), y, lw - Inches(0.7), Inches(0.85), text, size=14, line_spacing=1.0)
-    rx = MARGIN + lw + Inches(0.5)
-    rw = SLIDE_W - MARGIN - rx
-    deck.panel_title(s, rx, Inches(1.85), rw, "Risks and caveats")
-    deck.card(s, rx, Inches(2.35), rw, Inches(2.5))
-    risk_items = [(_clip(r, 150), {"bullet": True, "space_after": 7}) for r in risks[:4]] or [
-        ("No material caveats were raised for this run.", {"bullet": True})]
-    deck.text(s, rx + Inches(0.25), Inches(2.5), rw - Inches(0.5), Inches(2.4), risk_items, size=12, line_spacing=1.0)
+    cw = (CONTENT_W - Inches(0.6)) / 3
+    for i, (heading, items, bar) in enumerate(columns):
+        x = MARGIN + i * (cw + Inches(0.3))
+        deck.card(s, x, Inches(1.85), cw, Inches(4.15))
+        deck.rect(s, x, Inches(1.85), cw, Inches(0.06), bar)
+        deck.text(s, x + Inches(0.25), Inches(2.05), cw - Inches(0.5), Inches(0.35), heading, size=14, bold=True,
+                  color=p.accent if p.key == "finance" else p.text)
+        deck.text(s, x + Inches(0.25), Inches(2.55), cw - Inches(0.5), Inches(3.4),
+                  [(t, {"bullet": True, "space_after": 8}) for t in items], size=11.5, line_spacing=1.0)
     board = a.get("board_update")
-    deck.card(s, rx, Inches(5.05), rw, Inches(1.75))
-    deck.text(s, rx + Inches(0.25), Inches(5.17), rw - Inches(0.5), Inches(0.3), "BOARD UPDATE, ONE LINE",
-              size=10, bold=True, color=p.muted)
-    deck.text(s, rx + Inches(0.25), Inches(5.5), rw - Inches(0.5), Inches(1.25),
-              _clip(board, 330) if board else _first_sentence(a["summary"], 330), size=12.5,
-              line_spacing=1.0)
-    deck.notes(s, (board or a["summary"] or "") + "\n\nRisks: " + "; ".join(risks))
+    deck.card(s, MARGIN, Inches(6.15), CONTENT_W, Inches(0.7))
+    deck.rect(s, MARGIN, Inches(6.15), Inches(0.06), Inches(0.7), p.accent_2)
+    deck.text(s, MARGIN + Inches(0.25), Inches(6.21), Inches(3), Inches(0.22), "BOARD UPDATE, ONE LINE", size=9,
+              bold=True, color=p.muted)
+    deck.text(s, MARGIN + Inches(0.25), Inches(6.42), CONTENT_W - Inches(0.5), Inches(0.4),
+              _clip(board, 230) if board else _first_sentence(a["summary"], 230), size=11, line_spacing=1.0)
+    deck.notes(s, (board or a["summary"] or "") + "\n\nRisks: " + "; ".join(risks)
+               + "\n\nRecommendations are derived from the driver figures, not written by the model.")
 
     # ---- 7. Future work -------------------------------------------------
     s = deck.slide("Next steps", "From a one-off analysis to a monthly, always-on revenue review", run_label)

@@ -19,6 +19,7 @@ const COLOR = {
   amberText: [153, 105, 12],
   amberBg: [255, 243, 220],
   border: [228, 231, 236],
+  carry: [214, 220, 227],
   panelBg: [247, 248, 250],
   white: [255, 255, 255],
 }
@@ -143,6 +144,12 @@ function drawWaterfallChart(doc, y, waterfall) {
     const barX = slotX + (slot - barWidth) / 2
     const barTop = chartBottom - (d.base + d.display) * scale
     const barHeight = Math.max(d.display * scale, 0.6)
+
+    // Revenue carried forward fills the space under a driver bar.
+    if (d.base > 0) {
+      doc.setFillColor(...COLOR.carry)
+      doc.rect(barX, chartBottom - d.base * scale, barWidth, d.base * scale, 'F')
+    }
 
     const color = d.type === 'decrease' ? COLOR.danger : COLOR.accent
     doc.setFillColor(...color)

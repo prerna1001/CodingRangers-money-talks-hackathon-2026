@@ -124,7 +124,13 @@ _FORMATS = {"money": "\\$#,0;(\\$#,0);\\$#,0", "pct": "0%", "int": "0", "date": 
 _NO_SUM = {"text", "int", "date", "bool", "pct"}
 _COLUMN_FORMATS = {("Drivers", "driver_pct_change"): '+0.0"%";-0.0"%";0.0"%"'}
 # Text columns shown in bar order rather than alphabetically.
-_SORT_BY = {("Bridge", "bar"): "bridge_order", ("Bridge", "bridge_line"): "bridge_order"}
+_SORT_BY = {("Bridge", "bar"): "bridge_order", ("Bridge", "bridge_line"): "bridge_order",
+            ("Bridge", "bridge_label"): "bridge_order", ("BridgeChart", "chart_step"): "chart_order"}
+# Bridge columns: revenue carried forward under each driver bar, per theme.
+CARRY_COLORS = {"Ledgerlight Corporate Navy": "#D3DBE6", "Ledgerlight Executive Dark": "#2B3B50"}
+# Chart labels, axes and money cards in thousands ($183K), not Power BI's
+# automatic millions ($0.18M). Tables keep the full figure.
+DISPLAY_UNITS = "1000D"
 
 MEASURES = [
     ("Prior Revenue", "SUM(Summary[from_revenue])", _FORMATS["money"]),
@@ -137,6 +143,11 @@ MEASURES = [
      "VAR t = SELECTEDVALUE(Summary[numbers_verified]) RETURN IF(ISBLANK(t), \"n/a\", LEFT(t, SEARCH(\" \", t & \" \") - 1))",
      None),
     ("Driver Change", "SUM(Drivers[driver_change])", "+\\$#,0;-\\$#,0;\\$#,0"),
+    # Size of each bridge step, ignoring direction, so the pie can show every
+    # driver's share of the total movement (pies drop negative slices).
+    ("Revenue Movement",
+     "CALCULATE(SUMX(Bridge, ABS(Bridge[bridge_amount])), Bridge[bridge_type] <> \"start\")",
+     _FORMATS["money"]),
     ("Evidence Transactions", "DISTINCTCOUNT(Evidence[txn_id])", "#,0"),
     ("Evidence Amount", "SUMX(VALUES(Evidence[txn_id]), CALCULATE(MAX(Evidence[txn_amount])))", _FORMATS["money"]),
     ("Period Amount", "SUM(PeriodLines[summary_amount])", _FORMATS["money"]),
@@ -314,10 +325,66 @@ def _textbox(box: tuple[int, int, int, int], runs: list[tuple[str, dict]]) -> _V
     return visual
 
 
-def _card(box: tuple[int, int, int, int], measure: str, label: str) -> _Visual:
+def _card(box: tuple[int, int, int, int], measure: str, label: str, thousands: bool = False) -> _Visual:
     visual = _Visual("card", box).add("Values", "Summary", measure, "measure")
     visual.objects = {"categoryLabels": [{"properties": {"show": _lit("true")}}]}
+    if thousands:
+        visual.objects["labels"] = [{"properties": {"labelDisplayUnits": _lit(DISPLAY_UNITS),
+                                                    "labelPrecision": _lit("0L")}}]
     visual.column_names["Summary." + measure] = label
+    return visual
+
+
+def _chart(visual: _Visual) -> _Visual:
+    """Data labels on, values and axis in thousands."""
+    visual.objects = {
+        "labels": [{"properties": {"show": _lit("true"), "labelDisplayUnits": _lit(DISPLAY_UNITS)}}],
+        "valueAxis": [{"properties": {"labelDisplayUnits": _lit(DISPLAY_UNITS)}}],
+    }
+    return visual
+
+
+def _fill(color: str) -> dict:
+    return {"solid": {"color": _text(color)}}
+
+
+def _bridge(box: tuple[int, int, int, int], title: str, theme: dict, floor: float) -> _Visual:
+    """The revenue bridge as stacked columns. Power BI's own waterfall leaves
+    empty space under each floating bar; here the revenue carried forward
+    fills it, in a soft tint, and only the movements and totals are labelled."""
+    colors = theme["visualStyles"]["waterfallChart"]["*"]["sentimentColors"][0]
+    series = [
+        ("chart_carried", "Carried forward", CARRY_COLORS[theme["name"]]),
+        ("chart_increase", "Increase", colors["increaseFill"]["solid"]["color"]),
+        ("chart_decrease", "Decrease", colors["decreaseFill"]["solid"]["color"]),
+        ("chart_total", "Period total", colors["totalFill"]["solid"]["color"]),
+    ]
+    visual = _Visual("columnChart", box, title).add("Category", "BridgeChart", "chart_step", label="Step")
+    for field, label, _ in series:
+        visual.add("Y", "BridgeChart", field, "sum", label=label)
+    visual.sort("BridgeChart", "chart_step")
+    visual = _chart(visual)
+    visual.objects["dataPoint"] = [
+        {"properties": {"fill": _fill(color)}, "selector": {"metadata": f"Sum(BridgeChart.{field})"}}
+        for field, _, color in series
+    ]
+    visual.objects["labels"].append(
+        {"properties": {"showSeries": _lit("false")}, "selector": {"metadata": "Sum(BridgeChart.chart_carried)"}})
+    visual.objects["valueAxis"][0]["properties"]["start"] = _lit(f"{floor:.0f}D")
+    visual.objects["legend"] = [{"properties": {"show": _lit("true"), "position": _text("Top")}}]
+    visual.objects["categoryAxis"] = [{"properties": {"concatenateLabels": _lit("false")}}]
+    return visual
+
+
+def _pie(box: tuple[int, int, int, int], title: str) -> _Visual:
+    visual = (_Visual("pieChart", box, title)
+              .add("Category", "Bridge", "bridge_line", label="Driver")
+              .add("Y", "Summary", "Revenue Movement", "measure", label="Movement"))
+    visual.objects = {
+        "labels": [{"properties": {"show": _lit("true"), "labelStyle": _text("Category, percent of total"),
+                                   "percentageLabelPrecision": _lit("1L")}}],
+        "legend": [{"properties": {"show": _lit("false")}}],
+    }
     return visual
 
 
@@ -358,25 +425,28 @@ def _pages(summary: dict[str, Any], theme: dict) -> list[tuple[str, list[_Visual
     gutter, top, width = 24, 96, 1232
     card_w = (width - 5 * 12) // 6
     cards = [
-        ("Prior Revenue", f"{summary['from_period']} revenue"),
-        ("Current Revenue", f"{summary['to_period']} revenue"),
-        ("Revenue Change", "Change"),
-        ("Revenue Change %", "Change %"),
-        ("Data Quality", "Data quality"),
-        ("Numbers Verified", "Numbers verified"),
+        ("Prior Revenue", f"{summary['from_period']} revenue", True),
+        ("Current Revenue", f"{summary['to_period']} revenue", True),
+        ("Revenue Change", "Change", True),
+        ("Revenue Change %", "Change %", False),
+        ("Data Quality", "Data quality", False),
+        ("Numbers Verified", "Numbers verified", False),
     ]
     overview = [_header(summary["headline"] or "Revenue variance", subtitle, colors)]
-    overview += [_card((gutter + i * (card_w + 12), top, card_w, 92), m, label) for i, (m, label) in enumerate(cards)]
-    overview.append(
-        _Visual("waterfallChart", (gutter, 200, 740, 292), f"Revenue bridge, {period}")
-        .add("Category", "Bridge", "bridge_line", label="Step").add("Y", "Bridge", "bridge_amount", "sum", label="Amount")
-        .sort("Bridge", "bridge_line")
-    )
-    overview.append(
-        _Visual("clusteredBarChart", (776, 200, 480, 292), "Change by driver")
-        .add("Category", "Drivers", "driver").add("Y", "Summary", "Driver Change", "measure", label="Change")
+    overview += [_card((gutter + i * (card_w + 12), top, card_w, 92), m, label, thousands)
+                 for i, (m, label, thousands) in enumerate(cards)]
+    # Start the axis below the smaller period total, as the deck does, so the
+    # movements are visible instead of slivers on top of tall columns.
+    low = min(summary["from_revenue"] or 0, summary["to_revenue"] or 0)
+    floor = round(low * 0.8, -3) if low > 0 else 0
+    overview.append(_bridge((gutter, 200, 500, 292), f"Revenue bridge, {period} (% of prior revenue)", theme, floor))
+    overview.append(_pie((536, 200, 340, 292), "Share of revenue movement"))
+    overview.append(_chart(
+        _Visual("clusteredBarChart", (888, 200, 368, 292), "Change by driver (% vs prior)")
+        .add("Category", "Drivers", "driver_label", label="Driver")
+        .add("Y", "Summary", "Driver Change", "measure", label="Change")
         .sort("Summary", "Driver Change", "measure", descending=True)
-    )
+    ))
     overview.append(_table((gutter, 504, width, 204), "Drivers, largest first", "Drivers", [
         ("rank", "Rank", 0.6), ("driver", "Driver", 2.2), ("driver_account", "Account", 2.2),
         ("driver_prior", "Prior", 1.3), ("driver_current", "Current", 1.3), ("driver_change", "Change", 1.3),
@@ -390,7 +460,7 @@ def _pages(summary: dict[str, Any], theme: dict) -> list[tuple[str, list[_Visual
                       "header": [{"properties": {"show": _lit("false")}}]}
     evidence.append(slicer)
     evidence.append(_card((396, top, 420, 92), "Evidence Transactions", "Source transactions"))
-    evidence.append(_card((828, top, 428, 92), "Evidence Amount", "Their total"))
+    evidence.append(_card((828, top, 428, 92), "Evidence Amount", "Their total", thousands=True))
     evidence.append(_table((396, 200, 860, 508), "Source transactions", "Evidence", [
         ("txn_date", "Date", 1.1), ("txn_counterparty", "Counterparty", 1.6), ("txn_account", "Account", 1.5),
         ("txn_amount", "Amount", 1.1), ("txn_memo", "Memo", 2.6), ("txn_source_row", "Row", 0.6),
@@ -398,13 +468,13 @@ def _pages(summary: dict[str, Any], theme: dict) -> list[tuple[str, list[_Visual
     ], sort_field="txn_date"))
 
     trend = [_header("Trend and transactions", "Account totals by period, and every transaction in this run.", colors)]
-    trend.append(
+    trend.append(_chart(
         _Visual("clusteredColumnChart", (gutter, top, width, 292), "Amount by account and period")
         .add("Category", "PeriodLines", "summary_period", label="Period")
         .add("Series", "PeriodLines", "summary_account", label="Account")
         .add("Y", "Summary", "Period Amount", "measure", label="Amount")
         .sort("PeriodLines", "summary_period")
-    )
+    ))
     trend.append(_table((gutter, 400, width, 308), "Transactions", "Transactions", [
         ("posted_date", "Date", 1.0), ("period_id", "Period", 0.8), ("account_name", "Account", 1.5),
         ("counterparty", "Counterparty", 1.5), ("category", "Category", 1.2), ("amount", "Amount", 1.0),
