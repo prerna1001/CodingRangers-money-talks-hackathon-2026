@@ -1,0 +1,9 @@
+date,account,account_type,category,counterparty_name,counterparty_type,amount,currency,memo
+2026-07-05,Patient service revenue,revenue,clinical,CarePlus payer,customer,118000,USD,July insured patient services
+2026-07-17,Patient service revenue,revenue,clinical,Self-pay patients,customer,42000,USD,July self-pay services
+2026-07-10,Clinical labor,opex,payroll,Clinical staff,employee,69000,USD,July staffing payroll
+2026-07-22,Medical supplies,cogs,supplies,Medline,vendor,17000,USD,July supplies
+2026-08-05,Patient service revenue,revenue,clinical,CarePlus payer,customer,166000,USD,New employer contract appointments
+2026-08-17,Patient service revenue,revenue,clinical,Self-pay patients,customer,47000,USD,August self-pay services
+2026-08-10,Clinical labor,opex,payroll,Clinical staff,employee,88000,USD,Temporary clinician coverage
+2026-08-22,Medical supplies,cogs,supplies,Medline,vendor,25000,USD,Higher procedure volume supplies

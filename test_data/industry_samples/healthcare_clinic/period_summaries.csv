@@ -1,0 +1,7 @@
+period_id,start_date,end_date,account,account_type,amount
+2026-07,2026-07-01,2026-07-31,Patient service revenue,revenue,160000
+2026-07,2026-07-01,2026-07-31,Clinical labor,opex,69000
+2026-07,2026-07-01,2026-07-31,Medical supplies,cogs,17000
+2026-08,2026-08-01,2026-08-31,Patient service revenue,revenue,213000
+2026-08,2026-08-01,2026-08-31,Clinical labor,opex,88000
+2026-08,2026-08-01,2026-08-31,Medical supplies,cogs,25000

@@ -1,26 +1,60 @@
 .scenario-buttons {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  border-top: 1.5px solid var(--text-h);
+  margin-bottom: 24px;
 }
 
-.scenario-btn--active {
+.scenario-btn {
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  text-align: left;
+  padding: 14px 12px 14px 0;
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--text-h);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.12s ease;
+}
+
+.scenario-btn::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  flex-shrink: 0;
+}
+
+.scenario-btn:hover:not(:disabled) {
+  background: var(--bg-alt);
+}
+
+.scenario-btn--active::before {
+  background: var(--accent);
   border-color: var(--accent);
-  color: var(--accent-strong);
+}
+
+.scenario-btn:disabled {
+  cursor: progress;
+  color: var(--text-dim);
 }
 
 .scenario-result {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
   background: var(--bg-alt);
+  border-radius: var(--radius-control);
+  padding: 16px 20px;
 }
 
 .scenario-result__compare {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-end;
+  gap: 20px;
   margin-bottom: 10px;
 }
 
@@ -31,28 +65,32 @@
 }
 
 .scenario-result__label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  font-size: 13px;
   color: var(--text-dim);
 }
 
 .scenario-result__value {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
   color: var(--text-h);
 }
 
 .scenario-result__value--sim {
-  color: var(--accent-strong);
+  color: var(--accent);
 }
 
 .scenario-result__arrow {
+  font-family: var(--serif);
+  font-style: italic;
   color: var(--text-dim);
+  padding-bottom: 4px;
 }
 
 .scenario-result__note {
-  font-size: 13px;
+  font-family: var(--serif);
+  font-size: 16px;
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.55;
+  max-width: 64ch;
 }

@@ -7,10 +7,11 @@ const MARGIN = 16
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2
 
 const COLOR = {
-  accent: [15, 157, 112],
-  accentDark: [10, 122, 86],
-  accentBg: [223, 245, 236],
-  textDark: [16, 20, 28],
+  accent: [42, 138, 92],
+  accentDark: [29, 112, 72],
+  accentBg: [226, 240, 232],
+  pencil: [182, 162, 245],
+  textDark: [22, 35, 58],
   textDim: [110, 118, 132],
   textLight: [156, 163, 175],
   danger: [200, 48, 43],
@@ -18,6 +19,7 @@ const COLOR = {
   amberText: [153, 105, 12],
   amberBg: [255, 243, 220],
   border: [228, 231, 236],
+  carry: [214, 220, 227],
   panelBg: [247, 248, 250],
   white: [255, 255, 255],
 }
@@ -38,20 +40,22 @@ function drawCoverHeader(doc, analysis) {
   doc.setFillColor(...COLOR.textDark)
   doc.rect(0, 0, PAGE_WIDTH, 34, 'F')
 
-  doc.setFillColor(...COLOR.accent)
-  doc.roundedRect(MARGIN, 10, 12, 12, 3, 3, 'F')
-  doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  // Tickmark logo, drawn as two strokes
+  doc.setDrawColor(...COLOR.pencil)
+  doc.setLineWidth(1.3)
+  doc.setLineCap('round')
+  doc.setLineJoin('round')
+  doc.lines([[3, 3], [6.5, -7.5]], MARGIN + 1.5, 16.5, [1, 1], 'S', false)
+  doc.setLineWidth(0.2)
   setColor(doc, 'setTextColor', COLOR.white)
-  doc.text('FE', MARGIN + 6, 17.5, { align: 'center' })
 
   doc.setFontSize(14)
   doc.setFont('helvetica', 'bold')
-  doc.text('FinOps Explain AI', MARGIN + 18, 16)
+  doc.text('Ledgerlight', MARGIN + 18, 16)
   doc.setFontSize(9.5)
   doc.setFont('helvetica', 'normal')
   setColor(doc, 'setTextColor', [200, 210, 205])
-  doc.text('Money operations, explained with evidence', MARGIN + 18, 21.5)
+  doc.text('Every variance explained and traced to its transactions', MARGIN + 18, 21.5)
 
   doc.setFontSize(9)
   setColor(doc, 'setTextColor', [200, 210, 205])
@@ -140,6 +144,12 @@ function drawWaterfallChart(doc, y, waterfall) {
     const barX = slotX + (slot - barWidth) / 2
     const barTop = chartBottom - (d.base + d.display) * scale
     const barHeight = Math.max(d.display * scale, 0.6)
+
+    // Revenue carried forward fills the space under a driver bar.
+    if (d.base > 0) {
+      doc.setFillColor(...COLOR.carry)
+      doc.rect(barX, chartBottom - d.base * scale, barWidth, d.base * scale, 'F')
+    }
 
     const color = d.type === 'decrease' ? COLOR.danger : COLOR.accent
     doc.setFillColor(...color)
@@ -245,7 +255,7 @@ function drawFooters(doc) {
     doc.setFontSize(8)
     doc.setFont('helvetica', 'normal')
     setColor(doc, 'setTextColor', COLOR.textLight)
-    doc.text('FinOps Explain AI — auto-generated, synthetic demo data', MARGIN, PAGE_HEIGHT - 9)
+    doc.text('Ledgerlight, generated from synthetic demo data', MARGIN, PAGE_HEIGHT - 9)
     doc.text(`Page ${i} of ${pageCount}`, PAGE_WIDTH - MARGIN, PAGE_HEIGHT - 9, { align: 'right' })
   }
 }

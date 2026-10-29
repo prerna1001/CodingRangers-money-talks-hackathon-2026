@@ -1,0 +1,9 @@
+date,account,account_type,category,counterparty_name,counterparty_type,amount,currency,memo
+2026-07-06,Freight revenue,revenue,transport,Atlas Retail,customer,93000,USD,July contracted freight
+2026-07-18,Freight revenue,revenue,transport,Regional shippers,customer,54000,USD,July regional freight
+2026-07-09,Fuel expense,opex,fuel,Shell Fleet,vendor,31000,USD,July fleet fuel
+2026-07-23,Carrier expense,cogs,transport,Independent carriers,vendor,39000,USD,July carrier capacity
+2026-08-06,Freight revenue,revenue,transport,Atlas Retail,customer,149000,USD,Added Midwest distribution lanes
+2026-08-18,Freight revenue,revenue,transport,Regional shippers,customer,59000,USD,August regional freight
+2026-08-09,Fuel expense,opex,fuel,Shell Fleet,vendor,46000,USD,More loaded miles
+2026-08-23,Carrier expense,cogs,transport,Independent carriers,vendor,61000,USD,Added carrier capacity

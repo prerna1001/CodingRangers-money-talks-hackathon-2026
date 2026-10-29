@@ -1,0 +1,9 @@
+date,account,account_type,category,counterparty_name,counterparty_type,amount,currency,memo
+2026-07-02,Room revenue,revenue,lodging,Leisure guests,customer,102000,USD,July leisure stays
+2026-07-15,Food and beverage revenue,revenue,dining,Restaurant guests,customer,28000,USD,July dining revenue
+2026-07-08,Housekeeping labor,opex,payroll,Hotel operations staff,employee,35000,USD,July housekeeping payroll
+2026-07-24,OTA commissions,opex,distribution,Booking platforms,vendor,11000,USD,July booking commissions
+2026-08-02,Room revenue,revenue,lodging,Conference attendees,customer,164000,USD,Regional conference room block
+2026-08-15,Food and beverage revenue,revenue,dining,Conference attendees,customer,49000,USD,Conference catering and dining
+2026-08-08,Housekeeping labor,opex,payroll,Hotel operations staff,employee,52000,USD,Conference turnover labor
+2026-08-24,OTA commissions,opex,distribution,Booking platforms,vendor,13000,USD,August booking commissions

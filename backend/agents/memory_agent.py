@@ -106,13 +106,13 @@ def to_memory_influence(applications: list[MemoryApplication]) -> list[MemoryInf
     ]
 
 
-def load_and_apply(store: MemoryStore, *, company_id: str, facts: list[Fact],
+def load_and_apply(store: MemoryStore, *, user_id: str, company_id: str, facts: list[Fact],
                     transactions: list[CanonicalTransaction] | None = None) -> list[MemoryApplication]:
-    memories = store.retrievable_for_run(company_id)
+    memories = store.retrievable_for_run(company_id, user_id=user_id)
     return apply_memories(memories, facts, transactions)
 
 
-def update_store_after_run(store: MemoryStore, *, company_id: str, run_id: str,
+def update_store_after_run(store: MemoryStore, *, user_id: str, company_id: str, run_id: str,
                             applications: list[MemoryApplication]) -> None:
     """Corroborate/contradict every memory that was actually consulted, then
     decay everything else that went unobserved this run (plan section 8.3).
@@ -121,10 +121,10 @@ def update_store_after_run(store: MemoryStore, *, company_id: str, run_id: str,
     for app in applications:
         observed_ids.add(app.memory.memory_id)
         if app.conflict:
-            store.contradict(app.memory.memory_id)
+            store.contradict(app.memory.memory_id, user_id=user_id)
         elif app.relevant_facts:
-            store.corroborate(app.memory.memory_id, run_id)
-    store.decay_unobserved(company_id, observed_ids)
+            store.corroborate(app.memory.memory_id, run_id, user_id=user_id)
+    store.decay_unobserved(company_id, observed_ids, user_id=user_id)
 
 
 def derive_candidate_memories(

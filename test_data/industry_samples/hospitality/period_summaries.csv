@@ -1,0 +1,7 @@
+period_id,start_date,end_date,account,account_type,amount
+2026-07,2026-07-01,2026-07-31,Room revenue,revenue,102000
+2026-07,2026-07-01,2026-07-31,Food and beverage revenue,revenue,28000
+2026-07,2026-07-01,2026-07-31,Housekeeping labor,opex,35000
+2026-08,2026-08-01,2026-08-31,Room revenue,revenue,164000
+2026-08,2026-08-01,2026-08-31,Food and beverage revenue,revenue,49000
+2026-08,2026-08-01,2026-08-31,Housekeeping labor,opex,52000

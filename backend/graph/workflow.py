@@ -42,7 +42,7 @@ from agents import profile_builder as profile_builder_agent
 from agents import rag_agent
 from agents import report_writer as report_writer_agent
 from agents import stress_tester as stress_tester_agent
-from config import MAX_REVISION_PASSES
+from config import DEFAULT_USER_ID, MAX_REVISION_PASSES
 from graph.events import EVENT_BUS, agent_step, emit_run_complete
 from graph.state import new_run_state
 from models.schemas import (
@@ -62,6 +62,7 @@ from models.schemas import (
 from services import grounding
 from services.memory_store import MemoryStore
 from services.rag_store import Document, RagStore
+from services.reference_store import for_company as uploaded_reference_documents
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +103,8 @@ def _seed_rag_store_if_empty(store: RagStore, state: RunState) -> None:
     """
     if store.backend != "empty":
         return
-    store.add_documents(
+    documents = uploaded_reference_documents(state["user_id"], state["company_id"])
+    documents.extend(
         [
             Document(
                 chunk_id="chunk_prior_report_seed",
@@ -118,6 +120,7 @@ def _seed_rag_store_if_empty(store: RagStore, state: RunState) -> None:
             ),
         ]
     )
+    store.add_documents(documents)
 
 
 # ---------------------------------------------------------------------------
@@ -171,7 +174,7 @@ def node_memory(state: RunState) -> dict:
     """
     with agent_step(state["run_id"], "memory") as step:
         store = MemoryStore()
-        memories = store.retrievable_for_run(state["company_id"])
+        memories = store.retrievable_for_run(state["company_id"], user_id=state["user_id"])
         step.output_summary = f"{len(memories)} memorie(s) loaded"
     return {
         "memories": memories,
@@ -182,7 +185,7 @@ def node_memory(state: RunState) -> dict:
 
 def node_rag(state: RunState) -> dict:
     with agent_step(state["run_id"], "rag") as step:
-        store = RagStore()
+        store = RagStore(user_id=state["user_id"], company_id=state["company_id"])
         _seed_rag_store_if_empty(store, state)
         facts = compute_facts(state)
         retrieved = rag_agent.retrieve_for_facts(store, facts)
@@ -206,35 +209,40 @@ def node_analytics(state: RunState) -> dict:
 
 
 def node_analyst(state: RunState) -> dict:
-    with agent_step(
-        state["run_id"], "analyst", detail=f"Explaining {len(state['facts'])} fact(s)"
-    ) as step:
-        applications = memory_agent.apply_memories(state["memories"], state["facts"], state["transactions"])
-        hints = memory_agent.to_memory_influence(applications)
+    try:
+        with agent_step(
+            state["run_id"], "analyst", detail=f"Explaining {len(state['facts'])} fact(s)"
+        ) as step:
+            applications = memory_agent.apply_memories(state["memories"], state["facts"], state["transactions"])
+            hints = memory_agent.to_memory_influence(applications)
 
-        revision_feedback = None
-        guardrail_result = state.get("guardrail_result")
-        if guardrail_result is not None and guardrail_result.status == GuardrailStatus.NEEDS_REVISION:
-            revision_feedback = guardrail_result.revision_feedback
+            revision_feedback = None
+            guardrail_result = state.get("guardrail_result")
+            if guardrail_result is not None and guardrail_result.status == GuardrailStatus.NEEDS_REVISION:
+                revision_feedback = guardrail_result.revision_feedback
 
-        token_usage_delta: dict[str, int] = {}
-        explanation, _response = analyst_agent.generate_explanation(
-            profile=state["profile"],
-            facts=state["facts"],
-            retrieved=state["retrieved"],
-            memories=state["memories"],
-            memory_influence_hints=hints,
-            qa_report=state["qa_report"],
-            revision_feedback=revision_feedback,
-            token_usage=token_usage_delta,
-        )
-        step.output_summary = explanation.headline
-    return {
-        "explanation": explanation,
-        "timeline": [step.entry],
-        "timings": {"analyst": step.entry.duration_ms},
-        "token_usage": token_usage_delta,
-    }
+            token_usage_delta: dict[str, int] = {}
+            explanation, _response = analyst_agent.generate_explanation(
+                profile=state["profile"],
+                facts=state["facts"],
+                retrieved=state["retrieved"],
+                memories=state["memories"],
+                memory_influence_hints=hints,
+                qa_report=state["qa_report"],
+                revision_feedback=revision_feedback,
+                token_usage=token_usage_delta,
+            )
+            step.output_summary = explanation.headline
+        return {
+            "explanation": explanation,
+            "timeline": [step.entry],
+            "timings": {"analyst": step.entry.duration_ms},
+            "token_usage": token_usage_delta,
+        }
+    except Exception as exc:  # Provider outages must not turn a valid data run into a 500.
+        fallback = node_template_fallback(state)
+        fallback["errors"] = [f"Analyst unavailable; used deterministic fact report: {exc}"]
+        return fallback
 
 
 def node_guardrail(state: RunState) -> dict:
@@ -418,13 +426,17 @@ def node_memory_update(state: RunState) -> dict:
         store = MemoryStore()
         applications = memory_agent.apply_memories(state["memories"], state["facts"], state["transactions"])
         memory_agent.update_store_after_run(
-            store, company_id=state["company_id"], run_id=state["run_id"], applications=applications
+            store,
+            user_id=state["user_id"],
+            company_id=state["company_id"],
+            run_id=state["run_id"],
+            applications=applications,
         )
         new_candidates = memory_agent.derive_candidate_memories(
             company_id=state["company_id"], facts=state["facts"], transactions=state["transactions"]
         )
         for candidate in new_candidates:
-            store.create(candidate)
+            store.create(candidate, user_id=state["user_id"])
         step.output_summary = f"{len(applications)} memorie(s) reinforced, {len(new_candidates)} new candidate(s) created"
     return {
         "timeline": [step.entry],
@@ -504,6 +516,7 @@ def get_compiled_graph():
 
 def run_pipeline(
     *,
+    user_id: str = DEFAULT_USER_ID,
     company_id: str,
     current_period: str,
     prior_period: str,
@@ -515,6 +528,7 @@ def run_pipeline(
     run_id: str | None = None,
 ) -> RunState:
     initial_state = new_run_state(
+        user_id=user_id,
         company_id=company_id,
         current_period=current_period,
         prior_period=prior_period,
