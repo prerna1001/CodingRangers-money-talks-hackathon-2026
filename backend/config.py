@@ -201,10 +201,20 @@ VOICE_BRIEFING_MAX_SECONDS = 60
 
 
 # ---------------------------------------------------------------------------
-# Storage
+# Storage and ownership
 # ---------------------------------------------------------------------------
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./ledgerlight.db")
+
+# Owner applied to every request when Auth0 is not configured (local dev,
+# unit tests, the demo path). Authenticated requests always use the Auth0
+# `sub` claim instead -- this value is never trusted for a signed-in caller.
+DEFAULT_USER_ID = os.getenv("DEFAULT_USER_ID", "local_dev_user").strip() or "local_dev_user"
+
+# Owner assigned by the schema migration to rows written before ownership
+# existed. Keeping them in one bucket preserves the data without exposing it
+# to new accounts.
+LEGACY_USER_ID = os.getenv("LEGACY_USER_ID", "legacy_user").strip() or "legacy_user"
 
 
 # ---------------------------------------------------------------------------

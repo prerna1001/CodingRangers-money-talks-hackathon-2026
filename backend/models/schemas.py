@@ -514,6 +514,7 @@ class RunState(TypedDict, total=False):
     """
 
     run_id: str
+    user_id: str
     company_id: str
     current_period: str
     prior_period: str

@@ -11,9 +11,10 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Literal
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
+import auth0_setup
 from models.schemas import AvailableFile, CanonicalTransaction, PeriodSummary
 from services import csv_parser
 from services.ingestion import ExtractionResult, IngestionService
@@ -31,6 +32,7 @@ MAX_TABLE_ROWS = 50_000
 @dataclass
 class UploadedFile:
     file_id: str
+    user_id: str
     filename: str
     detected_type: str
     classification: str
@@ -101,6 +103,7 @@ def _store_reference(uploaded: UploadedFile) -> None:
         raise HTTPException(status_code=400, detail="No extractable reference text was found in this document")
     document_id = f"upload:{uploaded.file_id}:reference"
     add_reference_document(
+        uploaded.user_id,
         uploaded.company_id,
         Document(
             chunk_id=document_id,
@@ -131,8 +134,9 @@ def _response(uploaded: UploadedFile) -> dict:
 @router.post("/upload")
 async def upload(
     file: UploadFile = File(...),
-    company_id: str = Form("demo_saas"),
+    company_id: str = Form(""),
     period_id: str = Form(""),
+    user_id: str = Depends(auth0_setup.get_current_user_id),
 ) -> dict:
     raw = await file.read()
     if len(raw) > MAX_UPLOAD_BYTES:
@@ -146,10 +150,11 @@ async def upload(
 
     uploaded = UploadedFile(
         file_id=f"file_{uuid.uuid4().hex[:12]}",
+        user_id=user_id,
         filename=file.filename,
         detected_type=extraction.detected_type,
         classification=extraction.classification,
-        company_id=company_id,
+        company_id=company_id.strip() or "default",
         period_id=period_id,
         sha256=_ingestion.fingerprint(raw),
         extraction=extraction,
@@ -169,19 +174,27 @@ async def upload(
     return _response(uploaded)
 
 
-@router.get("/uploads/{file_id}")
-def get_upload(file_id: str) -> dict:
+def _get_owned_upload(file_id: str, user_id: str) -> UploadedFile:
     uploaded = _UPLOADED_FILES.get(file_id)
-    if uploaded is None:
+    if uploaded is None or uploaded.user_id != user_id:
+        # Deliberately 404, not 403: knowing a file_id must not confirm that
+        # another account has that upload.
         raise HTTPException(status_code=404, detail=f"Uploaded file {file_id} not found")
-    return _response(uploaded)
+    return uploaded
+
+
+@router.get("/uploads/{file_id}")
+def get_upload(file_id: str, user_id: str = Depends(auth0_setup.get_current_user_id)) -> dict:
+    return _response(_get_owned_upload(file_id, user_id))
 
 
 @router.post("/uploads/{file_id}/confirm")
-def confirm_upload(file_id: str, request: ConfirmUploadRequest) -> dict:
-    uploaded = _UPLOADED_FILES.get(file_id)
-    if uploaded is None:
-        raise HTTPException(status_code=404, detail=f"Uploaded file {file_id} not found")
+def confirm_upload(
+    file_id: str,
+    request: ConfirmUploadRequest,
+    user_id: str = Depends(auth0_setup.get_current_user_id),
+) -> dict:
+    uploaded = _get_owned_upload(file_id, user_id)
     if request.use_as == "reference_document":
         _store_reference(uploaded)
         return _response(uploaded)
@@ -194,36 +207,30 @@ def confirm_upload(file_id: str, request: ConfirmUploadRequest) -> dict:
     return _response(uploaded)
 
 
-def get_uploaded_transactions(file_ids: list[str]) -> list[CanonicalTransaction]:
+def get_uploaded_transactions(file_ids: list[str], *, user_id: str) -> list[CanonicalTransaction]:
     transactions: list[CanonicalTransaction] = []
     for file_id in file_ids:
-        uploaded = _UPLOADED_FILES.get(file_id)
-        if uploaded is None:
-            raise HTTPException(status_code=404, detail=f"Uploaded file {file_id} not found")
+        uploaded = _get_owned_upload(file_id, user_id)
         if uploaded.review_status != "ready" or uploaded.file_type != "transaction_csv":
             raise HTTPException(status_code=400, detail=f"File {uploaded.filename} must be reviewed as transaction data before analysis")
         transactions.extend(uploaded.transactions)
     return transactions
 
 
-def get_uploaded_period_summaries(file_ids: list[str]) -> list[PeriodSummary]:
+def get_uploaded_period_summaries(file_ids: list[str], *, user_id: str) -> list[PeriodSummary]:
     summaries: list[PeriodSummary] = []
     for file_id in file_ids:
-        uploaded = _UPLOADED_FILES.get(file_id)
-        if uploaded is None:
-            raise HTTPException(status_code=404, detail=f"Uploaded file {file_id} not found")
+        uploaded = _get_owned_upload(file_id, user_id)
         if uploaded.review_status != "ready" or uploaded.file_type != "period_summary_csv":
             raise HTTPException(status_code=400, detail=f"File {uploaded.filename} must be reviewed as period summaries before analysis")
         summaries.extend(uploaded.period_summaries)
     return summaries
 
 
-def get_available_files(file_ids: list[str]) -> list[AvailableFile]:
+def get_available_files(file_ids: list[str], *, user_id: str) -> list[AvailableFile]:
     files: list[AvailableFile] = []
     for file_id in file_ids:
-        uploaded = _UPLOADED_FILES.get(file_id)
-        if uploaded is None:
-            raise HTTPException(status_code=404, detail=f"Uploaded file {file_id} not found")
+        uploaded = _get_owned_upload(file_id, user_id)
         files.append(
             AvailableFile(
                 file_id=uploaded.file_id,

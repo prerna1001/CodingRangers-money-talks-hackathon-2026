@@ -26,6 +26,7 @@ from openpyxl import load_workbook
 from api.routes.analyze import _RUNS
 from graph.workflow import run_pipeline
 from main import app
+from config import DEFAULT_USER_ID
 from models.schemas import CanonicalTransaction, CompanyProfileCore, PeriodSummary
 from services.powerbi_export import SHEETS
 from services.powerbi_report import THEMES as REPORT_THEMES
@@ -58,7 +59,7 @@ def finished_run():
         period_summaries=[PeriodSummary(**p) for p in data["period_summaries"]],
     )
     run_id = state["run_id"]
-    _RUNS[run_id] = {"status": "complete", "state": state, "error": None}
+    _RUNS[run_id] = {"status": "complete", "state": state, "error": None, "user_id": DEFAULT_USER_ID}
     yield run_id
     _RUNS.pop(run_id, None)
 

@@ -42,7 +42,7 @@ from agents import profile_builder as profile_builder_agent
 from agents import rag_agent
 from agents import report_writer as report_writer_agent
 from agents import stress_tester as stress_tester_agent
-from config import MAX_REVISION_PASSES
+from config import DEFAULT_USER_ID, MAX_REVISION_PASSES
 from graph.events import EVENT_BUS, agent_step, emit_run_complete
 from graph.state import new_run_state
 from models.schemas import (
@@ -103,7 +103,7 @@ def _seed_rag_store_if_empty(store: RagStore, state: RunState) -> None:
     """
     if store.backend != "empty":
         return
-    documents = uploaded_reference_documents(state["company_id"])
+    documents = uploaded_reference_documents(state["user_id"], state["company_id"])
     documents.extend(
         [
             Document(
@@ -174,7 +174,7 @@ def node_memory(state: RunState) -> dict:
     """
     with agent_step(state["run_id"], "memory") as step:
         store = MemoryStore()
-        memories = store.retrievable_for_run(state["company_id"])
+        memories = store.retrievable_for_run(state["company_id"], user_id=state["user_id"])
         step.output_summary = f"{len(memories)} memorie(s) loaded"
     return {
         "memories": memories,
@@ -185,7 +185,7 @@ def node_memory(state: RunState) -> dict:
 
 def node_rag(state: RunState) -> dict:
     with agent_step(state["run_id"], "rag") as step:
-        store = RagStore()
+        store = RagStore(user_id=state["user_id"], company_id=state["company_id"])
         _seed_rag_store_if_empty(store, state)
         facts = compute_facts(state)
         retrieved = rag_agent.retrieve_for_facts(store, facts)
@@ -426,13 +426,17 @@ def node_memory_update(state: RunState) -> dict:
         store = MemoryStore()
         applications = memory_agent.apply_memories(state["memories"], state["facts"], state["transactions"])
         memory_agent.update_store_after_run(
-            store, company_id=state["company_id"], run_id=state["run_id"], applications=applications
+            store,
+            user_id=state["user_id"],
+            company_id=state["company_id"],
+            run_id=state["run_id"],
+            applications=applications,
         )
         new_candidates = memory_agent.derive_candidate_memories(
             company_id=state["company_id"], facts=state["facts"], transactions=state["transactions"]
         )
         for candidate in new_candidates:
-            store.create(candidate)
+            store.create(candidate, user_id=state["user_id"])
         step.output_summary = f"{len(applications)} memorie(s) reinforced, {len(new_candidates)} new candidate(s) created"
     return {
         "timeline": [step.entry],
@@ -512,6 +516,7 @@ def get_compiled_graph():
 
 def run_pipeline(
     *,
+    user_id: str = DEFAULT_USER_ID,
     company_id: str,
     current_period: str,
     prior_period: str,
@@ -523,6 +528,7 @@ def run_pipeline(
     run_id: str | None = None,
 ) -> RunState:
     initial_state = new_run_state(
+        user_id=user_id,
         company_id=company_id,
         current_period=current_period,
         prior_period=prior_period,

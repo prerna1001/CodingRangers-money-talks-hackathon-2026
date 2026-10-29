@@ -28,6 +28,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, Response, status
 from starlette.middleware.sessions import SessionMiddleware
 
+from config import DEFAULT_USER_ID
+
 load_dotenv()
 
 # Sentinel for an unconfigured secret. Handing a predictable value to the
@@ -261,6 +263,58 @@ async def current_user(request: Request, response: Response) -> dict[str, Any] |
     return await auth_client.client.get_user(
         store_options={"request": request, "response": response}
     )
+
+
+def owner_from_session(session: dict[str, Any] | None) -> str | None:
+    """Extract the stable owner id (Auth0 ``sub``) from an SDK session.
+
+    The SDK stores the ID-token claims under ``session["user"]``. A few
+    older/fake sessions use ``user_id`` or a top-level ``sub``; accepting
+    those keeps tests and local shims working without weakening production,
+    where a missing subject makes the request fail closed.
+    """
+    if not session:
+        return None
+
+    candidates: list[Any] = []
+    user = session.get("user")
+    if isinstance(user, dict):
+        candidates.extend([user.get("sub"), user.get("user_id"), user.get("id")])
+    elif isinstance(user, str):
+        candidates.append(user)
+    candidates.extend([session.get("sub"), session.get("user_id")])
+
+    for candidate in candidates:
+        if isinstance(candidate, str) and candidate.strip():
+            return candidate.strip()
+    return None
+
+
+async def get_current_user_id(request: Request, response: Response) -> str:
+    """FastAPI dependency returning the owner id for this request.
+
+    Authenticated callers are scoped to their Auth0 subject. When Auth0 is
+    not configured we fall back to ``DEFAULT_USER_ID`` so local development
+    and tests still work. If a tenant is configured but the operator
+    explicitly set ``AUTH0_REQUIRED=0``, an anonymous caller gets the shared
+    local owner rather than every account's data.
+    """
+    if not AUTH0_ENABLED:
+        return DEFAULT_USER_ID
+
+    if not AUTH0_REQUIRED:
+        session = await current_session(request, response)
+        return owner_from_session(session) or DEFAULT_USER_ID
+
+    session = await require_session(request, response)
+    owner = owner_from_session(session)
+    if not owner:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Your session is missing a user identifier",
+            headers={"Location": f"{APP_BASE_URL}/auth/login"},
+        )
+    return owner
 
 
 def status_summary() -> dict[str, Any]:

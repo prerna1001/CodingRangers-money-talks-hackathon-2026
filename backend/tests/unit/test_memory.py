@@ -25,6 +25,8 @@ from models.schemas import (
 )
 from services.memory_store import MemoryStore
 
+USER_ID = "test_user"
+
 
 def _make_memory(**overrides) -> Memory:
     now = datetime.now(timezone.utc)
@@ -50,17 +52,17 @@ def store(tmp_path):
 
 def test_create_and_get_roundtrip(store):
     memory = _make_memory()
-    store.create(memory)
-    fetched = store.get(memory.memory_id)
+    store.create(memory, user_id=USER_ID)
+    fetched = store.get(memory.memory_id, user_id=USER_ID)
     assert fetched is not None
     assert fetched.content == memory.content
 
 
 def test_corroboration_confirms_after_threshold(store):
     memory = _make_memory()
-    store.create(memory)
+    store.create(memory, user_id=USER_ID)
     for i in range(MEMORY_CONFIRM_AFTER_CORROBORATIONS):
-        updated = store.corroborate(memory.memory_id, f"run_{i}")
+        updated = store.corroborate(memory.memory_id, f"run_{i}", user_id=USER_ID)
     assert updated.status == MemoryStatus.CONFIRMED
     assert updated.corroboration_count == MEMORY_CONFIRM_AFTER_CORROBORATIONS
     assert updated.confidence > 0.5
@@ -68,21 +70,21 @@ def test_corroboration_confirms_after_threshold(store):
 
 def test_contradiction_disputes_then_retires(store):
     memory = _make_memory(status=MemoryStatus.CONFIRMED, confidence=0.8)
-    store.create(memory)
+    store.create(memory, user_id=USER_ID)
     for _ in range(MEMORY_DISPUTE_AFTER_CONTRADICTIONS):
-        updated = store.contradict(memory.memory_id)
+        updated = store.contradict(memory.memory_id, user_id=USER_ID)
     assert updated.status == MemoryStatus.DISPUTED
     for _ in range(MEMORY_RETIRE_AFTER_CONTRADICTIONS - MEMORY_DISPUTE_AFTER_CONTRADICTIONS):
-        updated = store.contradict(memory.memory_id)
+        updated = store.contradict(memory.memory_id, user_id=USER_ID)
     assert updated.status == MemoryStatus.RETIRED
     assert updated.confidence < 0.8
 
 
 def test_user_edited_memory_is_locked_from_auto_retirement(store):
     memory = _make_memory(status=MemoryStatus.CONFIRMED, user_edited=True, confidence=0.9)
-    store.create(memory)
+    store.create(memory, user_id=USER_ID)
     for _ in range(5):
-        updated = store.contradict(memory.memory_id)
+        updated = store.contradict(memory.memory_id, user_id=USER_ID)
     assert updated.status == MemoryStatus.CONFIRMED  # never demoted -- user_edited locks it
 
 
@@ -91,8 +93,8 @@ def test_retrievable_for_run_excludes_retired_and_low_confidence(store):
     retired = _make_memory(memory_id="mem_b", status=MemoryStatus.RETIRED, confidence=0.9)
     low_conf = _make_memory(memory_id="mem_c", status=MemoryStatus.CONFIRMED, confidence=0.1)
     for m in (confirmed, retired, low_conf):
-        store.create(m)
-    retrievable_ids = {m.memory_id for m in store.retrievable_for_run("demo_saas")}
+        store.create(m, user_id=USER_ID)
+    retrievable_ids = {m.memory_id for m in store.retrievable_for_run("demo_saas", user_id=USER_ID)}
     assert retrievable_ids == {"mem_a"}
 
 
@@ -101,13 +103,13 @@ def test_decay_unobserved_shrinks_confidence_but_skips_user_edited(store):
     unobserved = _make_memory(memory_id="mem_unobserved", confidence=0.8)
     locked = _make_memory(memory_id="mem_locked", confidence=0.8, user_edited=True)
     for m in (observed, unobserved, locked):
-        store.create(m)
+        store.create(m, user_id=USER_ID)
 
-    store.decay_unobserved("demo_saas", observed_memory_ids={"mem_observed"})
+    store.decay_unobserved("demo_saas", observed_memory_ids={"mem_observed"}, user_id=USER_ID)
 
-    assert store.get("mem_observed").confidence == 0.8
-    assert store.get("mem_unobserved").confidence < 0.8
-    assert store.get("mem_locked").confidence == 0.8
+    assert store.get("mem_observed", user_id=USER_ID).confidence == 0.8
+    assert store.get("mem_unobserved", user_id=USER_ID).confidence < 0.8
+    assert store.get("mem_locked", user_id=USER_ID).confidence == 0.8
 
 
 # ---------------------------------------------------------------------------

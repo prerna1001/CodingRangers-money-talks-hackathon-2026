@@ -13,9 +13,10 @@ judges actually ask ("what's the delta if I pull this driver out?").
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
+import auth0_setup
 from api.routes.analyze import get_run_or_404
 
 router = APIRouter()
@@ -27,8 +28,11 @@ class ScenarioRequest(BaseModel):
 
 
 @router.post("/scenarios/simulate")
-def simulate_scenario(request: ScenarioRequest) -> dict:
-    state = get_run_or_404(request.run_id)
+def simulate_scenario(
+    request: ScenarioRequest,
+    user_id: str = Depends(auth0_setup.get_current_user_id),
+) -> dict:
+    state = get_run_or_404(request.run_id, user_id=user_id)
     explanation = state.get("explanation")
     if explanation is None:
         raise HTTPException(status_code=404, detail=f"No explanation available for run {request.run_id}")
