@@ -1,0 +1,39 @@
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border, rgba(148, 163, 184, 0.35));
+  border-radius: 999px;
+  background: var(--surface-2, rgba(148, 163, 184, 0.08));
+}
+
+.lang-toggle__btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.lang-toggle__btn:hover {
+  opacity: 0.9;
+}
+
+.lang-toggle__btn--active {
+  opacity: 1;
+  background: var(--accent, #2563eb);
+  color: #fff;
+}
+
+.lang-toggle__warn {
+  color: #f59e0b;
+  font-weight: 700;
+  padding-right: 6px;
+}

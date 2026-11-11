@@ -4,6 +4,7 @@ import AgentTimeline from '../components/AgentTimeline'
 import Dashboard from '../components/dashboard/Dashboard'
 import Tick from '../components/Tick'
 import { useAuth } from '../auth/authContext'
+import LanguageToggle from '../i18n/LanguageToggle'
 import { analyzeRun } from '../services/api'
 
 const PIPELINE_STEPS = [
@@ -80,6 +81,7 @@ function AppShell() {
           <span className="brand__name">Ledgerlight</span>
         </div>
         <span className="page__tagline">Every variance explained and traced to its transactions</span>
+        <LanguageToggle />
         {auth.authenticated && auth.logout_url && (
           <a className="page__signout" href={auth.logout_url}>Sign out</a>
         )}

@@ -2,7 +2,7 @@
 (plan sections 14.3, 15.2 -- board-ready report export).
 
 PDF generation is optional-dependency graceful degradation, same pattern
-as services/tavily_client.py and services/elevenlabs_client.py: if
+as services/tavily_client.py and services/voice_client.py: if
 `weasyprint` isn't installed, the endpoint returns a clear 501 pointing
 at the markdown endpoint instead of crashing the request.
 """

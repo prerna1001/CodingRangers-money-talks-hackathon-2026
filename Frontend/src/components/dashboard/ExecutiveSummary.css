@@ -127,6 +127,18 @@
   color: var(--text-dim);
 }
 
+.voice-panel__play {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.voice-panel__error {
+  font-size: 12px;
+  color: var(--danger);
+}
+
 .voice-panel__script {
   font-family: var(--serif);
   font-style: italic;

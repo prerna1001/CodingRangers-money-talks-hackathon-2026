@@ -15,7 +15,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 import auth0_setup
-from api.routes import analyze, health, memory, reports, scenarios, stress_tests, upload, voice
+from api.routes import (
+    analyze,
+    chat,
+    health,
+    memory,
+    reports,
+    scenarios,
+    stress_tests,
+    translate,
+    upload,
+    voice,
+)
 from login_page import setup_required_page
 
 app = FastAPI(title="Ledgerlight API", version="0.1.0")
@@ -47,6 +58,8 @@ app.include_router(memory.router, prefix="/api", tags=["memory"], dependencies=g
 app.include_router(stress_tests.router, prefix="/api", tags=["stress-tests"], dependencies=guard)
 app.include_router(reports.router, prefix="/api", tags=["reports"], dependencies=guard)
 app.include_router(voice.router, prefix="/api", tags=["voice"], dependencies=guard)
+app.include_router(chat.router, prefix="/api", tags=["chat"], dependencies=guard)
+app.include_router(translate.router, prefix="/api", tags=["translate"], dependencies=guard)
 app.include_router(scenarios.router, prefix="/api", tags=["scenarios"], dependencies=guard)
 
 

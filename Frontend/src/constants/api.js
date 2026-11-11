@@ -7,6 +7,9 @@ export const API_ENDPOINTS = {
   authStatus: '/api/auth/status',
   upload: '/api/upload',
   analyze: '/api/analyze',
+  chat: '/api/chat',
+  voiceSpeak: '/api/voice/speak',
+  voiceTranscribe: '/api/voice/transcribe',
   analyzeStream: (runId) => `/api/analyze/stream/${runId}`,
   runs: '/api/runs',
   run: (runId) => `/api/runs/${runId}`,
@@ -18,4 +21,6 @@ export const API_ENDPOINTS = {
   powerbi: (runId) => `/api/runs/${runId}/powerbi`,
   pitchDeck: (runId, theme) => `/api/runs/${runId}/pitch-deck?theme=${theme}`,
   voice: (runId) => `/api/voice/${runId}`,
+  translate: '/api/translate',
+  translateLanguages: '/api/translate/languages',
 }
