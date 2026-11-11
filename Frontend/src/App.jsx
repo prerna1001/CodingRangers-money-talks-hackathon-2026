@@ -4,6 +4,7 @@ import { canEnterApp, useAuth } from './auth/authContext'
 import RequireAuth from './auth/RequireAuth'
 import HomePage from './pages/HomePage'
 import AppShell from './pages/AppShell'
+import { LanguageProvider } from './i18n/LanguageProvider'
 import './App.css'
 
 // Unknown paths resolve by session: signed-in users end up in the app,
@@ -21,18 +22,20 @@ function CatchAll() {
 function App() {
   return (
     <AuthProvider>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route
-          path="/app"
-          element={
-            <RequireAuth>
-              <AppShell />
-            </RequireAuth>
-          }
-        />
-        <Route path="*" element={<CatchAll />} />
-      </Routes>
+      <LanguageProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/app"
+            element={
+              <RequireAuth>
+                <AppShell />
+              </RequireAuth>
+            }
+          />
+          <Route path="*" element={<CatchAll />} />
+        </Routes>
+      </LanguageProvider>
     </AuthProvider>
   )
 }

@@ -187,3 +187,91 @@ export async function downloadPitchDeck(runId, theme) {
   setTimeout(() => URL.revokeObjectURL(url), 1000)
   return filename
 }
+
+// POST /api/chat — answers grounded in this run's analysis (backend
+// api/routes/chat.py: LLM when a key is configured, rule-based otherwise).
+export async function sendChatMessage(runId, message, history) {
+  const res = await fetch(API_ENDPOINTS.chat, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ run_id: runId, message, history }),
+  })
+
+  if (!res.ok) {
+    throw new Error(await errorDetail(res, `Chat failed with status ${res.status}`))
+  }
+
+  return res.json()
+}
+
+// POST /api/voice/speak — text-to-speech via the backend (local Kokoro by
+// default). Returns an MP3 blob. A 503 means the voice provider isn't set up;
+// the error carries the backend's explanation.
+//
+// `language` is the language to speak in. Pass translate: true when the text
+// is still English but should be spoken in `language` — the backend
+// translates it first, so the audio matches what the screen shows.
+export async function synthesizeSpeech(text, { language = 'en', translate = false } = {}) {
+  const res = await fetch(API_ENDPOINTS.voiceSpeak, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, language, translate }),
+  })
+
+  if (!res.ok) {
+    throw new Error(await errorDetail(res, `Voice synthesis failed with status ${res.status}`))
+  }
+
+  return res.blob()
+}
+
+// POST /api/voice/transcribe — speech-to-text via the backend (local
+// faster-whisper by default). Takes the recorded audio blob, returns the
+// transcribed text. `language` picks the decoding language, so a Spanish
+// question isn't forced through an English-only model.
+export async function transcribeAudio(blob, { language = 'en' } = {}) {
+  const ext = blob.type.includes('mp4') ? 'mp4' : blob.type.includes('ogg') ? 'ogg' : 'webm'
+  const form = new FormData()
+  form.append('file', blob, `recording.${ext}`)
+  form.append('language', language)
+
+  const res = await fetch(API_ENDPOINTS.voiceTranscribe, { method: 'POST', body: form })
+
+  if (!res.ok) {
+    throw new Error(await errorDetail(res, `Transcription failed with status ${res.status}`))
+  }
+
+  const { text } = await res.json()
+  return text ?? ''
+}
+
+// POST /api/translate — batch screen translation (Helsinki-NLP OPUS-MT on
+// the backend). Returns translations in the same order as `texts`; on any
+// failure the caller keeps showing the original text, so this never blanks
+// the UI.
+export async function translateTexts(texts, target, source = 'en') {
+  if (!texts.length || target === source) return texts
+
+  const res = await fetch(API_ENDPOINTS.translate, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ texts, target, source }),
+  })
+
+  if (!res.ok) {
+    throw new Error(await errorDetail(res, `Translation failed with status ${res.status}`))
+  }
+
+  const { translations } = await res.json()
+  return Array.isArray(translations) ? translations : texts
+}
+
+async function errorDetail(res, fallback) {
+  try {
+    const body = await res.json()
+    if (typeof body?.detail === 'string') return body.detail
+  } catch {
+    // response wasn't JSON — keep the generic message
+  }
+  return fallback
+}
