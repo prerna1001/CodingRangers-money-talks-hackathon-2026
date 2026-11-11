@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { runStressTests } from '../../services/mockApi'
 import './StressTestPanel.css'
+import { useLanguage } from '../../i18n/context'
 
 const STATUS_META = {
   pass: { label: 'Pass', className: 'badge--success' },
@@ -9,6 +10,7 @@ const STATUS_META = {
 }
 
 export default function StressTestPanel() {
+  const { t } = useLanguage()
   const [checks, setChecks] = useState(null)
   const [running, setRunning] = useState(false)
   const [source, setSource] = useState(null)
@@ -27,8 +29,8 @@ export default function StressTestPanel() {
     <div className="stress-panel">
       <div className="panel-heading">
         <div>
-          <h3>Stress tests</h3>
-          <p>Adversarial and messy-data scenarios run against this dataset</p>
+          <h3>{t('Stress tests')}</h3>
+          <p>{t('Adversarial and messy-data scenarios run against this dataset')}</p>
         </div>
         <button type="button" className="btn btn--primary btn--sm" onClick={handleRun} disabled={running}>
           {running ? (

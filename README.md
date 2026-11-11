@@ -36,7 +36,7 @@ FinOps Explain AI is a money-operations analyst that:
 2. Runs them through an analysis pipeline (Profile Builder → Data QA → Memory → RAG → Analyzer → Guardrail → Stress Test → Report).
 3. Presents an executive dashboard: headline finding, top drivers, a revenue waterfall, a driver drilldown table, and transaction-level evidence.
 4. Lets the user ask follow-up questions in a chat panel grounded in the same analysis (no separate source of truth).
-5. Generates a downloadable PDF report and an optional spoken CFO-style audio briefing (ElevenLabs).
+5. Generates a downloadable PDF report and an optional spoken CFO-style audio briefing (local Kokoro TTS).
 
 Target users: startup founders, fractional CFOs, finance operators, and RevOps teams who need a defensible answer to "what changed this month, and why" without waiting on a full manual close.
 
@@ -55,7 +55,7 @@ Target users: startup founders, fractional CFOs, finance operators, and RevOps t
 | **Memory & RAG Panels** | UI surfaces for prior-run memory and retrieved context, showing what informed the current explanation. |
 | **Scenario Simulator** | What-if exploration on top of the analyzed drivers. |
 | **Report Export** | One-click PDF report generation (jsPDF) with the executive summary, waterfall, and driver table. |
-| **Voice Briefing** | Real ElevenLabs text-to-speech integration — turns the written summary into a downloadable audio briefing. |
+| **Voice Briefing** | Text-to-speech turns the written summary into a downloadable audio briefing. Runs locally on Kokoro-82M (Apache-2.0) by default — no API key, no per-call cost — with ElevenLabs available behind an env var. |
 
 ## System Architecture
 
@@ -77,7 +77,7 @@ Target users: startup founders, fractional CFOs, finance operators, and RevOps t
 - python-dotenv
 
 **Third-party / Sponsor integrations**
-- ElevenLabs (text-to-speech CFO voice briefing)
+- Kokoro-82M via ONNX Runtime (text-to-speech CFO voice briefing) and faster-whisper (speech-to-text for the chat mic), both local and open-source; ElevenLabs optional
 
 **Planned (per hackathon plan)**
 - LangGraph (multi-agent orchestration)
@@ -130,7 +130,7 @@ CodingRangers-money-talks-hackathon-2026/
 | `POST` | `/api/upload` | Accepts a CSV file, detects type (`transaction_csv` / `monthly_summary_csv`), returns row count and file metadata. |
 | `POST` | `/api/analyze` | Runs analysis for a given `file_id` (optional) and returns the full explanation object: headline, drivers, waterfall series, agent timeline, risks/caveats. |
 | `POST` | `/api/chat` | Accepts `{ message, history }`, returns a reply grounded in the current analysis. |
-| `POST` | `/api/voice/speak` | Accepts `{ text }`, returns an MP3 audio stream generated via ElevenLabs. Requires `ELEVENLABS_API_KEY`. |
+| `POST` | `/api/voice/speak` | Accepts `{ text }`, returns an MP3 audio stream. Uses the local Kokoro voice by default. |
 
 ## Getting Started
 
@@ -138,6 +138,7 @@ CodingRangers-money-talks-hackathon-2026/
 
 - Python 3.11+
 - Node.js 18+
+- `ffmpeg` on `PATH` (macOS: `brew install ffmpeg`) — the local voice providers use it to encode MP3 and decode browser recordings
 
 ### Backend
 
@@ -146,9 +147,21 @@ cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # add ELEVENLABS_API_KEY to enable voice briefings
+cp .env.example .env   # voice works out of the box; no key needed
+python scripts/fetch_voice_models.py   # one-time ~900MB voice model download
 uvicorn main:app --reload --port 8000
 ```
+
+### Voice
+
+Speech runs locally and free by default: **Kokoro-82M** (Apache-2.0, via ONNX
+Runtime) for text-to-speech and **faster-whisper** (MIT) for the chat mic. No
+API key, no per-call cost, and it works offline once the models are cached.
+`GET /api/health` reports which providers are live under `voice`.
+
+Swap providers in `backend/.env` — `VOICE_TTS_PROVIDER=kokoro|elevenlabs` and
+`VOICE_STT_PROVIDER=whisper|elevenlabs` (ElevenLabs needs `ELEVENLABS_API_KEY`).
+`KOKORO_VOICE` picks the narrator; `WHISPER_MODEL` trades accuracy for speed.
 
 ### Frontend
 

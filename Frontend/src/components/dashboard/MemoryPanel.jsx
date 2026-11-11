@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { deleteMemory, fetchMemories } from '../../services/mockApi'
 import './MemoryPanel.css'
+import { useLanguage } from '../../i18n/context'
 
 export default function MemoryPanel() {
+  const { t } = useLanguage()
   const [memories, setMemories] = useState(null)
   const [source, setSource] = useState(null)
 
@@ -19,7 +21,7 @@ export default function MemoryPanel() {
     setMemories((prev) => prev.filter((m) => m.memory_id !== memoryId))
   }
 
-  if (!memories) return <p className="panel-loading">Loading memories…</p>
+  if (!memories) return <p className="panel-loading">{t('Loading memories…')}</p>
 
   const usedCount = memories.filter((m) => m.used_in_this_run).length
 
@@ -27,8 +29,8 @@ export default function MemoryPanel() {
     <div className="memory-panel">
       <div className="panel-heading">
         <div>
-          <h3>Memory</h3>
-          <p>What the agent remembers from previous runs — opt-in, editable, deletable</p>
+          <h3>{t('Memory')}</h3>
+          <p>{t('What the agent remembers from previous runs — opt-in, editable, deletable')}</p>
         </div>
         {source && (
           <span className="source-tag">

@@ -16,6 +16,7 @@ across runs.
 from __future__ import annotations
 
 import json
+import logging
 
 from models.schemas import (
     ClaimType,
@@ -28,6 +29,8 @@ from models.schemas import (
     RetrievedChunk,
 )
 from services import llm
+
+logger = logging.getLogger(__name__)
 
 _SYSTEM_PROMPT = """You are a senior FP&A analyst explaining a month-over-month \
 financial variance to a founder or CFO.
@@ -208,19 +211,10 @@ def generate_explanation(
 
 
 def _extract_json(text: str) -> dict:
-    text = text.strip()
-    if text.startswith("```"):
-        text = text.strip("`")
-        if text.lower().startswith("json"):
-            text = text[4:]
-    start = text.find("{")
-    end = text.rfind("}")
-    if start == -1 or end == -1:
-        raise ValueError(f"Analyst response did not contain a JSON object: {text[:200]!r}")
-    # strict=False tolerates raw newlines/tabs inside JSON strings, which
-    # models emit routinely when a summary spans lines. Rejecting the whole
-    # explanation over a literal newline is not a real safety property.
-    return json.loads(text[start : end + 1], strict=False)
+    # services/llm.extract_json handles the fences and the quirks smaller
+    # models emit (raw newlines inside strings, trailing commas). Rejecting a
+    # whole explanation over a stray comma is not a real safety property.
+    return llm.extract_json(text, what="Analyst")
 
 
 def _normalize_explanation_payload(raw: dict) -> dict:
@@ -231,6 +225,7 @@ def _normalize_explanation_payload(raw: dict) -> dict:
     Convert only safe presentation fields; evidence-bearing claims remain
     validated by Pydantic and the grounding pass.
     """
+    kept: list[dict] = []
     for driver in raw.get("drivers", []) or []:
         if driver.get("share_of_gross_change_pct") is None:
             driver["share_of_gross_change_pct"] = 0.0
@@ -243,4 +238,29 @@ def _normalize_explanation_payload(raw: dict) -> dict:
                 evidence["amount"] = 0.0
             if evidence.get("txn_ids") is None:
                 evidence["txn_ids"] = []
+
+        # A driver's amount is an evidence-bearing claim, so it is NOT
+        # defaulted to 0.0 the way the presentation fields above are --
+        # that would put a number the model never produced in front of a
+        # CFO. Recover it by adding up the driver's own evidence, which is
+        # a derivation rather than an invention; with nothing to add up,
+        # drop the driver instead of failing the whole explanation.
+        if driver.get("amount") is None:
+            evidence = driver.get("evidence", []) or []
+            if evidence:
+                driver["amount"] = sum(float(e.get("amount") or 0.0) for e in evidence)
+                logger.info(
+                    "analyst: recovered null amount for driver %r from its evidence",
+                    driver.get("driver"),
+                )
+            else:
+                logger.warning(
+                    "analyst: dropped driver %r -- null amount and no evidence",
+                    driver.get("driver"),
+                )
+                continue
+        kept.append(driver)
+
+    if "drivers" in raw:
+        raw["drivers"] = kept
     return raw

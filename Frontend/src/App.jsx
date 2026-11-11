@@ -3,6 +3,9 @@ import UploadCard from './components/UploadCard'
 import AgentTimeline from './components/AgentTimeline'
 import Dashboard from './components/dashboard/Dashboard'
 import { analyzeRun } from './services/api'
+import { LanguageProvider } from './i18n/LanguageProvider'
+import { useLanguage } from './i18n/context'
+import LanguageToggle from './i18n/LanguageToggle'
 import './App.css'
 
 const PIPELINE_STEPS = [
@@ -23,7 +26,8 @@ const PIPELINE_STEPS = [
 // doesn't cut the animation short, and a fast backend doesn't skip it.
 // Tracked via refs (not effect-derived state) since the transition is
 // triggered from two separate callbacks, not from a render-time value.
-function App() {
+function AppShell() {
+  const { t } = useLanguage()
   const [phase, setPhase] = useState('upload')
   const [analysis, setAnalysis] = useState(null)
   const [error, setError] = useState(null)
@@ -51,7 +55,8 @@ function App() {
       setAnalysis(res)
       tryEnterDashboard()
     } catch (err) {
-      setError(err.message || 'Analysis failed')
+      // Backend messages arrive in English, so translate them too.
+      setError(t(err.message || 'Analysis failed'))
       setPhase('upload')
     }
   }
@@ -74,9 +79,10 @@ function App() {
       <header className="page__header">
         <div className="brand">
           <span className="brand__mark">FE</span>
-          <span className="brand__name">FinOps Explain AI</span>
+          <span className="brand__name">{t('FinOps Explain AI')}</span>
         </div>
-        <span className="page__tagline">Money operations, explained with evidence</span>
+        <span className="page__tagline">{t('Money operations, explained with evidence')}</span>
+        <LanguageToggle />
       </header>
 
       <main className="page__main">
@@ -99,4 +105,10 @@ function App() {
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppShell />
+    </LanguageProvider>
+  )
+}

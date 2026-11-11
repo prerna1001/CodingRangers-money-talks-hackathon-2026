@@ -34,7 +34,12 @@ function setColor(doc, method, color) {
   doc[method](color[0], color[1], color[2])
 }
 
-function drawCoverHeader(doc, analysis) {
+const PDF_LABELS = {
+  en: { tagline: 'Money operations, explained with evidence', run: 'Run', confidence: 'Confidence', quality: 'Data quality', waterfall: 'Variance waterfall', waterfallSub: 'How prior-period revenue became current-period revenue', drivers: 'Driver drilldown', driversSub: 'Ranked by absolute contribution to the change', evidence: 'Evidence', evidenceSub: 'Source transactions cited for each driver', risks: 'Risks & caveats', timeline: 'Agent run timeline', driver: 'Driver', agent: 'Agent', account: 'Account', current: 'Current', prior: 'Prior', change: 'Change', share: '% Share', conf: 'Conf.', status: 'Status', duration: 'Duration', passed: 'Passed', warning: 'Warning', failed: 'Failed', footer: 'FinOps Explain AI — auto-generated, synthetic demo data', page: 'Page', of: 'of' },
+  es: { tagline: 'Operaciones financieras, explicadas con evidencia', run: 'Ejecución', confidence: 'Confianza', quality: 'Calidad de datos', waterfall: 'Cascada de variación', waterfallSub: 'Cómo los ingresos del período anterior se convirtieron en los actuales', drivers: 'Desglose de factores', driversSub: 'Ordenado por contribución absoluta al cambio', evidence: 'Evidencia', evidenceSub: 'Transacciones citadas para cada factor', risks: 'Riesgos y salvedades', timeline: 'Cronología de agentes', driver: 'Factor', agent: 'Agente', account: 'Cuenta', current: 'Actual', prior: 'Anterior', change: 'Variación', share: '% participación', conf: 'Conf.', status: 'Estado', duration: 'Duración', passed: 'Correcto', warning: 'Advertencia', failed: 'Fallido', footer: 'FinOps Explain AI — datos de demostración sintéticos y generados automáticamente', page: 'Página', of: 'de' },
+}
+
+function drawCoverHeader(doc, analysis, labels) {
   doc.setFillColor(...COLOR.textDark)
   doc.rect(0, 0, PAGE_WIDTH, 34, 'F')
 
@@ -51,25 +56,25 @@ function drawCoverHeader(doc, analysis) {
   doc.setFontSize(9.5)
   doc.setFont('helvetica', 'normal')
   setColor(doc, 'setTextColor', [200, 210, 205])
-  doc.text('Money operations, explained with evidence', MARGIN + 18, 21.5)
+  doc.text(labels.tagline, MARGIN + 18, 21.5)
 
   doc.setFontSize(9)
   setColor(doc, 'setTextColor', [200, 210, 205])
-  doc.text(`Run ${analysis.run_id || ''}`, PAGE_WIDTH - MARGIN, 14, { align: 'right' })
-  doc.text(new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }), PAGE_WIDTH - MARGIN, 19, {
+  doc.text(`${labels.run} ${analysis.run_id || ''}`, PAGE_WIDTH - MARGIN, 14, { align: 'right' })
+  doc.text(new Date().toLocaleDateString(labels.run === 'Ejecución' ? 'es-ES' : undefined, { year: 'numeric', month: 'long', day: 'numeric' }), PAGE_WIDTH - MARGIN, 19, {
     align: 'right',
   })
 
   return 46
 }
 
-function drawScoreCards(doc, y, analysis) {
+function drawScoreCards(doc, y, analysis, labels) {
   const gap = 6
   const cardWidth = (CONTENT_WIDTH - gap * 2) / 3
   const cardHeight = 24
   const cards = [
-    { label: 'Confidence', value: `${Math.round(analysis.confidence * 100)}%` },
-    { label: 'Data quality', value: `${Math.round(analysis.data_quality_score * 100)}%` },
+    { label: labels.confidence, value: `${Math.round(analysis.confidence * 100)}%` },
+    { label: labels.quality, value: `${Math.round(analysis.data_quality_score * 100)}%` },
     {
       label: `${analysis.periods.prior.label} -> ${analysis.periods.current.label}`,
       value: `$${(analysis.periods.current.revenue / 1000).toFixed(0)}k`,
@@ -109,17 +114,17 @@ function buildWaterfallSeries(waterfall) {
   })
 }
 
-function drawWaterfallChart(doc, y, waterfall) {
+function drawWaterfallChart(doc, y, waterfall, labels) {
   y = ensureSpace(doc, y, 78)
 
   doc.setFontSize(12.5)
   doc.setFont('helvetica', 'bold')
   setColor(doc, 'setTextColor', COLOR.textDark)
-  doc.text('Variance waterfall', MARGIN, y)
+  doc.text(labels.waterfall, MARGIN, y)
   doc.setFontSize(8.5)
   doc.setFont('helvetica', 'normal')
   setColor(doc, 'setTextColor', COLOR.textDim)
-  doc.text('How prior-period revenue became current-period revenue', MARGIN, y + 5)
+  doc.text(labels.waterfallSub, MARGIN, y + 5)
   y += 12
 
   const data = buildWaterfallSeries(waterfall)
@@ -163,10 +168,10 @@ function drawWaterfallChart(doc, y, waterfall) {
   return chartBottom + 16
 }
 
-function statusMeta(status) {
-  if (status === 'passed_with_warnings') return { label: 'Warning', color: COLOR.amberText, bg: COLOR.amberBg }
-  if (status === 'failed') return { label: 'Failed', color: COLOR.danger, bg: COLOR.dangerBg }
-  return { label: 'Passed', color: COLOR.accentDark, bg: COLOR.accentBg }
+function statusMeta(status, labels) {
+  if (status === 'passed_with_warnings') return { label: labels.warning, color: COLOR.amberText, bg: COLOR.amberBg }
+  if (status === 'failed') return { label: labels.failed, color: COLOR.danger, bg: COLOR.dangerBg }
+  return { label: labels.passed, color: COLOR.accentDark, bg: COLOR.accentBg }
 }
 
 function drawSectionTitle(doc, y, text, subtitle) {
@@ -210,9 +215,9 @@ function tableTheme(doc, y, options) {
   return doc.lastAutoTable.finalY + 10
 }
 
-function drawRiskCallout(doc, y, risks) {
+function drawRiskCallout(doc, y, risks, labels) {
   if (!risks?.length) return y
-  y = drawSectionTitle(doc, y, 'Risks & caveats')
+  y = drawSectionTitle(doc, y, labels.risks)
 
   const lineHeight = 5.2
   const wrapped = risks.map((r) => doc.splitTextToSize(`•  ${r}`, CONTENT_WIDTH - 10))
@@ -236,7 +241,7 @@ function drawRiskCallout(doc, y, risks) {
   return y + boxHeight + 10
 }
 
-function drawFooters(doc) {
+function drawFooters(doc, labels) {
   const pageCount = doc.internal.getNumberOfPages()
   for (let i = 1; i <= pageCount; i += 1) {
     doc.setPage(i)
@@ -245,8 +250,8 @@ function drawFooters(doc) {
     doc.setFontSize(8)
     doc.setFont('helvetica', 'normal')
     setColor(doc, 'setTextColor', COLOR.textLight)
-    doc.text('FinOps Explain AI — auto-generated, synthetic demo data', MARGIN, PAGE_HEIGHT - 9)
-    doc.text(`Page ${i} of ${pageCount}`, PAGE_WIDTH - MARGIN, PAGE_HEIGHT - 9, { align: 'right' })
+    doc.text(labels.footer, MARGIN, PAGE_HEIGHT - 9)
+    doc.text(`${labels.page} ${i} ${labels.of} ${pageCount}`, PAGE_WIDTH - MARGIN, PAGE_HEIGHT - 9, { align: 'right' })
   }
 }
 
@@ -254,10 +259,11 @@ function drawFooters(doc) {
 // chart, and autoTable tables) from the analyze response and triggers a
 // browser download. Nothing here is re-fetched — it's a pure render of the
 // analysis object already held in state.
-export function downloadAnalysisPdf(analysis) {
+export function downloadAnalysisPdf(analysis, { language = 'en' } = {}) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+  const labels = PDF_LABELS[language] || PDF_LABELS.en
 
-  let y = drawCoverHeader(doc, analysis)
+  let y = drawCoverHeader(doc, analysis, labels)
 
   doc.setFontSize(19)
   doc.setFont('helvetica', 'bold')
@@ -273,12 +279,12 @@ export function downloadAnalysisPdf(analysis) {
   doc.text(summaryLines, MARGIN, y)
   y += summaryLines.length * 5.2 + 10
 
-  y = drawScoreCards(doc, y, analysis)
-  y = drawWaterfallChart(doc, y, analysis.waterfall)
+  y = drawScoreCards(doc, y, analysis, labels)
+  y = drawWaterfallChart(doc, y, analysis.waterfall, labels)
 
-  y = drawSectionTitle(doc, y, 'Driver drilldown', 'Ranked by absolute contribution to the change')
+  y = drawSectionTitle(doc, y, labels.drivers, labels.driversSub)
   y = tableTheme(doc, y, {
-    head: [['Driver', 'Account', 'Current', 'Prior', 'Change', '% Share', 'Conf.']],
+    head: [[labels.driver, labels.account, labels.current, labels.prior, labels.change, labels.share, labels.conf]],
     body: analysis.drivers.map((d) => [
       d.driver,
       d.account,
@@ -305,32 +311,36 @@ export function downloadAnalysisPdf(analysis) {
     },
   })
 
-  y = drawSectionTitle(doc, y, 'Evidence', 'Source transactions cited for each driver')
+  y = drawSectionTitle(doc, y, labels.evidence, labels.evidenceSub)
   const evidenceRows = []
   analysis.drivers.forEach((d) => {
-    d.evidence.forEach((e, idx) => {
+    // The analysis response may omit evidence for a calculated aggregate.
+    // A report should still download with an empty evidence section instead
+    // of failing after the user has already clicked the button.
+    const evidence = Array.isArray(d.evidence) ? d.evidence : []
+    evidence.forEach((e, idx) => {
       evidenceRows.push([idx === 0 ? d.driver : '', e])
     })
   })
   y = tableTheme(doc, y, {
-    head: [['Driver', 'Evidence']],
-    body: evidenceRows,
+    head: [[labels.driver, labels.evidence]],
+    body: evidenceRows.length ? evidenceRows : [[language === 'es' ? 'Sin evidencia detallada' : 'No detailed evidence', '—']],
     columnStyles: {
       0: { cellWidth: 44, fontStyle: 'bold', textColor: COLOR.textDark },
       1: { textColor: COLOR.textDim },
     },
   })
 
-  y = drawRiskCallout(doc, y, analysis.risks_or_caveats)
+  y = drawRiskCallout(doc, y, analysis.risks_or_caveats, labels)
 
   if (analysis.agent_timeline?.length) {
-    y = drawSectionTitle(doc, y, 'Agent run timeline')
+    y = drawSectionTitle(doc, y, labels.timeline)
     y = tableTheme(doc, y, {
-      head: [['#', 'Agent', 'Status', 'Duration']],
+      head: [['#', labels.agent, labels.status, labels.duration]],
       body: analysis.agent_timeline.map((step, idx) => [
         String(idx + 1),
         step.name,
-        statusMeta(step.status).label,
+        statusMeta(step.status, labels).label,
         `${step.duration_ms}ms`,
       ]),
       columnStyles: {
@@ -341,13 +351,13 @@ export function downloadAnalysisPdf(analysis) {
       didParseCell: (data) => {
         if (data.section === 'body' && data.column.index === 2) {
           const step = analysis.agent_timeline[data.row.index]
-          data.cell.styles.textColor = statusMeta(step.status).color
+          data.cell.styles.textColor = statusMeta(step.status, labels).color
         }
       },
     })
   }
 
-  drawFooters(doc)
+  drawFooters(doc, labels)
 
   const filename = `finops-report-${analysis.run_id || 'run'}.pdf`
   doc.save(filename)

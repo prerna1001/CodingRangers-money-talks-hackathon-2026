@@ -5,7 +5,7 @@ function here only rearranges fields that already exist on the Explanation
 and GroundingReport it's given.
 
 Voice script generation happens from the approved explanation only, so
-ElevenLabs (services/elevenlabs_client.py) can never speak a claim the
+the voice providers (services/voice_client.py) can never speak a claim the
 guardrail rejected (plan section 16.2).
 """
 

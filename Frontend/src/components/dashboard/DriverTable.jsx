@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { fetchDriverEvidence } from '../../services/mockApi'
 import './DriverTable.css'
+import { useLanguage } from '../../i18n/context'
 
 function formatCurrency(value) {
   const numeric = Number(value) || 0
@@ -25,6 +26,7 @@ function driverType(account) {
 }
 
 export default function DriverTable({ drivers = [] }) {
+  const { t } = useLanguage()
   const [openDriver, setOpenDriver] = useState(null)
   const [evidence, setEvidence] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -46,8 +48,8 @@ export default function DriverTable({ drivers = [] }) {
     <div className="driver-table-wrap">
       <div className="panel-heading panel-heading--table">
         <div>
-          <h3>Driver Drilldown</h3>
-          <p>Click a row to inspect the source transactions behind it</p>
+          <h3>{t('Driver Drilldown')}</h3>
+          <p>{t('Click a row to inspect the source transactions behind it')}</p>
         </div>
         <span className="driver-table__count">{drivers.length} ranked drivers</span>
       </div>
@@ -56,13 +58,13 @@ export default function DriverTable({ drivers = [] }) {
         <table className="driver-table">
           <thead>
             <tr>
-              <th>Account</th>
-              <th>Current</th>
-              <th>Prior</th>
-              <th>Change</th>
-              <th>% change</th>
-              <th>Top driver</th>
-              <th>Confidence</th>
+              <th>{t('Account')}</th>
+              <th>{t('Current')}</th>
+              <th>{t('Prior')}</th>
+              <th>{t('Change')}</th>
+              <th>{t('% change')}</th>
+              <th>{t('Top driver')}</th>
+              <th>{t('Confidence')}</th>
             </tr>
           </thead>
           <tbody>
@@ -80,7 +82,7 @@ export default function DriverTable({ drivers = [] }) {
               <tr key={`${d.account || 'account'}-${d.driver || index}`} onClick={() => openEvidence(d)}>
                 <td>
                   <div className="driver-table__account">
-                    <span>{d.account || 'Unknown account'}</span>
+                    <span>{t(d.account || 'Unknown account')}</span>
                     <small>{driverType(d.account)}</small>
                   </div>
                 </td>
@@ -95,7 +97,7 @@ export default function DriverTable({ drivers = [] }) {
                     {Number(d.share_of_change_pct) || 0}%
                   </span>
                 </td>
-                <td className="driver-table__driver-name">{d.driver || 'Unknown driver'}</td>
+                <td className="driver-table__driver-name">{t(d.driver || 'Unknown driver')}</td>
                 <td>
                   <span className="confidence-pill">
                     <span style={{ width: `${Math.round(confidence * 100)}%` }} />

@@ -238,6 +238,9 @@ def to_frontend_analysis(state: RunState) -> dict:
                 "name": _pretty_agent_name(entry.agent),
                 "status": _STATUS_MAP.get(entry.status, "passed"),
                 "duration_ms": round(entry.duration_ms or 0),
+                "input_summary": entry.input_summary,
+                "output_summary": entry.output_summary,
+                "safety_notes": entry.safety_notes or [],
             }
             for entry in state.get("timeline", [])
         ],

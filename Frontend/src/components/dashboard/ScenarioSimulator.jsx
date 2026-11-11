@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { runScenario } from '../../services/mockApi'
 import './ScenarioSimulator.css'
+import { useLanguage } from '../../i18n/context'
 
 const SCENARIOS = [
   { id: 'remove_top_customer', label: 'What if the top customer had not expanded?' },
@@ -9,6 +10,7 @@ const SCENARIOS = [
 ]
 
 export default function ScenarioSimulator({ baselinePct }) {
+  const { t } = useLanguage()
   const [activeId, setActiveId] = useState(null)
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -25,8 +27,8 @@ export default function ScenarioSimulator({ baselinePct }) {
     <div className="scenario-panel">
       <div className="panel-heading">
         <div>
-          <h3>Scenario simulator</h3>
-          <p>Ask "what if" — recomputed against this run's evidence</p>
+          <h3>{t('Scenario simulator')}</h3>
+          <p>{t('Ask "what if" — recomputed against this run\'s evidence')}</p>
         </div>
       </div>
 
@@ -48,12 +50,12 @@ export default function ScenarioSimulator({ baselinePct }) {
         <div className="scenario-result">
           <div className="scenario-result__compare">
             <div>
-              <span className="scenario-result__label">Actual</span>
+              <span className="scenario-result__label">{t('Actual')}</span>
               <span className="scenario-result__value">+{result.baseline_pct}%</span>
             </div>
             <span className="scenario-result__arrow">→</span>
             <div>
-              <span className="scenario-result__label">Simulated</span>
+              <span className="scenario-result__label">{t('Simulated')}</span>
               <span className="scenario-result__value scenario-result__value--sim">
                 +{result.adjusted_change_pct}%
               </span>

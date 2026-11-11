@@ -9,7 +9,9 @@ with LLM_MOCK_MODE=on so it remains testable without network access.
 
 from __future__ import annotations
 
+import json
 import logging
+import re
 import time
 from dataclasses import dataclass
 from typing import Callable
@@ -119,7 +121,12 @@ def _complete_openai_compatible(
         # with that field set). OpenRouter's own unified `reasoning`
         # control is the field it actually honors, and is safely ignored
         # for any routed model that doesn't support reasoning control.
-        payload["reasoning"] = {"enabled": False}
+        # gpt-oss models reject disabling it outright ("Reasoning is
+        # mandatory", 400), so ask for the lowest effort instead.
+        if model.startswith("openai/gpt-oss"):
+            payload["reasoning"] = {"effort": "low"}
+        else:
+            payload["reasoning"] = {"enabled": False}
 
     with httpx.Client(timeout=config.LLM_TIMEOUT_SECONDS) as client:
         response = client.post(url, headers=headers, json=payload)
@@ -239,3 +246,77 @@ def record_usage(token_usage: dict[str, int], response: LLMResponse) -> None:
     token_usage[key] = token_usage.get(key, 0) + 1
     provider_key = f"{response.provider}_calls"
     token_usage[provider_key] = token_usage.get(provider_key, 0) + 1
+
+
+# ---------------------------------------------------------------------------
+# Parsing structured replies
+# ---------------------------------------------------------------------------
+
+# A trailing comma before a closing brace/bracket -- `"a": 1,}` -- is invalid
+# JSON that smaller models emit regularly. Only applied after a strict parse
+# has already failed, so well-formed output is never rewritten.
+_TRAILING_COMMA_RE = re.compile(r",(\s*[}\]])")
+
+
+def _candidate_objects(text: str) -> list[dict]:
+    """The top-level JSON objects in `text`, in order.
+
+    raw_decode stops at the end of the first complete value, so unlike
+    slicing to the last `}` it is unbothered by anything that follows --
+    a closing remark, a second object, a repeated answer.
+
+    Scanning resumes *after* each object it parses rather than at the next
+    `{`, so nested objects are never returned as candidates of their own. A
+    driver inside the payload is part of the answer, not a rival to it.
+    """
+    decoder = json.JSONDecoder(strict=False)
+    found: list[dict] = []
+    index = text.find("{")
+    while index != -1:
+        try:
+            value, end = decoder.raw_decode(text, index)
+        except json.JSONDecodeError:
+            index = text.find("{", index + 1)
+            continue
+        if isinstance(value, dict):
+            found.append(value)
+        index = text.find("{", max(end, index + 1))
+    return found
+
+
+def extract_json(text: str, *, what: str) -> dict:
+    """Pull the JSON object out of a model reply and parse it.
+
+    Models wrap JSON in ```json fences, pad it with prose, and emit quirks
+    that are not worth failing a whole run over: raw newlines inside strings,
+    trailing commas, and text after the object. The schema is still validated
+    by the caller -- this only gets us far enough to validate it.
+
+    When a reply contains more than one object (a worked example before the
+    real answer, say) the richest one wins: the payloads these agents return
+    have many keys, and the stray ones are small.
+    """
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.strip("`")
+        if text.lower().startswith("json"):
+            text = text[4:]
+
+    if "{" not in text:
+        raise ValueError(f"{what} response did not contain a JSON object: {text[:200]!r}")
+
+    candidates = _candidate_objects(text)
+    if candidates:
+        return max(candidates, key=len)
+
+    # Nothing parsed cleanly: the likeliest cause is a trailing comma, which
+    # raw_decode rejects too. Repair the whole span and try once more.
+    repaired = _TRAILING_COMMA_RE.sub(r"\1", text[text.find("{") : text.rfind("}") + 1])
+    try:
+        parsed = json.loads(repaired, strict=False)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"{what} response was not valid JSON: {exc}") from exc
+    if not isinstance(parsed, dict):
+        raise ValueError(f"{what} response was not a JSON object")
+    logger.info("%s response needed a trailing-comma repair before parsing", what)
+    return parsed

@@ -17,6 +17,20 @@ numpy>=2.0
 sqlalchemy>=2.0
 rapidfuzz>=3.9
 
+# --- voice: local open-source providers (no API key, no per-call cost) ---
+# Kokoro-82M (Apache-2.0) via ONNX Runtime for text-to-speech, and
+# faster-whisper (MIT) for speech-to-text. Needs ffmpeg on PATH, and
+# `python scripts/fetch_voice_models.py` to download the weights once.
+# Pinned: kokoro-onnx 0.4.8+ all cap at Python <3.14, and this venv is 3.14.
+kokoro-onnx==0.4.7
+faster-whisper>=1.2
+
+# --- translation: English <-> Spanish, local and open-source ---
+# Helsinki-NLP OPUS-MT (MarianMT) through transformers, which
+# sentence-transformers already provides; sentencepiece is what the Marian
+# tokenizer needs. No API key and no per-character bill.
+sentencepiece>=0.2
+
 # --- shared ---
 pytest>=8.3
 httpx>=0.27

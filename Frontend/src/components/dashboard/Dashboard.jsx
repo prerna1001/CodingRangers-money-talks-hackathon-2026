@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import ExecutiveSummary from './ExecutiveSummary'
 import WaterfallChart from './WaterfallChart'
 import DriverTable from './DriverTable'
@@ -8,6 +8,9 @@ import RagPanel from './RagPanel'
 import StressTestPanel from './StressTestPanel'
 import ScenarioSimulator from './ScenarioSimulator'
 import ReportPanel from './ReportPanel'
+import ChatPanel from './ChatPanel'
+import { useLanguage } from '../../i18n/context'
+import TabVoiceButton from './TabVoiceButton'
 import './Dashboard.css'
 
 const TABS = [
@@ -22,7 +25,10 @@ const TABS = [
 ]
 
 export default function Dashboard({ analysis, onReset }) {
+  const { t } = useLanguage()
   const [tab, setTab] = useState('summary')
+  const [chatOpen, setChatOpen] = useState(false)
+  const panelRef = useRef(null)
   const periods = analysis?.periods ?? {}
   const prior = periods.prior ?? { label: 'Prior', revenue: 0 }
   const current = periods.current ?? { label: 'Current', revenue: 0 }
@@ -44,26 +50,27 @@ export default function Dashboard({ analysis, onReset }) {
   }
 
   return (
-    <div className="dashboard">
+    <div className={`dashboard ${chatOpen ? 'dashboard--chat-open' : ''}`}>
       <div className="dashboard__toolbar">
         <nav className="dashboard__tabs">
-          {TABS.map((t) => (
+          {TABS.map((item) => (
             <button
-              key={t.id}
+              key={item.id}
               type="button"
-              className={`dashboard__tab ${tab === t.id ? 'dashboard__tab--active' : ''}`}
-              onClick={() => setTab(t.id)}
+              className={`dashboard__tab ${tab === item.id ? 'dashboard__tab--active' : ''}`}
+              onClick={() => setTab(item.id)}
             >
-              {t.label}
+              {t(item.label)}
             </button>
           ))}
         </nav>
         <button type="button" className="btn btn--ghost btn--sm" onClick={onReset}>
-          New analysis
+          {t('New analysis')}
         </button>
+        <TabVoiceButton targetRef={panelRef} />
       </div>
 
-      <div className="dashboard__panel">
+      <div className="dashboard__panel" ref={panelRef}>
         {tab === 'summary' && <ExecutiveSummary analysis={normalizedAnalysis} />}
         {tab === 'drivers' && (
           <div className="dashboard__drivers-grid">
@@ -71,13 +78,46 @@ export default function Dashboard({ analysis, onReset }) {
             <DriverTable drivers={drivers} />
           </div>
         )}
-        {tab === 'pipeline' && <PipelinePanel steps={agentTimeline} />}
+        {tab === 'pipeline' && <PipelinePanel steps={agentTimeline} analysis={normalizedAnalysis} />}
         {tab === 'memory' && <MemoryPanel />}
         {tab === 'rag' && <RagPanel />}
         {tab === 'stress' && <StressTestPanel />}
         {tab === 'scenarios' && <ScenarioSimulator baselinePct={revenueChangePct} />}
         {tab === 'report' && <ReportPanel analysis={normalizedAnalysis} />}
       </div>
+
+      {chatOpen && (
+        <>
+          <button
+            type="button"
+            className="dashboard__chat-scrim"
+            onClick={() => setChatOpen(false)}
+            aria-label={t('Close chatbot')}
+          />
+          <aside className="dashboard__chat-drawer" aria-label={t('Chatbot')}>
+          <button
+            type="button"
+            className="dashboard__chat-close"
+            onClick={() => setChatOpen(false)}
+            aria-label={t('Close chatbot')}
+            title={t('Close chatbot')}
+          >
+            ×
+          </button>
+          <ChatPanel analysis={normalizedAnalysis} compact />
+        </aside>
+        </>
+      )}
+      <button
+        type="button"
+        className="dashboard__chat-launcher"
+        onClick={() => setChatOpen((open) => !open)}
+        aria-label={chatOpen ? t('Close chatbot') : t('Open chatbot')}
+        aria-expanded={chatOpen}
+        title={chatOpen ? t('Close chatbot') : t('Open chatbot')}
+      >
+        {chatOpen ? '×' : '💬'}
+      </button>
     </div>
   )
 }

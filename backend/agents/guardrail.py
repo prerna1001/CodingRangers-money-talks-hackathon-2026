@@ -85,13 +85,7 @@ def _llm_review(
     if token_usage is not None:
         llm.record_usage(token_usage, response)
 
-    text = response.text.strip()
-    if text.startswith("```"):
-        text = text.strip("`")
-        if text.lower().startswith("json"):
-            text = text[4:]
-    start, end = text.find("{"), text.rfind("}")
-    payload = json.loads(text[start : end + 1])
+    payload = llm.extract_json(response.text, what="Guardrail")
     return bool(payload.get("approved", False)), payload.get("notes", []), payload.get("revision_feedback", [])
 
 

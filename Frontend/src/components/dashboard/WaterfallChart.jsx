@@ -1,4 +1,5 @@
 import './WaterfallChart.css'
+import { useLanguage } from '../../i18n/context'
 
 const COLORS = {
   start: 'var(--chart-baseline)',
@@ -100,6 +101,7 @@ function scaleFor(data) {
 }
 
 export default function WaterfallChart({ waterfall, drivers = [] }) {
+  const { t } = useLanguage()
   const data = buildWaterfallData(waterfall, drivers)
   const { min, max } = scaleFor(data)
   const plotWidth = WIDTH - PLOT.left - PLOT.right
@@ -114,8 +116,8 @@ export default function WaterfallChart({ waterfall, drivers = [] }) {
     <div className="waterfall-chart">
       <div className="panel-heading">
         <div>
-          <h3>Variance Waterfall</h3>
-          <p>How prior-period revenue bridged to current-period revenue</p>
+          <h3>{t('Variance Waterfall')}</h3>
+          <p>{t('How prior-period revenue bridged to current-period revenue')}</p>
         </div>
         <span className="waterfall-chart__badge">{Math.max(data.length - 2, 0)} drivers</span>
       </div>

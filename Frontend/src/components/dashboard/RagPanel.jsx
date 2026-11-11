@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { fetchRagEvidence } from '../../services/mockApi'
 import './RagPanel.css'
+import { useLanguage } from '../../i18n/context'
 
 export default function RagPanel() {
+  const { t } = useLanguage()
   const [items, setItems] = useState(null)
   const [source, setSource] = useState(null)
 
@@ -13,14 +15,14 @@ export default function RagPanel() {
     })
   }, [])
 
-  if (!items) return <p className="panel-loading">Retrieving context…</p>
+  if (!items) return <p className="panel-loading">{t('Retrieving context…')}</p>
 
   return (
     <div className="rag-panel">
       <div className="panel-heading">
         <div>
-          <h3>Retrieved context (RAG)</h3>
-          <p>Business context pulled in before analysis — previous reports, policies, definitions</p>
+          <h3>{t('Retrieved context (RAG)')}</h3>
+          <p>{t('Business context pulled in before analysis — previous reports, policies, definitions')}</p>
         </div>
         {source && (
           <span className="source-tag">

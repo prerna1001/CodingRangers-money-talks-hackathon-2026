@@ -38,10 +38,10 @@ _MODEL_FULL = {
     "normalization": "nvidia/nemotron-3.5-lightning-30b-a3b",
     "memory_relevance": "nvidia/nemotron-3.5-lightning-30b-a3b",
     "rag_rerank": "nvidia/nemotron-3.5-lightning-30b-a3b",
-    "analyst": "nvidia/nemotron-3-super-120b-a12b",
+    "analyst": "nvidia/nemotron-3.5-lightning-30b-a3b",
     "guardrail": "openai/gpt-oss-safeguard-20b",
     "stress_test": "nvidia/nemotron-3.5-lightning-30b-a3b",
-    "report_writer": "nvidia/nemotron-3-super-120b-a12b",
+    "report_writer": "nvidia/nemotron-3.5-lightning-30b-a3b",
 }
 
 # DEMO_FAST_MODE downgrades every task to cheaper/faster workhorse models.
@@ -88,9 +88,20 @@ LLM_ROUTES = {
         "model": os.getenv("LLM_MODEL_RAG_RERANK", "nvidia/nemotron-3.5-lightning:free"),
     },
     # The main CFO explanation should showcase the NVIDIA sponsor model.
+    # Two constraints pick the model:
+    #   - nemotron-3-super-120b-a12b is in NVIDIA's public catalog but returns
+    #     404 "Not found for account" on this key, so it fails every run.
+    #   - nemotron-3-ultra-550b-a55b is enabled and gives the best answer, but
+    #     the guardrail can send the analyst back twice (MAX_REVISION_PASSES),
+    #     and three sequential 550B calls overran the frontend's poll timeout.
+    # lightning-30b is enabled, answers in a few seconds, and is the same
+    # model family the memory/RAG agents already use. Swap in the ultra model
+    # via LLM_MODEL_ANALYST when a run has time to spare.
+    # Groq is not a fallback here: its free tier allows 8,000 tokens per
+    # minute, and the analyst prompt alone pushes a run past that (413).
     "analyst": {
         "provider": os.getenv("LLM_PROVIDER_ANALYST", "nvidia"),
-        "model": os.getenv("LLM_MODEL_ANALYST", "nvidia/nemotron-3-super-120b-a12b"),
+        "model": os.getenv("LLM_MODEL_ANALYST", "nvidia/nemotron-3.5-lightning-30b-a3b"),
     },
     # Guardrail review is small but important; Groq is fast and isolated from
     # the analyst provider so one provider's limits do not pause every agent.
@@ -105,6 +116,11 @@ LLM_ROUTES = {
     "report_writer": {
         "provider": os.getenv("LLM_PROVIDER_REPORT_WRITER", "openrouter"),
         "model": os.getenv("LLM_MODEL_REPORT_WRITER", "nvidia/nemotron-3.5-lightning:free"),
+    },
+    # Dashboard chatbot: short conversational answers grounded in one run.
+    "chat": {
+        "provider": os.getenv("LLM_PROVIDER_CHAT", "groq"),
+        "model": os.getenv("LLM_MODEL_CHAT", "openai/gpt-oss-20b"),
     },
 }
 
@@ -197,7 +213,71 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")
 TAVILY_TIMEOUT_SECONDS = 5
 
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
 VOICE_BRIEFING_MAX_SECONDS = 60
+
+
+# ---------------------------------------------------------------------------
+# Voice providers (services/voice_client.py)
+# ---------------------------------------------------------------------------
+# Default to the local open-source stack so voice works offline, with no API
+# key and no per-call cost: Kokoro-82M (Apache-2.0 weights, run through ONNX
+# Runtime) for speech, and faster-whisper (MIT, CTranslate2 port of Whisper)
+# for transcription. Set either to "elevenlabs" to use the hosted provider.
+
+VOICE_TTS_PROVIDER = os.getenv("VOICE_TTS_PROVIDER", "kokoro").strip().lower()
+VOICE_STT_PROVIDER = os.getenv("VOICE_STT_PROVIDER", "whisper").strip().lower()
+
+# Kokoro ships one checkpoint with many baked-in voices. "af_heart" is the
+# highest-graded American English voice and the closest match to the calm,
+# neutral narration the briefing used to get from ElevenLabs' "Rachel".
+KOKORO_VOICE = os.getenv("KOKORO_VOICE", "af_heart")
+KOKORO_LANG = os.getenv("KOKORO_LANG", "en-us")
+KOKORO_SPEED = _env_float("KOKORO_SPEED", 1.0)
+
+# Weights are ~350MB, so they are downloaded once on first use rather than
+# vendored: scripts/fetch_voice_models.py pre-fetches them before a demo.
+KOKORO_MODEL_DIR = os.getenv("KOKORO_MODEL_DIR", "./.cache/kokoro")
+KOKORO_MODEL_FILE = os.getenv("KOKORO_MODEL_FILE", "kokoro-v1.0.onnx")
+KOKORO_VOICES_FILE = os.getenv("KOKORO_VOICES_FILE", "voices-v1.0.bin")
+KOKORO_RELEASE_URL = os.getenv(
+    "KOKORO_RELEASE_URL",
+    "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1",
+)
+
+# "small.en" is the accuracy/latency sweet spot for the short spoken
+# questions the chat panel sends; int8 on CPU keeps it off the GPU entirely.
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small.en")
+WHISPER_DEVICE = os.getenv("WHISPER_DEVICE", "cpu")
+WHISPER_COMPUTE_TYPE = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
+WHISPER_LANGUAGE = os.getenv("WHISPER_LANGUAGE", "en")
+WHISPER_BEAM_SIZE = int(os.getenv("WHISPER_BEAM_SIZE", "5"))
+
+# An ".en" model can only do English, so a Spanish question needs the
+# multilingual checkpoint. Loaded only if a non-English language is asked for.
+WHISPER_MODEL_MULTILINGUAL = os.getenv("WHISPER_MODEL_MULTILINGUAL", "small")
+
+# Kokoro's Spanish voices are ef_dora, em_alex and em_santa.
+KOKORO_VOICE_ES = os.getenv("KOKORO_VOICE_ES", "ef_dora")
+
+
+# ---------------------------------------------------------------------------
+# Translation (services/translator.py)
+# ---------------------------------------------------------------------------
+# Screen/UI translation runs on Helsinki-NLP's OPUS-MT models through
+# transformers -- local, open-source and free, so there is no per-character
+# bill like the Google Translate API's.
+
+UI_DEFAULT_LANGUAGE = os.getenv("UI_DEFAULT_LANGUAGE", "en")
+TRANSLATION_SUPPORTED_LANGUAGES = ("en", "es")
+TRANSLATION_MODELS = {
+    "en-es": os.getenv("TRANSLATION_MODEL_EN_ES", "Helsinki-NLP/opus-mt-en-es"),
+    "es-en": os.getenv("TRANSLATION_MODEL_ES_EN", "Helsinki-NLP/opus-mt-es-en"),
+}
+# A screenful of labels fits comfortably; the caps stop one request from
+# pinning the CPU for a minute.
+TRANSLATION_MAX_TEXTS = int(os.getenv("TRANSLATION_MAX_TEXTS", "250"))
+TRANSLATION_MAX_CHARS = int(os.getenv("TRANSLATION_MAX_CHARS", "2000"))
 
 
 # ---------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { uploadFiles } from '../services/api'
+import { useLanguage } from '../i18n/context'
 import './UploadCard.css'
 
 function formatBytes(bytes) {
@@ -10,6 +11,7 @@ function formatBytes(bytes) {
 }
 
 export default function UploadCard({ onUploaded }) {
+  const { t } = useLanguage()
   const [files, setFiles] = useState([])
   const [status, setStatus] = useState('idle') // idle | uploading | success | error
   const [result, setResult] = useState(null)
@@ -67,7 +69,7 @@ export default function UploadCard({ onUploaded }) {
       })
       setStatus('success')
     } catch (err) {
-      setError(err.message || 'Upload failed')
+      setError(t(err.message || 'Upload failed'))
       setStatus('error')
     }
   }
@@ -75,8 +77,8 @@ export default function UploadCard({ onUploaded }) {
   return (
     <div className="upload-card">
       <div className="upload-card__header">
-        <h2>Upload financial data</h2>
-        <p>Monthly account summaries or transaction-level CSVs</p>
+        <h2>{t('Upload financial data')}</h2>
+        <p>{t('Monthly account summaries or transaction-level CSVs')}</p>
       </div>
 
       <div
@@ -111,8 +113,10 @@ export default function UploadCard({ onUploaded }) {
                 strokeLinejoin="round"
               />
             </svg>
-            <p className="dropzone__title">Drag &amp; drop CSV files here</p>
-            <p className="dropzone__subtitle">transactions.csv and period_summaries.csv — .csv only</p>
+            <p className="dropzone__title">{t('Drag & drop CSV files here')}</p>
+            <p className="dropzone__subtitle">
+              {t('transactions.csv and period_summaries.csv — .csv only')}
+            </p>
           </>
         ) : (
           <div className="file-chip-list">
@@ -138,7 +142,7 @@ export default function UploadCard({ onUploaded }) {
                     e.stopPropagation()
                     setFiles((prev) => prev.filter((x) => !(x.name === f.name && x.size === f.size)))
                   }}
-                  aria-label={`Remove ${f.name}`}
+                  aria-label={`${t('Remove')} ${f.name}`}
                 >
                   ×
                 </button>
@@ -157,15 +161,15 @@ export default function UploadCard({ onUploaded }) {
         >
           {status === 'uploading' ? (
             <>
-              <span className="spinner" /> Uploading…
+              <span className="spinner" /> {t('Uploading…')}
             </>
           ) : (
-            'Upload'
+            t('Upload')
           )}
         </button>
         {(status === 'success' || status === 'error') && (
           <button type="button" className="btn btn--ghost" onClick={reset}>
-            Upload another
+            {t('Upload another')}
           </button>
         )}
         {status === 'success' && result && (
@@ -174,7 +178,7 @@ export default function UploadCard({ onUploaded }) {
             className="btn btn--primary"
             onClick={() => onUploaded?.(result)}
           >
-            Run analysis →
+            {t('Run analysis →')}
           </button>
         )}
       </div>
@@ -186,14 +190,14 @@ export default function UploadCard({ onUploaded }) {
           {callInfo && (
             <div className="call-confirm">
               <span className="call-confirm__dot" />
-              Live call confirmed — <code>{callInfo.method}</code>{' '}
-              <code>{callInfo.url}</code> responded in{' '}
+              {t('Live call confirmed')} — <code>{callInfo.method}</code>{' '}
+              <code>{callInfo.url}</code> {t('responded in')}{' '}
               <strong>{callInfo.ms}ms</strong>
             </div>
           )}
           <div className="result__header">
-            <span className="badge badge--success">success</span>
-            <span className="result__label">API response</span>
+            <span className="badge badge--success">{t('success')}</span>
+            <span className="result__label">{t('API response')}</span>
           </div>
           <pre className="result__json">{JSON.stringify(result, null, 2)}</pre>
         </div>
