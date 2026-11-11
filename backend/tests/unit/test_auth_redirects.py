@@ -68,10 +68,12 @@ def test_empty_cookie_and_no_referer_falls_back_to_the_app_url():
     assert _resolve(cookies={auth0_setup.APP_ORIGIN_COOKIE: ""}) == f"{auth0_setup.APP_URL}/"
 
 
-def test_login_and_logout_urls_stay_on_the_backend_origin():
+def test_login_and_logout_urls_stay_on_the_backend_origin(monkeypatch):
     # /auth/* is not proxied through Vite, so both URLs must be absolute on
     # APP_BASE_URL; returnTo in particular must stay there because Auth0 only
     # honours Allowed Logout URLs (configured as http://localhost:8000).
+    # The URLs only exist with a tenant configured, so don't depend on .env.
+    monkeypatch.setattr(auth0_setup, "AUTH0_ENABLED", True)
     summary = auth0_setup.status_summary()
     assert summary["login_url"] == f"{auth0_setup.APP_BASE_URL}/auth/login"
     assert summary["logout_url"].startswith(f"{auth0_setup.APP_BASE_URL}/auth/logout?returnTo=")
