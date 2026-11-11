@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import * as echarts from 'echarts/core'
 import { BarChart, LineChart } from 'echarts/charts'
 import { AriaComponent, GridComponent, LegendComponent, TooltipComponent } from 'echarts/components'
@@ -8,29 +8,42 @@ import { SVGRenderer } from 'echarts/renderers'
 // share of the bundle small. SVG renders crisp text at any zoom level.
 echarts.use([BarChart, LineChart, GridComponent, TooltipComponent, LegendComponent, AriaComponent, SVGRenderer])
 
-const TOKEN_NAMES = [
+const COLOR_TOKENS = [
   'text', 'text-h', 'text-dim', 'border', 'border-strong', 'surface', 'surface-raised',
-  'accent', 'up', 'danger', 'chart-up', 'chart-down', 'chart-total', 'chart-carry', 'chart-grid', 'sans',
+  'accent', 'up', 'danger', 'chart-up', 'chart-down', 'chart-total', 'chart-carry', 'chart-grid', 'chart-line',
 ]
+const FONT_TOKENS = ['sans', 'mono']
 
-// Charts draw with the same CSS tokens as the rest of the page, so they
-// follow light/dark mode instead of carrying their own palette.
-function readTokens() {
-  const style = getComputedStyle(document.documentElement)
-  return Object.fromEntries(
-    TOKEN_NAMES.map((name) => [name.replace(/-(\w)/g, (_, c) => c.toUpperCase()), style.getPropertyValue(`--${name}`).trim()]),
-  )
+const camel = (name) => name.replace(/-(\w)/g, (_, c) => c.toUpperCase())
+
+// The tokens are written in oklch, which ECharts' colour parser does not
+// read. Painting one pixel and reading it back gives the same colour as rgb.
+let probe = null
+function toRgb(value) {
+  if (!value) return value
+  if (!probe) {
+    const canvas = document.createElement('canvas')
+    canvas.width = 1
+    canvas.height = 1
+    probe = canvas.getContext('2d', { willReadFrequently: true })
+  }
+  if (!probe) return value
+  probe.clearRect(0, 0, 1, 1)
+  probe.fillStyle = value
+  probe.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = probe.getImageData(0, 0, 1, 1).data
+  return a === 255 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`
 }
 
-function useColorScheme() {
-  const [scheme, setScheme] = useState(() => (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-color-scheme: dark)')
-    const onChange = (event) => setScheme(event.matches ? 'dark' : 'light')
-    query.addEventListener('change', onChange)
-    return () => query.removeEventListener('change', onChange)
-  }, [])
-  return scheme
+// Charts draw with the same CSS tokens as the rest of the page instead of
+// carrying their own palette.
+function readTokens() {
+  const style = getComputedStyle(document.documentElement)
+  const read = (name) => style.getPropertyValue(`--${name}`).trim()
+  return {
+    ...Object.fromEntries(COLOR_TOKENS.map((name) => [camel(name), toRgb(read(name))])),
+    ...Object.fromEntries(FONT_TOKENS.map((name) => [camel(name), read(name)])),
+  }
 }
 
 /**
@@ -41,7 +54,6 @@ export default function EChart({ build, deps = [], onSelect, height = 320, label
   const nodeRef = useRef(null)
   const chartRef = useRef(null)
   const onSelectRef = useRef(onSelect)
-  const scheme = useColorScheme()
 
   useEffect(() => {
     onSelectRef.current = onSelect
@@ -63,7 +75,7 @@ export default function EChart({ build, deps = [], onSelect, height = 320, label
   useEffect(() => {
     chartRef.current?.setOption(build(readTokens()), { notMerge: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scheme, ...deps])
+  }, deps)
 
   return (
     <div

@@ -1,3 +1,4 @@
+import Icon from '../Icon'
 import { useEffect, useRef } from 'react'
 import { ledgerChange, ledgerMoney } from '../../utils/format'
 import './DriverTable.css'
@@ -41,7 +42,7 @@ export default function EvidenceDrawer({ driver, evidence, loading, onClose }) {
             <p>{driver.account}, {ledgerChange(driver.amount)} this period</p>
           </div>
           <button ref={closeRef} type="button" className="evidence-drawer__close" onClick={onClose} aria-label="Close evidence">
-            ×
+            <Icon name="close" />
           </button>
         </div>
 

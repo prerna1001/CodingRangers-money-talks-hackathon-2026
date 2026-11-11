@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { sendChatMessage, synthesizeSpeech, transcribeAudio } from '../../services/api'
 import { useLanguage } from '../../i18n/context'
+import Icon from '../Icon'
 import './ChatPanel.css'
 
 // Browser speech recognition (Chrome, Edge, Safari) gives live word-by-word
@@ -38,9 +39,9 @@ function Message({ msg, onSpeak, t }) {
             {msg.speakStatus === 'loading' ? (
               <span className="spinner" />
             ) : msg.speakStatus === 'playing' ? (
-              '⏹'
+              <Icon name="stop" />
             ) : (
-              '🔈'
+              <Icon name="speaker" />
             )}
           </button>
         )}
@@ -310,7 +311,7 @@ export default function ChatPanel({ analysis, compact = false }) {
           aria-label={micStatus === 'recording' ? t('Stop recording') : t('Speak your question')}
           title={micStatus === 'recording' ? t('Stop recording') : t('Speak your question')}
         >
-          {micStatus === 'transcribing' ? <span className="spinner" /> : micStatus === 'recording' ? '⏹' : '🎤'}
+          {micStatus === 'transcribing' ? <span className="spinner" /> : micStatus === 'recording' ? <Icon name="stop" /> : <Icon name="mic" />}
         </button>
         <input
           ref={inputRef}
@@ -319,14 +320,14 @@ export default function ChatPanel({ analysis, compact = false }) {
           onChange={(e) => setInput(e.target.value)}
           placeholder={
             micStatus === 'recording'
-              ? t('Listening… click ⏹ when done')
+              ? t('Listening… press stop when done')
               : micStatus === 'transcribing'
                 ? t('Transcribing…')
-                : t('Ask about this run, or click 🎤 to speak…')
+                : t('Ask about this run, or use the mic…')
           }
           className="chat-input"
         />
-        <button type="submit" className="btn btn--primary btn--sm" disabled={!input.trim() || sending}>
+        <button type="submit" className="btn btn--primary" disabled={!input.trim() || sending}>
           {t('Send')}
         </button>
       </form>

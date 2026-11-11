@@ -72,6 +72,7 @@ export default function UploadCard({ onUploaded }) {
 
   return (
     <div className="upload-card upload-card--batch">
+      <div className="upload-card__form stock">
       <div className="upload-card__header">
         <h1>Explain what changed between two periods</h1>
         <p>Add the statements, exports and notes for both periods. Ledgerlight checks the data, works out what drove the change, and traces every figure back to its transactions.</p>
@@ -86,7 +87,9 @@ export default function UploadCard({ onUploaded }) {
         <label className="context-grid__wide">Business context<textarea name="business_context" value={context.business_context} onChange={updateContext} placeholder="Seasonality, known campaigns, renewals, pricing changes, or questions to investigate" rows="3" /></label>
         </div>
       </fieldset>
+      </div>
 
+      <div className="upload-card__tray desk">
       <div
         className={`dropzone ${isDragging ? 'dropzone--active' : ''} ${files.length ? 'dropzone--filled' : ''}`}
         onDragOver={(event) => { event.preventDefault(); setIsDragging(true) }}
@@ -115,10 +118,10 @@ export default function UploadCard({ onUploaded }) {
         ) : (
           <div className="file-chip-list">
             {files.map((file) => (
-              <div className="file-chip" key={`${file.name}-${file.size}`}>
+              <div className="file-chip stock" key={`${file.name}-${file.size}`}>
                 <svg className="file-chip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /><path d="M14 3v5h5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
                 <div className="file-chip__meta"><span className="file-chip__name">{file.name}</span><span className="file-chip__size">{formatBytes(file.size)}</span></div>
-                <button type="button" className="file-chip__remove" onClick={(event) => { event.stopPropagation(); removeFile(file) }} aria-label={`Remove ${file.name}`}>×</button>
+                <button type="button" className="file-chip__remove" onClick={(event) => { event.stopPropagation(); removeFile(file) }} aria-label={`Remove ${file.name}`}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg></button>
               </div>
             ))}
             <div className="file-chip-list__more">
@@ -132,11 +135,12 @@ export default function UploadCard({ onUploaded }) {
       </div>
 
       <div className="upload-card__actions">
-        <button type="button" className="btn btn--primary" disabled={!files.length || status === 'uploading'} onClick={startAnalysis}>
+        <button type="button" className="btn btn--primary btn--lg" disabled={!files.length || status === 'uploading'} aria-busy={status === 'uploading'} onClick={startAnalysis}>
           {status === 'uploading' ? <><span className="spinner" /> Reading files…</> : files.length ? `Analyze ${files.length} ${files.length === 1 ? 'file' : 'files'}` : 'Analyze files'}
         </button>
       </div>
       {error && <div className="banner banner--error" role="alert">{error}</div>}
+      </div>
     </div>
   )
 }

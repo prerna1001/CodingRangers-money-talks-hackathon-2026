@@ -1,50 +1,60 @@
+/* Hallmark · theme: Coral · redesign: full · the full stamp and critique are in index.css */
+/* Stress tests: one ruled row per check, the result as an outlined mark. */
+
 .source-tag--block {
-  margin-bottom: 14px;
+  display: inline-flex;
+  margin-bottom: var(--space-md);
 }
 
 .stress-panel__empty {
-  font-size: 15px;
-  color: var(--text-dim);
-}
-
-.stress-panel__stat {
-  font-size: 15px;
-  color: var(--text);
-  margin-bottom: 14px;
-}
-
-.stress-panel__stat strong {
-  color: var(--text-h);
+  padding: var(--space-xl) 0;
+  border-top: 1px solid var(--color-ink);
+  color: var(--color-muted);
 }
 
 .stress-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  column-gap: 32px;
-  border-top: 1.5px solid var(--text-h);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--space-xl);
 }
 
 .stress-check {
-  padding: 14px 0;
-  border-bottom: 1px solid var(--border);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-rule);
+  animation: stress-in 360ms var(--ease-out) both;
 }
+
+.stress-check:nth-child(n + 3) { animation-delay: 80ms; }
+.stress-check:nth-child(n + 5) { animation-delay: 160ms; }
+.stress-check:nth-child(n + 7) { animation-delay: 240ms; }
 
 .stress-check__top {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 4px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-2xs);
 }
 
 .stress-check__name {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-h);
+  font-weight: 500;
+  color: var(--color-ink);
 }
 
 .stress-check__detail {
-  font-size: 14px;
-  color: var(--text-dim);
-  line-height: 1.5;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+@keyframes stress-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (max-width: 60rem) {
+  .stress-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
