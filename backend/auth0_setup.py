@@ -19,6 +19,7 @@ are real values, `AUTH0_ENABLED` flips to True and:
 
 from __future__ import annotations
 
+import logging
 import os
 import secrets
 from typing import Any
@@ -31,6 +32,8 @@ from starlette.middleware.sessions import SessionMiddleware
 from config import DEFAULT_USER_ID
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 # Sentinel for an unconfigured secret. Handing a predictable value to the
 # session cookie would let anyone forge a session, so this is deliberately
@@ -50,6 +53,14 @@ def _env_bool(name: str, default: bool) -> bool:
     if not raw:
         return default
     return raw.lower() in _TRUTHY
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = _env(name)
+    try:
+        return int(raw) if raw else default
+    except ValueError:
+        return default
 
 
 APP_BASE_URL = _env("APP_BASE_URL", "http://localhost:8000").rstrip("/")
@@ -86,6 +97,20 @@ AUTH0_REQUIRED = _env_bool("AUTH0_REQUIRED", True) if AUTH0_ENABLED else False
 # (e.g. http://localhost:5173/app) so a completed sign-in lands on the app
 # rather than back on the homepage.
 APP_ORIGIN_COOKIE = "ledgerlight_app_origin"
+
+# Cookie names owned by the Auth0 SDK's stateless stores. The session is
+# chunked (`_a0_session_0`, `_a0_session_1`, ...), so clearing it means
+# expiring every chunk, not just the base name.
+SDK_SESSION_COOKIE = "_a0_session"
+SDK_TRANSACTION_COOKIE = "_a0_tx"
+# Auth0 and this host can disagree on the current time by a few seconds.
+# PyJWT rejects an ID token whose `iat` is even one second in the future, so
+# a slightly fast Auth0 clock would otherwise turn a valid login into a 400.
+CLOCK_SKEW_LEEWAY_SECONDS = _env_int("AUTH0_CLOCK_SKEW_LEEWAY_SECONDS", 120)
+# Signing out of the app should not leave the upstream identity provider
+# (Google, etc.) logged in, or the next login silently reuses it. Set to 0 if
+# you would rather keep the IdP session and only end the Auth0/app session.
+AUTH0_FEDERATED_LOGOUT = _env_bool("AUTH0_FEDERATED_LOGOUT", True)
 
 # Redirect targets are restricted to these. Anything else is ignored and we
 # fall back to APP_URL: this endpoint is a redirect, so honouring an arbitrary
@@ -161,6 +186,34 @@ def resolve_app_url(request: Request) -> str:
     return f"{APP_URL}/"
 
 
+def _expire_cookie(response: Response, name: str) -> None:
+    """Expire ``name`` in both its Secure and non-Secure form.
+
+    The SDK writes its cookies with ``Secure``. localhost is treated as a
+    secure context, but not every dev host is, and a Secure deletion cookie
+    can be ignored on a plain-http origin. Sending both means whichever one
+    the browser accepts removes the cookie; the duplicate is harmless.
+    """
+    response.delete_cookie(name, path="/", samesite="lax")
+    response.delete_cookie(name, path="/", samesite="lax", secure=True)
+
+
+def _clear_session_cookies(response: Response) -> None:
+    """Remove the SDK session/transaction and Starlette session cookies."""
+    for name in (SDK_SESSION_COOKIE, SDK_TRANSACTION_COOKIE, "session"):
+        _expire_cookie(response, name)
+    # The stateless session is chunked; expire a generous fixed range so a
+    # stale chunk from an older, larger session cannot survive a logout.
+    for index in range(20):
+        _expire_cookie(response, f"{SDK_SESSION_COOKIE}_{index}")
+
+
+def _clear_auth_cookies(response: Response) -> None:
+    """Clear everything the auth flow wrote, including the return-to marker."""
+    _clear_session_cookies(response)
+    _expire_cookie(response, APP_ORIGIN_COOKIE)
+
+
 def _load_sdk():
     """Import the SDK lazily so a missing dependency degrades to a warning
     instead of an ImportError at module import time."""
@@ -169,6 +222,43 @@ def _load_sdk():
     from auth0_fastapi.server.routes import register_auth_routes
 
     return Auth0Config, AuthClient, register_auth_routes
+
+
+def _install_clock_skew_tolerance(auth_client) -> None:
+    """Allow a little clock drift when the SDK verifies the ID token.
+
+    PyJWT's default tolerance is zero, so an Auth0 server whose clock is a
+    few seconds ahead makes every login fail with "The token is not yet valid
+    (iat)". The SDK exposes no leeway option, so replace its verifier with
+    the same checks plus ``leeway``. Signature, audience and expiry
+    verification are otherwise unchanged.
+    """
+    if CLOCK_SKEW_LEEWAY_SECONDS <= 0:
+        return
+
+    import jwt
+
+    async def verify(token: str, jwks: dict, audience: str | None = None) -> dict:
+        unverified_header = jwt.get_unverified_header(token)
+        kid = unverified_header.get("kid")
+        signing_key = None
+        for key in jwks.get("keys", []):
+            if key.get("kid") == kid:
+                signing_key = jwt.PyJWK.from_dict(key)
+                break
+        if signing_key is None:
+            raise ValueError(f"No matching key found in JWKS for kid: {kid}")
+
+        kwargs: dict[str, Any] = {
+            "algorithms": ["RS256"],
+            "options": {"verify_signature": True, "verify_iss": False},
+            "leeway": CLOCK_SKEW_LEEWAY_SECONDS,
+        }
+        if audience:
+            kwargs["audience"] = audience
+        return jwt.decode(token, signing_key.key, **kwargs)
+
+    auth_client.client._verify_and_decode_jwt = verify
 
 
 def build_auth_client():
@@ -188,11 +278,12 @@ def build_auth_client():
         # Without `openid` Auth0 returns no ID token/userinfo, so the SDK
         # persists a session with `user=None`. That passes `require_session`
         # but has no `sub`, which is what makes `get_current_user_id` fail
-        # with "session is missing a user identifier". `profile email` fill
-        # in the name/email claims the UI reads from /api/auth/status.
+        # with "session is missing a user identifier".
         authorization_params={"scope": "openid profile email"},
     )
-    return config, AuthClient(config), register_auth_routes
+    auth_client = AuthClient(config)
+    _install_clock_skew_tolerance(auth_client)
+    return config, auth_client, register_auth_routes
 
 
 def init_auth(app: FastAPI) -> None:
@@ -208,19 +299,90 @@ def init_auth(app: FastAPI) -> None:
         app.add_middleware(SessionMiddleware, secret_key=_UNSAFE_DEV_SECRET)
         return
 
-    config, auth_client, register_auth_routes = built
+    config, auth_client, _ = built
 
     app.add_middleware(SessionMiddleware, secret_key=config.secret)
     app.state.config = config
     app.state.auth_client = auth_client
 
-    # The SDK exposes a module-level router. Registering into our own
-    # APIRouter and including that keeps /auth/* namespaced here instead of
-    # mutating a global that other apps in this process may also import.
+    # Own the /auth/* routes rather than registering the SDK's. The SDK turns
+    # a declined consent (and a rejected ID token) into a raw 400 JSON page on
+    # the backend origin, and its logout does not clear every cookie we write.
+    from auth0_server_python.auth_types import LogoutOptions
     from fastapi import APIRouter
+    from fastapi.responses import RedirectResponse
 
     auth_router = APIRouter()
-    register_auth_routes(auth_router, config)
+
+    @auth_router.get("/auth/login")
+    async def login(request: Request, response: Response):
+        # Start from a clean slate so a stale chunk from an earlier session
+        # cannot be concatenated with the new one. The origin cookie is left
+        # alone here -- the homepage wrote it and the callback needs it.
+        _clear_session_cookies(response)
+        return_to = request.query_params.get("returnTo")
+        authorization_params = {
+            key: value
+            for key, value in request.query_params.items()
+            if key != "returnTo"
+        }
+        auth_url = await auth_client.start_login(
+            app_state={"returnTo": return_to} if return_to else None,
+            authorization_params=authorization_params,
+            store_options={"request": request, "response": response},
+        )
+        return RedirectResponse(auth_url, status_code=302, headers=response.headers)
+
+    @auth_router.get("/auth/callback")
+    async def callback(request: Request, response: Response):
+        # Auth0 sends `error` when the user declines consent or the upstream
+        # IdP fails. That is a normal outcome, not a server error: clear the
+        # half-finished transaction and send the browser home.
+        if request.query_params.get("error"):
+            _clear_auth_cookies(response)
+            return RedirectResponse(
+                f"{APP_URL}/", status_code=302, headers=response.headers
+            )
+
+        try:
+            session_data = await auth_client.complete_login(
+                str(request.url),
+                store_options={"request": request, "response": response},
+            )
+        except Exception as exc:  # noqa: BLE001 - surfaced on the homepage instead
+            # Includes a rejected ID token (clock skew, bad signature, ...).
+            # Nothing was persisted, so clean up rather than showing raw JSON
+            # at the backend origin.
+            logger.warning("Auth0 callback failed: %s", exc)
+            _clear_auth_cookies(response)
+            return RedirectResponse(
+                f"{APP_URL}/", status_code=302, headers=response.headers
+            )
+
+        app_state = session_data.get("app_state") or {}
+        target = _trusted_app_target(app_state.get("returnTo")) or resolve_app_url(request)
+        return RedirectResponse(target, status_code=302, headers=response.headers)
+
+    @auth_router.get("/auth/logout")
+    async def logout(request: Request, response: Response):
+        # Clear the app's cookies before anything that can fail, and log out
+        # federated so Auth0 also ends the upstream (e.g. Google) session.
+        # Otherwise the next login silently reuses that session and drops the
+        # user straight onto the consent screen.
+        _clear_auth_cookies(response)
+        return_to = request.query_params.get("returnTo") or f"{APP_BASE_URL}/"
+        try:
+            logout_url = await auth_client.client.logout(
+                LogoutOptions(
+                    return_to=return_to, federated=AUTH0_FEDERATED_LOGOUT
+                ),
+                store_options={"request": request, "response": response},
+            )
+        except Exception as exc:  # noqa: BLE001 - never strand the browser
+            logger.warning("Auth0 logout failed: %s", exc)
+            logout_url = f"{APP_URL}/"
+        return RedirectResponse(logout_url, status_code=302, headers=response.headers)
+
     app.include_router(auth_router)
 
 
@@ -243,6 +405,18 @@ async def require_session(request: Request, response: Response) -> dict[str, Any
     store_options = {"request": request, "response": response}
     session = await auth_client.client.get_session(store_options=store_options)
     if not session:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Please log in",
+            headers={"Location": f"{APP_BASE_URL}/auth/login"},
+        )
+
+    # A session without a subject is a leftover from a login that did not
+    # request `openid` (or from an older version of this app). Treat it as
+    # signed out and expire it so the homepage offers "Log in" again instead
+    # of letting the visitor into /app with no usable identity.
+    if not owner_from_session(session):
+        _clear_session_cookies(response)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Please log in",
