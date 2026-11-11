@@ -1,0 +1,98 @@
+/* Hallmark · theme: Coral · redesign: full · the full stamp and critique are in index.css */
+/* Sign-in: one cotton sheet on the desk, the two account actions on it. */
+
+.signin__nav {
+  border-bottom: 0;
+}
+
+.page.signin > .page__header {
+  border-bottom: 0;
+}
+
+.signin__main {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-xl) var(--space-md) var(--space-3xl);
+}
+
+.signin__main:focus {
+  outline: none;
+}
+
+.signin__card {
+  width: 100%;
+  max-width: 440px;
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  rotate: -0.6deg;
+  animation: signin-settle var(--dur-long) var(--ease-out) both;
+}
+
+.signin__card h1 {
+  font-size: var(--text-3xl);
+  max-width: 14ch;
+}
+
+.signin__lead {
+  color: var(--color-ink-2);
+}
+
+.signin__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.signin__fine {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.signin__notice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-rule-2);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.signin__continue {
+  min-height: var(--control-h-sm);
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color var(--dur-micro) var(--ease-out);
+}
+
+.signin__continue:hover {
+  text-decoration-color: var(--color-accent-2);
+}
+
+.signin__continue:active {
+  color: var(--color-accent-2);
+}
+
+@keyframes signin-settle {
+  from {
+    opacity: 0;
+    transform: translateY(16px) rotate(2deg);
+  }
+}
+
+@media (max-width: 40rem) {
+  .signin__card {
+    padding: var(--space-lg);
+    rotate: 0deg;
+  }
+}

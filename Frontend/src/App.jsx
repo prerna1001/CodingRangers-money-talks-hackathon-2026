@@ -4,11 +4,12 @@ import { canEnterApp, useAuth } from './auth/authContext'
 import RequireAuth from './auth/RequireAuth'
 import HomePage from './pages/HomePage'
 import AppShell from './pages/AppShell'
+import SignInPage from './pages/SignInPage'
 import { LanguageProvider } from './i18n/LanguageProvider'
 import './App.css'
 
 // Unknown paths resolve by session: signed-in users end up in the app,
-// everyone else on the homepage. `replace` keeps these off the history stack.
+// everyone else on the sign-in page. `replace` keeps these off the history stack.
 function CatchAll() {
   const { auth, error } = useAuth()
 
@@ -16,7 +17,7 @@ function CatchAll() {
     return <AuthCheck error={error} />
   }
 
-  return <Navigate to={canEnterApp(auth) ? '/app' : '/'} replace />
+  return <Navigate to={canEnterApp(auth) ? '/app' : '/signin'} replace />
 }
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
       <LanguageProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/signin" element={<SignInPage />} />
           <Route
             path="/app"
             element={

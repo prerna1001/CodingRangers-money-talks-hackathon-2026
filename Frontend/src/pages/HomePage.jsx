@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AuthCheck } from '../auth/AuthProvider'
-import { canEnterApp, useAuth } from '../auth/authContext'
+import { useAuth } from '../auth/authContext'
 import Tick from '../components/Tick'
 import DeskScene from '../components/landing/DeskScene'
 import { ledgerChange, ledgerMoney } from '../utils/format'
@@ -158,7 +158,7 @@ function AskSection() {
 }
 
 // Public landing page: reachable signed in or not, never redirects on its
-// own. The only outbound hop is the explicit "Log in" click.
+// own. Every "Navigate to app" goes through /signin for visitors not signed in.
 export default function HomePage() {
   const { auth, error } = useAuth()
 
@@ -166,29 +166,14 @@ export default function HomePage() {
     return <AuthCheck error={error} />
   }
 
-  const handleLogin = () => {
-    // Record where the visitor came from so /auth/callback can send them
-    // back to the app even though Vite is on a different port than the
-    // backend. Cookies ignore ports, so localhost is enough to carry this
-    // across the Auth0 round trip; the /app path makes the callback land
-    // straight in the app instead of back on this homepage.
-    document.cookie =
-      `ledgerlight_app_origin=${encodeURIComponent(`${window.location.origin}/app`)}` +
-      '; path=/; max-age=600; SameSite=Lax'
-    window.location.replace(auth.login_url)
-  }
-
-  const signedIn = canEnterApp(auth)
-  const action = (className) =>
-    signedIn ? (
-      <Link className={className} to="/app">
-        Navigate to app
-      </Link>
-    ) : (
-      <button className={className} type="button" onClick={handleLogin}>
-        Log in
-      </button>
-    )
+  // Signed-in visitors go straight to the app; everyone else goes through
+  // the sign-in page, which holds Log in and Sign up.
+  const appPath = auth.authenticated ? '/app' : '/signin'
+  const action = (className) => (
+    <Link className={className} to={appPath}>
+      Navigate to app
+    </Link>
+  )
 
   return (
     <div className="page home">

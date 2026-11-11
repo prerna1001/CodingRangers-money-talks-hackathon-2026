@@ -5,6 +5,7 @@
 /* Hallmark · waive 8 · the composition is new: a 3D desk hero, a sheet used as a control, an ink band, a two-language thread · the sections keep the order a figure travels through the product */
 /* Hallmark · answered F4 · Coral's controls are pressed cards: cotton for secondary, ink board for the one primary */
 /* Hallmark · answered F3 · base.css sets text-wrap: balance on every h1 to h3 */
+/* Hallmark · dropped onClick={handleLogin}, {canEnterApp(auth) ? '/app' : '/'} · moved, not removed: the owner asked for login and sign-up behind Navigate to app, so the Auth0 hand-off now lives in pages/SignInPage.jsx and every landing link goes to /signin */
 /* Hallmark · dropped dark mode · Coral is a light theme; the owner agreed to light first */
 @import url("./tokens.css");
 @import url("./base.css");
