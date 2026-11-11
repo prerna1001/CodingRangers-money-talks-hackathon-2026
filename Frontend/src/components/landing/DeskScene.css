@@ -1,0 +1,223 @@
+/* Hallmark · theme: Coral · redesign: full · the full stamp and critique are in index.css */
+/* The desk scene. Every size is in em so the whole scene scales from one
+   font-size; every motion is a transform or an opacity. */
+
+.desk-scene {
+  --lean-x: 0deg;
+  --lean-z: 0deg;
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  height: 36em;
+  font-size: clamp(8px, 1.06vw, 15px);
+  perspective: 150em;
+  perspective-origin: 50% 30%;
+}
+
+.desk-scene__plane {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46em;
+  height: 40em;
+  margin: -17em 0 0 -22em;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(40deg + var(--lean-x))) rotateZ(calc(-20deg + var(--lean-z)));
+  transition: transform var(--dur-long) var(--ease-out);
+}
+
+/* Shared by the scene and the trace section: a sheet's title and ruled rows. */
+.sheet__title {
+  font-size: 1.15em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+  margin-bottom: 0.8em;
+}
+
+.sheet__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 1.2em;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.55em 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.sheet__row--balance {
+  font-weight: 500;
+  border-bottom-color: var(--color-ink);
+}
+
+.sheet__row--total {
+  font-weight: 600;
+  border-bottom: 0;
+  border-top: 1px solid var(--color-ink);
+  box-shadow: 0 3px 0 var(--color-cotton), 0 4px 0 var(--color-ink);
+  margin-top: -1px;
+}
+
+.desk-sheet {
+  position: absolute;
+  padding: 1.6em 1.8em 1.8em;
+  backface-visibility: hidden;
+}
+
+.desk-sheet--summary {
+  left: 0;
+  top: 1em;
+  width: 25em;
+  rotate: -3deg;
+  animation: desk-settle 900ms var(--ease-out) both;
+}
+
+.desk-sheet__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6.2em 6.2em;
+  gap: 0.6em;
+  padding: 0.5em 0;
+  border-bottom: 1px solid var(--color-rule);
+  text-align: right;
+}
+
+.desk-sheet__cols > :first-child {
+  text-align: left;
+}
+
+.desk-sheet__cols--head {
+  color: var(--color-muted);
+  font-size: 0.9em;
+  border-bottom-color: var(--color-ink);
+}
+
+.desk-stack {
+  position: absolute;
+  left: 28em;
+  top: -1em;
+  width: 17em;
+  height: 9em;
+  transform-style: preserve-3d;
+}
+
+.desk-slip {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: center;
+  gap: 0.3em 1em;
+  padding: 1em 1.3em;
+  font-size: 0.95em;
+  translate: calc(var(--i) * 0.5em) calc(var(--i) * -0.35em) calc(var(--i) * 0.9em);
+  rotate: calc((var(--i) - 1.5) * 2.5deg);
+  animation: desk-deal 700ms var(--ease-out) both;
+  animation-delay: calc(500ms + var(--i) * 260ms);
+}
+
+.desk-slip__amount {
+  font-weight: 500;
+}
+
+.desk-slip__memo {
+  grid-column: 1 / -1;
+  color: var(--color-muted);
+  font-size: 0.9em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.desk-sheet--bridge {
+  left: 14em;
+  top: 14em;
+  width: 29em;
+  padding-bottom: 5em;
+  translate: 0 0 2.4em;
+  rotate: 2deg;
+  box-shadow: var(--edge-stock), 1.6em 1.4em 2.4em -1em oklch(var(--shade) / 0.34);
+  animation: desk-slide 900ms var(--ease-out) both;
+  animation-delay: 1700ms;
+}
+
+.desk-line {
+  animation: desk-line 520ms var(--ease-out) both;
+  animation-delay: calc(2500ms + var(--i) * 420ms);
+}
+
+.desk-line .tick {
+  font-size: 1.1em;
+  animation: desk-tick 380ms var(--ease-out) both;
+  animation-delay: calc(2800ms + var(--i) * 420ms);
+}
+
+/* The settled state, pressed into the stock. */
+.desk-stamp {
+  position: absolute;
+  right: 1.8em;
+  bottom: 1em;
+  font-size: 1.9em;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--color-paid);
+  text-shadow: 0.5px 0.75px 0 oklch(var(--lit) / 0.9), -0.4px -0.5px 0.6px oklch(var(--shade) / 0.3);
+  rotate: -7deg;
+  animation: desk-press 460ms var(--ease-out) both;
+  animation-delay: 4700ms;
+}
+
+@keyframes desk-settle {
+  from {
+    opacity: 0;
+    translate: -2em 1em 7em;
+  }
+}
+
+@keyframes desk-deal {
+  from {
+    opacity: 0;
+    translate: 6em -5em 12em;
+    rotate: 14deg;
+  }
+}
+
+@keyframes desk-slide {
+  from {
+    opacity: 0;
+    translate: -5em 4em 9em;
+  }
+}
+
+@keyframes desk-line {
+  from {
+    opacity: 0;
+    transform: translateX(-1em);
+  }
+}
+
+@keyframes desk-tick {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-20deg);
+  }
+}
+
+@keyframes desk-press {
+  from {
+    opacity: 0;
+    scale: 1.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk-scene__plane,
+  .desk-scene__plane * {
+    animation-delay: 0s !important;
+  }
+}
+
+@media (max-width: 60rem) {
+  .desk-scene {
+    font-size: clamp(6px, 1.75vw, 12px);
+    height: 38em;
+  }
+}

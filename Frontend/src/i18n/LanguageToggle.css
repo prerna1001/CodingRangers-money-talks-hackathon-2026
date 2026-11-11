@@ -1,39 +1,49 @@
+/* Hallmark · theme: Coral · redesign: full · the full stamp and critique are in index.css */
+/* A two-stop choice: a groove pressed into the paper, with a cotton card
+   riding to the chosen stop. */
 .lang-toggle {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px;
-  border: 1px solid var(--border, rgba(148, 163, 184, 0.35));
-  border-radius: 999px;
-  background: var(--surface-2, rgba(148, 163, 184, 0.08));
+  gap: var(--space-3xs);
+  padding: var(--space-3xs);
+  border-radius: var(--radius-stock);
+  background: var(--color-paper-2);
+  box-shadow: var(--press-groove);
 }
 
 .lang-toggle__btn {
+  min-width: 40px;
+  min-height: 28px;
+  padding: 0 var(--space-xs);
   border: 0;
+  border-radius: var(--radius-input);
   background: transparent;
-  color: inherit;
-  opacity: 0.6;
-  font: inherit;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 4px 10px;
-  border-radius: 999px;
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
   cursor: pointer;
+  transition: color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
 }
 
 .lang-toggle__btn:hover {
-  opacity: 0.9;
+  color: var(--color-ink);
+}
+
+.lang-toggle__btn:active {
+  transform: translateY(1px);
 }
 
 .lang-toggle__btn--active {
-  opacity: 1;
-  background: var(--accent, #2563eb);
-  color: #fff;
+  background-color: var(--color-cotton);
+  background-image: var(--tex-cotton);
+  color: var(--color-print);
+  box-shadow: var(--edge-stock), var(--cast-stock);
 }
 
 .lang-toggle__warn {
-  color: #f59e0b;
-  font-weight: 700;
-  padding-right: 6px;
+  margin-inline: var(--space-2xs);
+  color: var(--color-warn);
+  font-size: var(--text-xs);
+  font-weight: 600;
 }

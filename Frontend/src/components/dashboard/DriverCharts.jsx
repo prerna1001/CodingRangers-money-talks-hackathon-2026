@@ -1,5 +1,5 @@
 import EChart from '../charts/EChart'
-import { baseOption, categoryAxis, valueAxis } from '../charts/chartTheme'
+import { baseOption, categoryAxis, figureLabel, stagger, valueAxis } from '../charts/chartTheme'
 import { compactMoney, ledgerChange, ledgerMoney, toNumber } from '../../utils/format'
 import './DriverCharts.css'
 
@@ -25,7 +25,7 @@ function PriorCurrentChart({ drivers, periods, onSelectDriver }) {
       itemWidth: 10,
       itemHeight: 10,
       itemGap: 18,
-      textStyle: { color: t.textDim, fontSize: 12.5 },
+      textStyle: { color: t.textDim, fontSize: 12.5, fontFamily: t.sans },
     },
     tooltip: {
       ...baseOption(t).tooltip,
@@ -37,21 +37,23 @@ function PriorCurrentChart({ drivers, periods, onSelectDriver }) {
       },
     },
     xAxis: valueAxis(t, (v) => compactMoney(v)),
-    yAxis: categoryAxis(t, names, { axisLabel: { color: t.text, fontSize: 12.5, fontWeight: 600, width: 120, overflow: 'truncate' } }),
+    yAxis: categoryAxis(t, names, { axisLabel: { color: t.text, fontSize: 12.5, fontWeight: 500, width: 120, overflow: 'truncate' } }),
     series: [
       {
         name: periods.prior,
         type: 'bar',
         barGap: '15%',
         barMaxWidth: 14,
-        itemStyle: { color: t.borderStrong, borderRadius: 2 },
+        animationDelay: stagger(70),
+        itemStyle: { color: t.borderStrong, borderRadius: [0, 2, 2, 0] },
         data: rows.map((d) => toNumber(d.prior)),
       },
       {
         name: periods.current,
         type: 'bar',
         barMaxWidth: 14,
-        itemStyle: { color: t.chartTotal, borderRadius: 2 },
+        animationDelay: stagger(70, 120),
+        itemStyle: { color: t.chartTotal, borderRadius: [0, 2, 2, 0] },
         data: rows.map((d) => toNumber(d.current)),
       },
     ],
@@ -97,16 +99,17 @@ function ConcentrationChart({ drivers, onSelectDriver }) {
       },
     },
     xAxis: categoryAxis(t, rows.map((d) => d.driver), {
-      axisLabel: { color: t.text, fontSize: 12, fontWeight: 600, interval: 0, width: 84, overflow: 'truncate' },
+      axisLabel: { color: t.text, fontSize: 12, fontWeight: 500, interval: 0, width: 84, overflow: 'truncate' },
     }),
     yAxis: valueAxis(t, (v) => `${v}%`, { max: 100, interval: 25 }),
     series: [
       {
         type: 'bar',
         barMaxWidth: 40,
+        animationDelay: stagger(90),
         data: rows.map((d, i) => ({
           value: Math.round(shares[i] * 10) / 10,
-          itemStyle: { color: toNumber(d.amount) < 0 ? t.chartDown : t.chartUp, borderRadius: 2 },
+          itemStyle: { color: toNumber(d.amount) < 0 ? t.chartDown : t.chartUp, borderRadius: [3, 3, 0, 0] },
         })),
       },
       {
@@ -114,9 +117,12 @@ function ConcentrationChart({ drivers, onSelectDriver }) {
         data: cumulative.map((v) => Math.round(v * 10) / 10),
         symbol: 'circle',
         symbolSize: 7,
-        lineStyle: { color: t.accent, width: 2 },
-        itemStyle: { color: t.accent },
-        label: { show: true, position: 'top', color: t.accent, fontWeight: 700, fontSize: 12, formatter: ({ value }) => `${Math.round(value)}%` },
+        smooth: 0.25,
+        animationDuration: 1100,
+        animationDelay: 250,
+        lineStyle: { color: t.chartLine, width: 2 },
+        itemStyle: { color: t.chartLine },
+        label: { show: true, position: 'top', ...figureLabel(t, { color: t.chartLine, fontWeight: 500 }), formatter: ({ value }) => `${Math.round(value)}%` },
       },
     ],
   }, { xAxis: { axisLabel: { rotate: 35, width: 70 } } })

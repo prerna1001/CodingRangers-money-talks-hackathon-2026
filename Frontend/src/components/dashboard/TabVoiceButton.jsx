@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../../i18n/context'
+import Icon from '../Icon'
 
 const LOCALES = { en: 'en-US', es: 'es-ES' }
 
@@ -38,7 +39,7 @@ export default function TabVoiceButton({ targetRef }) {
       aria-label={speaking ? t('Stop reading tab') : t('Read this tab aloud')}
       title={speaking ? t('Stop reading tab') : t('Read this tab aloud')}
     >
-      {speaking ? '⏹' : '🔊'} {speaking ? t('Stop') : t('Read tab')}
+      <Icon name={speaking ? 'stop' : 'speaker'} /> {speaking ? t('Stop') : t('Read tab')}
     </button>
   )
 }

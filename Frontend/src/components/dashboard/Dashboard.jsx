@@ -9,6 +9,7 @@ import ReportPanel from './ReportPanel'
 import ChatPanel from './ChatPanel'
 import TabVoiceButton from './TabVoiceButton'
 import { useLanguage } from '../../i18n/context'
+import Icon from '../Icon'
 import './Dashboard.css'
 
 const DriversView = lazy(() => import('./DriversView'))
@@ -134,7 +135,7 @@ export default function Dashboard({ analysis, onReset }) {
               aria-label={t('Close chatbot')}
               title={t('Close chatbot')}
             >
-              ×
+              <Icon name="close" />
             </button>
             <ChatPanel analysis={normalizedAnalysis} compact />
           </aside>
@@ -148,7 +149,7 @@ export default function Dashboard({ analysis, onReset }) {
         aria-expanded={chatOpen}
         title={chatOpen ? t('Close chatbot') : t('Open chatbot')}
       >
-        {chatOpen ? '×' : '💬'}
+        <Icon name={chatOpen ? 'close' : 'chat'} />
       </button>
     </div>
   )

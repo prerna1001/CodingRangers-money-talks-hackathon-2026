@@ -30,9 +30,12 @@ export default function AgentTimeline({ steps, onComplete }) {
       }
       setActiveIndex(i)
       const stepDuration = Math.min(steps[i].duration_ms ?? 400, 700)
+      // Capture the index: the state updater runs after `i` has moved on,
+      // which used to mark step n+1 done and leave the first step unticked.
+      const finished = i
       setTimeout(() => {
         if (cancelled) return
-        setDoneIndices((prev) => [...prev, i])
+        setDoneIndices((prev) => (prev.includes(finished) ? prev : [...prev, finished]))
         i += 1
         advance()
       }, stepDuration)
@@ -50,7 +53,7 @@ export default function AgentTimeline({ steps, onComplete }) {
   const finalizing = doneIndices.length >= steps.length
 
   return (
-    <div className={`agent-timeline ${finalizing ? 'agent-timeline--finalizing' : ''}`}>
+    <div className={`agent-timeline stock ${finalizing ? 'agent-timeline--finalizing' : ''}`}>
       <div className="agent-timeline__header">
         <h1>{finalizing ? 'Writing up the results' : 'Working through your files'}</h1>
         <p>
@@ -61,7 +64,7 @@ export default function AgentTimeline({ steps, onComplete }) {
       </div>
 
       <div className="agent-timeline__bar" role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100} aria-label="Analysis progress">
-        <div className="agent-timeline__bar-fill" style={{ width: `${progressPct}%` }} />
+        <div className="agent-timeline__bar-fill" style={{ transform: `scaleX(${progressPct / 100})` }} />
       </div>
 
       <ol className="agent-timeline__list" aria-live="polite">

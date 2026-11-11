@@ -1,108 +1,120 @@
+/* Hallmark · theme: Coral · redesign: full · the full stamp and critique are in index.css */
+/* The analysing screen: the run as a ruled register. Each check is ticked
+   in coral as it passes. */
+
 .agent-timeline {
   width: 100%;
-  max-width: 560px;
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sheet);
-  padding: 32px 36px;
-  box-shadow: var(--shadow-sheet);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  max-width: 720px;
+  padding: var(--space-xl);
 }
 
 .agent-timeline__header h1 {
-  font-size: 26px;
-  line-height: 1.2;
-  margin-bottom: 6px;
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-xs);
 }
 
 .agent-timeline__header p {
-  font-family: var(--serif);
-  color: var(--text);
-  font-size: 16px;
+  color: var(--color-muted);
 }
 
 .agent-timeline__bar {
-  height: 3px;
-  background: var(--border);
+  height: 4px;
+  margin: var(--space-lg) 0 var(--space-xs);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-3);
   overflow: hidden;
 }
 
 .agent-timeline__bar-fill {
   height: 100%;
-  background: var(--accent);
-  transition: width 0.35s ease;
+  border-radius: inherit;
+  background: var(--color-ink);
+  transform-origin: left center;
+  transition: transform var(--dur-long) var(--ease-out);
 }
 
 .agent-timeline__list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
 }
 
 .agent-step {
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 14px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 15px;
-  color: var(--text-dim);
-  transition: color 0.2s ease;
+  gap: var(--space-sm);
+  min-height: 52px;
+  border-bottom: 1px solid var(--color-rule);
+  color: var(--color-muted);
+  transition: color var(--dur-short) var(--ease-out);
 }
 
 .agent-step:last-child {
-  border-bottom: none;
+  border-bottom: 0;
+}
+
+.agent-step__icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-family: var(--font-outlier);
+  font-size: var(--text-xs);
+}
+
+.agent-step__name {
+  font-weight: 500;
+}
+
+.agent-step__status {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
 }
 
 .agent-step--running,
 .agent-step--done {
-  color: var(--text-h);
+  color: var(--color-ink);
 }
 
-.agent-step--running .agent-step__name {
-  font-weight: 600;
+.agent-step--running {
+  animation: step-arrive 320ms var(--ease-out) both;
 }
 
-.agent-step__icon {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dim);
-}
-
-.agent-step--done .agent-step__icon {
+.agent-step--done .tick {
   font-size: 18px;
+  animation: step-press 360ms var(--ease-out) both;
+}
+
+.agent-step--done .agent-step__status {
+  animation: step-arrive 320ms var(--ease-out) both;
 }
 
 .agent-step__spinner {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  border: 2px solid var(--accent-border);
-  border-top-color: var(--accent);
+  border: 2px solid var(--color-rule-2);
+  border-top-color: var(--color-ink);
   animation: spin 0.7s linear infinite;
 }
 
-.agent-step__name {
-  flex: 1;
+@keyframes step-arrive {
+  from {
+    opacity: 0.4;
+    transform: translateX(-6px);
+  }
 }
 
-.agent-step__status {
-  font-size: 13px;
-  color: var(--text-dim);
+@keyframes step-press {
+  from {
+    opacity: 0;
+    transform: scale(1.9) rotate(-18deg);
+  }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 40rem) {
   .agent-timeline {
-    padding: 24px 18px;
+    padding: var(--space-lg);
   }
 }

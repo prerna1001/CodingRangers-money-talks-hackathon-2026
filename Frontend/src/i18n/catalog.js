@@ -63,7 +63,7 @@ export const CATALOG = {
       'El análisis terminó, pero no se recibió un resumen narrativo.',
     'Generating…': 'Generando…',
     'Regenerate voice briefing': 'Regenerar informe de voz',
-    '🔊 Generate CFO voice briefing': '🔊 Generar informe de voz del CFO',
+    'Create CFO voice briefing': 'Crear informe de voz del CFO',
     'audio ready': 'audio listo',
     'executive tone': 'tono ejecutivo',
     'Loading…': 'Cargando…',
@@ -170,10 +170,10 @@ export const CATALOG = {
     'Stop reading': 'Dejar de leer',
     'Speak your question': 'Habla tu pregunta',
     'Stop recording': 'Detener la grabación',
-    'Listening… click ⏹ when done': 'Escuchando… pulsa ⏹ al terminar',
+    'Listening… press stop when done': 'Escuchando… pulsa detener al terminar',
     'Transcribing…': 'Transcribiendo…',
-    'Ask about this run, or click 🎤 to speak…':
-      'Pregunta sobre este análisis, o pulsa 🎤 para hablar…',
+    'Ask about this run, or use the mic…':
+      'Pregunta sobre este análisis, o usa el micrófono…',
     'Microphone access was blocked. Allow it in the browser to speak your question.':
       'Se bloqueó el acceso al micrófono. Permítelo en el navegador para hablar tu pregunta.',
     'Voice input is not supported in this browser.':

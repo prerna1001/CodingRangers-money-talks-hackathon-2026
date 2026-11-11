@@ -1,63 +1,63 @@
+/* Hallmark · theme: Coral · redesign: full · the full stamp and critique are in index.css */
+/* Retrieved context: each source as a ruled entry with its match score. */
+
 .rag-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1.5px solid var(--text-h);
+  border-top: 1px solid var(--color-ink);
 }
 
 .rag-item {
-  padding: 16px 0;
-  border-bottom: 1px solid var(--border);
+  padding: var(--space-lg) 0;
+  border-bottom: 1px solid var(--color-rule);
 }
 
 .rag-item__top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 4px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xs);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
 }
 
 .rag-item__source {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dim);
+  font-weight: 500;
 }
 
 .relevance {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--text-h);
+  gap: var(--space-xs);
+  font-family: var(--font-outlier);
   white-space: nowrap;
 }
 
 .relevance__track {
-  width: 44px;
+  width: 64px;
   height: 4px;
-  border-radius: 2px;
-  background: var(--code-bg);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-3);
   overflow: hidden;
 }
 
 .relevance__track span {
   display: block;
   height: 100%;
-  background: var(--text-dim);
+  background: var(--color-ink);
 }
 
 .rag-item__title {
-  font-size: 16px;
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: var(--text-h);
-  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+  margin-bottom: var(--space-2xs);
 }
 
 .rag-item__snippet {
-  font-family: var(--serif);
-  font-size: 16px;
-  color: var(--text);
-  line-height: 1.55;
-  max-width: 72ch;
+  color: var(--color-ink-2);
+  max-width: 76ch;
 }

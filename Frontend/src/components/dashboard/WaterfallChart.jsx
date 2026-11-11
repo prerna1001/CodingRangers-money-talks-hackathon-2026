@@ -1,5 +1,5 @@
 import EChart from '../charts/EChart'
-import { baseOption, categoryAxis, valueAxis } from '../charts/chartTheme'
+import { baseOption, categoryAxis, figureLabel, stagger, valueAxis } from '../charts/chartTheme'
 import { compactMoney, ledgerChange, ledgerMoney } from '../../utils/format'
 import './WaterfallChart.css'
 
@@ -67,7 +67,7 @@ export default function WaterfallChart({ waterfall, drivers = [], onSelectDriver
       },
     },
     xAxis: categoryAxis(t, data.map((d) => d.label), {
-      axisLabel: { color: t.text, fontSize: 12.5, fontWeight: 600, interval: 0, formatter: truncateLabel, width: 110, overflow: 'truncate' },
+      axisLabel: { color: t.text, fontSize: 12.5, fontWeight: 500, interval: 0, formatter: truncateLabel, width: 110, overflow: 'truncate' },
     }),
     yAxis: valueAxis(t, (v) => compactMoney(v)),
     series: [
@@ -76,6 +76,7 @@ export default function WaterfallChart({ waterfall, drivers = [], onSelectDriver
         type: 'bar',
         stack: 'waterfall',
         silent: true,
+        animationDelay: stagger(140),
         itemStyle: { color: t.chartCarry, borderRadius: 2 },
         emphasis: { disabled: true },
         tooltip: { show: false },
@@ -87,21 +88,38 @@ export default function WaterfallChart({ waterfall, drivers = [], onSelectDriver
         stack: 'waterfall',
         barMaxWidth: 96,
         barCategoryGap: '38%',
+        z: 3,
+        animationDelay: stagger(140),
+        emphasis: { focus: 'self', itemStyle: { shadowBlur: 12, shadowOffsetX: 4, shadowOffsetY: 4, shadowColor: t.chartGrid } },
         data: data.map((d) => ({
           value: d.isTotal ? d.end : Math.abs(d.delta),
           itemStyle: {
             color: d.isTotal ? t.chartTotal : d.delta < 0 ? t.chartDown : t.chartUp,
-            borderRadius: 2,
+            borderRadius: [3, 3, 0, 0],
           },
           label: {
             show: true,
             position: 'top',
+            ...figureLabel(t, { fontSize: 12.5, fontWeight: 500 }),
             color: d.delta < 0 && !d.isTotal ? t.danger : t.textH,
-            fontWeight: 700,
-            fontSize: 13,
             formatter: () => (d.isTotal ? compactMoney(d.end) : `${d.delta > 0 ? '+' : ''}${compactMoney(d.delta)}`),
           },
         })),
+      },
+      {
+        // Connector: carries each running total across to the next bar, the
+        // way a hand-drawn bridge is ruled.
+        name: 'running total',
+        type: 'line',
+        step: 'end',
+        silent: true,
+        symbol: 'none',
+        z: 2,
+        tooltip: { show: false },
+        lineStyle: { color: t.textH, width: 1, type: [3, 3], opacity: 0.55 },
+        animationDuration: 900,
+        animationDelay: 300,
+        data: data.map((d) => d.end),
       },
     ],
   })

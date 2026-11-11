@@ -1,15 +1,14 @@
-.report-panel {
-  display: flex;
-  flex-direction: column;
-}
+/* Hallmark · theme: Coral · redesign: full · the full stamp and critique are in index.css */
+/* Report: each export as a ruled entry, what it is on the left and its
+   action on the right. */
 
 .report-option {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, auto);
-  gap: 16px 40px;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+  gap: var(--space-xl);
   align-items: start;
-  padding: 24px 0;
-  border-bottom: 1px solid var(--border);
+  padding: var(--space-xl) 0;
+  border-bottom: 1px solid var(--color-rule-2);
 }
 
 .report-option:first-child {
@@ -17,62 +16,68 @@
 }
 
 .report-option:last-child {
-  border-bottom: none;
   padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .report-option__text h2 {
-  font-size: 22px;
-  margin-bottom: 6px;
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-xs);
 }
 
 .report-option__text p {
-  color: var(--text);
-  font-size: 15px;
-  max-width: 62ch;
+  color: var(--color-ink-2);
+  max-width: 68ch;
 }
 
 .report-option__steps {
-  margin: 12px 0 0;
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 14px;
-  color: var(--text-dim);
-  max-width: 62ch;
+  margin: var(--space-md) 0 0;
+  padding-left: var(--space-lg);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  max-width: 68ch;
 }
 
-.report-option__steps code,
-.report-panel__confirm code {
-  font-size: 13px;
-  color: var(--text-h);
+.report-option__steps li {
+  padding: var(--space-2xs) 0;
 }
 
 .report-option__action {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: stretch;
+  gap: var(--space-xs);
 }
 
 .report-panel__confirm {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text);
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
   overflow-wrap: anywhere;
+  animation: report-in 320ms var(--ease-out) both;
 }
 
 .report-panel__error {
-  font-size: 14px;
-  color: var(--danger);
-  max-width: 36ch;
+  font-size: var(--text-sm);
+  color: var(--color-down);
 }
 
-@media (max-width: 720px) {
+@keyframes report-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (max-width: 60rem) {
   .report-option {
     grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-md);
+  }
+
+  .report-option__action {
+    align-items: flex-start;
   }
 }
