@@ -27,8 +27,8 @@ export default function MemoryPanel() {
     <div className="memory-panel">
       <div className="panel-heading">
         <div>
-          <h3>Memory</h3>
-          <p>What the agent remembers from previous runs — opt-in, editable, deletable</p>
+          <h2>Memory</h2>
+          <p>What Ledgerlight remembers from earlier runs. Delete anything that is wrong and it will not be used again.</p>
         </div>
         {source && (
           <span className="source-tag">
@@ -38,27 +38,27 @@ export default function MemoryPanel() {
       </div>
 
       <p className="memory-panel__stat">
-        <strong>{usedCount}</strong> of {memories.length} memories influenced this run
+        <strong>{usedCount} of {memories.length}</strong> memories shaped this run
       </p>
 
       <ul className="memory-list">
         {memories.map((m) => (
           <li key={m.memory_id} className={`memory-item ${m.deleting ? 'memory-item--deleting' : ''}`}>
             <div className="memory-item__top">
-              <span className="memory-item__type">{m.memory_type.replace(/_/g, ' ')}</span>
-              {m.used_in_this_run && <span className="badge badge--success">used this run</span>}
+              <span className="memory-item__type">{m.memory_type.charAt(0).toUpperCase() + m.memory_type.slice(1).replace(/_/g, ' ')}</span>
+              {m.used_in_this_run && <span className="badge badge--success">Used in this run</span>}
             </div>
             <p className="memory-item__content">{m.content}</p>
             <div className="memory-item__footer">
-              <span className="memory-item__confidence">confidence {Math.round(m.confidence * 100)}%</span>
-              <span className="memory-item__evidence">{m.evidence.join(', ')}</span>
+              <span className="memory-item__confidence">{Math.round(m.confidence * 100)}% confidence</span>
+              <span className="memory-item__evidence">Seen in {m.evidence.join(', ')}</span>
               <button
                 type="button"
                 className="memory-item__delete"
                 onClick={() => handleDelete(m.memory_id)}
                 disabled={m.deleting}
               >
-                {m.deleting ? 'Deleting…' : 'Delete'}
+                {m.deleting ? 'Deleting…' : 'Delete memory'}
               </button>
             </div>
           </li>

@@ -1,0 +1,33 @@
+.driver-charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px;
+}
+
+.driver-chart {
+  margin: 0;
+  min-width: 0;
+}
+
+.driver-chart figcaption {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.driver-chart h3 {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.driver-chart p {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+@media (max-width: 860px) {
+  .driver-charts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+}

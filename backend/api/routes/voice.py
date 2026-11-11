@@ -9,9 +9,10 @@ wires that into HTTP.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 
+import auth0_setup
 from agents import report_writer as report_writer_agent
 from api.routes.analyze import get_run_or_404
 from services import elevenlabs_client
@@ -19,8 +20,8 @@ from services import elevenlabs_client
 router = APIRouter()
 
 
-def _script_for_run(run_id: str) -> str:
-    state = get_run_or_404(run_id)
+def _script_for_run(run_id: str, *, user_id: str) -> str:
+    state = get_run_or_404(run_id, user_id=user_id)
     explanation = state.get("explanation")
     if explanation is None:
         raise HTTPException(status_code=404, detail=f"No explanation available for run {run_id}")
@@ -28,8 +29,10 @@ def _script_for_run(run_id: str) -> str:
 
 
 @router.post("/voice/{run_id}")
-def generate_voice_briefing(run_id: str) -> dict:
-    script = _script_for_run(run_id)
+def generate_voice_briefing(
+    run_id: str, user_id: str = Depends(auth0_setup.get_current_user_id)
+) -> dict:
+    script = _script_for_run(run_id, user_id=user_id)
     audio_path = elevenlabs_client.generate(script)
     if audio_path is None:
         raise HTTPException(
@@ -40,8 +43,8 @@ def generate_voice_briefing(run_id: str) -> dict:
 
 
 @router.get("/voice/{run_id}/audio")
-def get_voice_audio(run_id: str):
-    script = _script_for_run(run_id)
+def get_voice_audio(run_id: str, user_id: str = Depends(auth0_setup.get_current_user_id)):
+    script = _script_for_run(run_id, user_id=user_id)
     audio_path = elevenlabs_client.generate(script)
     if audio_path is None or not audio_path.exists():
         raise HTTPException(status_code=404, detail="Audio not available")

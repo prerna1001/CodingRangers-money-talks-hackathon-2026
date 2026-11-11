@@ -1,16 +1,15 @@
 .source-tag--block {
-  display: inline-flex;
   margin-bottom: 14px;
 }
 
 .stress-panel__empty {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text-dim);
 }
 
 .stress-panel__stat {
-  font-size: 13px;
-  color: var(--text-dim);
+  font-size: 15px;
+  color: var(--text);
   margin-bottom: 14px;
 }
 
@@ -20,32 +19,32 @@
 
 .stress-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  column-gap: 32px;
+  border-top: 1.5px solid var(--text-h);
 }
 
 .stress-check {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
 }
 
 .stress-check__top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 10px;
+  margin-bottom: 4px;
 }
 
 .stress-check__name {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-h);
 }
 
 .stress-check__detail {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text-dim);
   line-height: 1.5;
 }

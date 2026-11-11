@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "accessibility-general": {
+      "source": "mgifford/accessibility-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ACCESSIBILITY-general/SKILL.md",
+      "computedHash": "d25e01acf4f471ff184eaa8c157c35354320c4b05b6dd54953a841bdfe2c0c76"
+    },
+    "forms": {
+      "source": "mgifford/accessibility-skills",
+      "sourceType": "github",
+      "skillPath": "skills/forms/SKILL.md",
+      "computedHash": "1dbaf0400fdf5903db701c1718d4a2024c3a4362b6afac14340b74c74eb2885f"
+    },
+    "keyboard": {
+      "source": "mgifford/accessibility-skills",
+      "sourceType": "github",
+      "skillPath": "skills/keyboard/SKILL.md",
+      "computedHash": "7f717ffaa2b07ad6fc7c7cffad3bb271640c60becdd507060df418e746d544b2"
+    }
+  }
+}

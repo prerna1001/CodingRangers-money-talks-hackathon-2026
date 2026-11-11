@@ -4,6 +4,7 @@
 // them locally, but keeps the same URL string so swapping a mock function for a
 // real fetch() later is the only change needed, at that one call site.
 export const API_ENDPOINTS = {
+  authStatus: '/api/auth/status',
   upload: '/api/upload',
   analyze: '/api/analyze',
   analyzeStream: (runId) => `/api/analyze/stream/${runId}`,
@@ -14,5 +15,7 @@ export const API_ENDPOINTS = {
   memoryDelete: (memoryId) => `/api/memory/${memoryId}`,
   stressTestsRun: '/api/stress-tests/run',
   reportPdf: (runId) => `/api/reports/${runId}/pdf`,
+  powerbi: (runId) => `/api/runs/${runId}/powerbi`,
+  pitchDeck: (runId, theme) => `/api/runs/${runId}/pitch-deck?theme=${theme}`,
   voice: (runId) => `/api/voice/${runId}`,
 }

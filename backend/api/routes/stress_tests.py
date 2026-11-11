@@ -10,9 +10,10 @@ logic be iterated on without paying for a fresh Analyst/Guardrail pass.
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+import auth0_setup
 from agents import memory_agent, stress_tester as stress_tester_agent
 from api.routes.analyze import get_run_or_404
 
@@ -24,8 +25,11 @@ class StressTestRequest(BaseModel):
 
 
 @router.post("/stress-tests/run")
-def run_stress_tests(request: StressTestRequest) -> dict:
-    state = get_run_or_404(request.run_id)
+def run_stress_tests(
+    request: StressTestRequest,
+    user_id: str = Depends(auth0_setup.get_current_user_id),
+) -> dict:
+    state = get_run_or_404(request.run_id, user_id=user_id)
     applications = memory_agent.apply_memories(state["memories"], state["facts"], state["transactions"])
     results = stress_tester_agent.run_available_scenarios(
         transactions=state["transactions"],
@@ -37,6 +41,8 @@ def run_stress_tests(request: StressTestRequest) -> dict:
 
 
 @router.get("/stress-tests/results")
-def get_stress_results(run_id: str) -> dict:
-    state = get_run_or_404(run_id)
+def get_stress_results(
+    run_id: str, user_id: str = Depends(auth0_setup.get_current_user_id)
+) -> dict:
+    state = get_run_or_404(run_id, user_id=user_id)
     return {"run_id": run_id, "results": [r.model_dump() for r in state.get("stress_results", [])]}

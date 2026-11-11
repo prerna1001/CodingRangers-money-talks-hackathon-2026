@@ -21,6 +21,7 @@ from models.schemas import (
 
 def new_run_state(
     *,
+    user_id: str,
     company_id: str,
     current_period: str,
     prior_period: str,
@@ -33,6 +34,7 @@ def new_run_state(
 ) -> RunState:
     return RunState(
         run_id=run_id or f"run_{uuid.uuid4().hex[:12]}",
+        user_id=user_id,
         company_id=company_id,
         current_period=current_period,
         prior_period=prior_period,

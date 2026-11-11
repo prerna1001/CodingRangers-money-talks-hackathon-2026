@@ -29,7 +29,15 @@ class Document:
 
 
 class RagStore:
-    def __init__(self, persist_dir: str = CHROMA_PERSIST_DIR) -> None:
+    def __init__(
+        self,
+        persist_dir: str = CHROMA_PERSIST_DIR,
+        *,
+        user_id: str | None = None,
+        company_id: str | None = None,
+    ) -> None:
+        self.user_id = user_id
+        self.company_id = company_id
         self._docs: dict[str, Document] = {}
         self._collection = None
         self._bm25 = None
@@ -47,8 +55,29 @@ class RagStore:
     def backend(self) -> str:
         return "chroma" if self._collection is not None else "bm25" if self._bm25 is not None else "empty"
 
+    def _tag_owner(self, metadata: dict) -> dict:
+        """Stamp the owning user/company onto every stored chunk.
+
+        Assign rather than setdefault: a caller must not be able to file a
+        document under a different account by supplying its own metadata.
+        """
+        metadata = dict(metadata or {})
+        if self.user_id:
+            metadata["user_id"] = self.user_id
+        if self.company_id:
+            metadata["company_id"] = self.company_id
+        return metadata
+
+    def _is_owned(self, metadata: dict) -> bool:
+        if self.user_id and metadata.get("user_id") != self.user_id:
+            return False
+        if self.company_id and metadata.get("company_id") != self.company_id:
+            return False
+        return True
+
     def add_documents(self, docs: list[Document]) -> None:
         for doc in docs:
+            doc.metadata = self._tag_owner(doc.metadata)
             self._docs[doc.chunk_id] = doc
 
         if self._collection is not None:
@@ -70,19 +99,33 @@ class RagStore:
         except ImportError:
             self._bm25 = None
             return
-        self._bm25_ids = list(self._docs.keys())
+        self._bm25_ids = [cid for cid, doc in self._docs.items() if self._is_owned(doc.metadata)]
         tokenized = [self._docs[cid].text.lower().split() for cid in self._bm25_ids]
         self._bm25 = BM25Plus(tokenized) if tokenized else None
 
+    def _owner_filter(self) -> dict | None:
+        clauses = []
+        if self.user_id:
+            clauses.append({"user_id": self.user_id})
+        if self.company_id:
+            clauses.append({"company_id": self.company_id})
+        if not clauses:
+            return None
+        return clauses[0] if len(clauses) == 1 else {"$and": clauses}
+
     def query(self, query_text: str, k: int = RAG_RETRIEVE_K) -> list[RetrievedChunk]:
-        if not self._docs:
+        if not self._docs and self._collection is None:
             return []
         if self._collection is not None:
             return self._query_chroma(query_text, k)
         return self._query_bm25(query_text, k)
 
     def _query_chroma(self, query_text: str, k: int) -> list[RetrievedChunk]:
-        result = self._collection.query(query_texts=[query_text], n_results=min(k, len(self._docs)))
+        kwargs: dict = {"query_texts": [query_text], "n_results": k}
+        where = self._owner_filter()
+        if where is not None:
+            kwargs["where"] = where
+        result = self._collection.query(**kwargs)
         chunks: list[RetrievedChunk] = []
         ids = result.get("ids", [[]])[0]
         for i, chunk_id in enumerate(ids):

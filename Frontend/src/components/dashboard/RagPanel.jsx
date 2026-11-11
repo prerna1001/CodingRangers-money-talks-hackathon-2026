@@ -19,8 +19,8 @@ export default function RagPanel() {
     <div className="rag-panel">
       <div className="panel-heading">
         <div>
-          <h3>Retrieved context (RAG)</h3>
-          <p>Business context pulled in before analysis — previous reports, policies, definitions</p>
+          <h2>Retrieved context</h2>
+          <p>Earlier reports, policies and definitions Ledgerlight looked up before writing the explanation</p>
         </div>
         {source && (
           <span className="source-tag">
@@ -34,7 +34,10 @@ export default function RagPanel() {
           <li key={item.title} className="rag-item">
             <div className="rag-item__top">
               <span className="rag-item__source">{item.source}</span>
-              <span className="relevance-pill">{Math.round(item.relevance * 100)}% relevant</span>
+              <span className="relevance">
+                <span className="relevance__track" aria-hidden="true"><span style={{ width: `${Math.round(item.relevance * 100)}%` }} /></span>
+                {Math.round(item.relevance * 100)}% match
+              </span>
             </div>
             <p className="rag-item__title">{item.title}</p>
             <p className="rag-item__snippet">{item.snippet}</p>

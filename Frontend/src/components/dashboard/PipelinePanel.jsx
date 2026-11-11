@@ -2,7 +2,7 @@ import './PipelinePanel.css'
 
 const STATUS_META = {
   passed: { label: 'Passed', className: 'badge--success' },
-  passed_with_warnings: { label: 'Warning', className: 'badge--warn' },
+  passed_with_warnings: { label: 'Passed with warnings', className: 'badge--warn' },
   failed: { label: 'Failed', className: 'badge--fail' },
 }
 
@@ -11,24 +11,25 @@ export default function PipelinePanel({ steps }) {
     <div className="pipeline-panel">
       <div className="panel-heading">
         <div>
-          <h3>Agent run timeline</h3>
-          <p>Every agent that ran for this analysis, in order, with its result</p>
+          <h2>Agent run</h2>
+          <p>Every agent that worked on this analysis, in the order it ran, and what it concluded</p>
         </div>
       </div>
 
-      <ul className="pipeline-list">
+      {steps.length === 0 && <p className="panel-loading">This run did not report its agent steps.</p>}
+      <ol className="pipeline-list">
         {steps.map((step, idx) => {
           const meta = STATUS_META[step.status] || { label: step.status, className: 'badge--success' }
           return (
-            <li key={step.name} className="pipeline-row">
+            <li key={`${idx}-${step.name}`} className="pipeline-row">
               <span className="pipeline-row__index">{idx + 1}</span>
               <span className="pipeline-row__name">{step.name}</span>
-              <span className="pipeline-row__duration">{step.duration_ms}ms</span>
+              <span className="pipeline-row__duration">{(Number(step.duration_ms) || 0).toLocaleString('en-US')} ms</span>
               <span className={`badge ${meta.className}`}>{meta.label}</span>
             </li>
           )
         })}
-      </ul>
+      </ol>
     </div>
   )
 }

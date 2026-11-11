@@ -22,13 +22,17 @@ import uuid
 from collections import defaultdict
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
+import auth0_setup
 from api.presenters import to_frontend_analysis
 from graph.events import EVENT_BUS
 from graph.workflow import run_pipeline
+from services.injection_filter import sanitize
+from services.rag_store import Document
+from services.reference_store import add as add_reference_document
 from models.schemas import (
     CanonicalTransaction,
     CompanyProfileCore,
@@ -49,7 +53,7 @@ _FIXTURES_DIR = Path(__file__).resolve().parent.parent.parent / "tests" / "fixtu
 
 
 class AnalyzeRequest(BaseModel):
-    company_id: str = "demo_saas"
+    company_id: str = ""
     company_name: str | None = None
     current_period: str = "2026-08"
     prior_period: str = "2026-07"
@@ -59,6 +63,11 @@ class AnalyzeRequest(BaseModel):
     transaction_file_ids: list[str] = []
     period_summary_file_ids: list[str] = []
     known_aliases: dict[str, list[str]] = {}
+    industry: str = "unknown"
+    business_model: str = "unknown"
+    primary_revenue_streams: list[str] = []
+    known_seasonality: list[str] = []
+    business_context: str = ""
 
 
 def _derive_period_summaries(transactions: list[CanonicalTransaction]) -> list[PeriodSummary]:
@@ -114,25 +123,32 @@ def _infer_periods(summaries: list[PeriodSummary]) -> tuple[str, str] | None:
 
 def _load_uploaded_dataset(
     request: "AnalyzeRequest",
-) -> tuple[list[CanonicalTransaction], list[PeriodSummary], CompanyProfileCore]:
-    from api.routes.upload import get_uploaded_period_summaries, get_uploaded_transactions
+    *,
+    user_id: str,
+    company_id: str,
+) -> tuple[list[CanonicalTransaction], list[PeriodSummary], CompanyProfileCore, list]:
+    from api.routes.upload import get_available_files, get_uploaded_period_summaries, get_uploaded_transactions
 
-    transactions = get_uploaded_transactions(request.transaction_file_ids)
-    period_summaries = get_uploaded_period_summaries(request.period_summary_file_ids)
+    transactions = get_uploaded_transactions(request.transaction_file_ids, user_id=user_id)
+    period_summaries = get_uploaded_period_summaries(request.period_summary_file_ids, user_id=user_id)
 
     if not period_summaries and transactions:
         period_summaries = _derive_period_summaries(transactions)
 
     profile_core = CompanyProfileCore(
-        company_id=request.company_id,
-        company_name=request.company_name or request.company_id,
-        industry="unknown",
-        business_model="unknown",
+        company_id=company_id,
+        company_name=request.company_name or company_id,
+        industry=request.industry,
+        business_model=request.business_model,
+        primary_revenue_streams=request.primary_revenue_streams,
+        known_seasonality=request.known_seasonality,
+        business_context=sanitize(request.business_context, max_len=4_000),
     )
-    return transactions, period_summaries, profile_core
+    file_ids = [*request.transaction_file_ids, *request.period_summary_file_ids]
+    return transactions, period_summaries, profile_core, get_available_files(file_ids, user_id=user_id)
 
 
-def _load_demo_fixture() -> tuple[list[CanonicalTransaction], list[PeriodSummary], CompanyProfileCore]:
+def _load_demo_fixture() -> tuple[list[CanonicalTransaction], list[PeriodSummary], CompanyProfileCore, list]:
     data = json.loads((_FIXTURES_DIR / "saas_2026_08_transactions.json").read_text())
     transactions = [CanonicalTransaction(**t) for t in data["transactions"]]
     period_summaries = [PeriodSummary(**p) for p in data["period_summaries"]]
@@ -144,29 +160,35 @@ def _load_demo_fixture() -> tuple[list[CanonicalTransaction], list[PeriodSummary
         primary_revenue_streams=["SMB subscriptions", "Enterprise subscriptions", "Professional services"],
         known_seasonality=["Q4 enterprise renewals", "summer SMB slowdown"],
     )
-    return transactions, period_summaries, profile_core
+    return transactions, period_summaries, profile_core, []
 
 
-async def _execute_pipeline(run_id: str, **kwargs) -> None:
+async def _execute_pipeline(user_id: str, run_id: str, **kwargs) -> None:
     """Runs the (synchronous, LLM-calling) pipeline off the event loop so
     the SSE stream below can actually receive events as they happen,
     instead of the whole run completing -- and publishing every event --
     before a client has had a chance to subscribe.
     """
     try:
-        final_state = await asyncio.to_thread(run_pipeline, run_id=run_id, **kwargs)
-        _RUNS[run_id] = {"status": "complete", "state": final_state, "error": None}
+        final_state = await asyncio.to_thread(run_pipeline, user_id=user_id, run_id=run_id, **kwargs)
+        _RUNS[run_id] = {"status": "complete", "state": final_state, "error": None, "user_id": user_id}
     except Exception as exc:  # noqa: BLE001 - surfaced via GET /api/runs/{run_id}
-        _RUNS[run_id] = {"status": "error", "state": None, "error": str(exc)}
+        _RUNS[run_id] = {"status": "error", "state": None, "error": str(exc), "user_id": user_id}
 
 
 @router.post("/analyze")
-async def analyze(request: AnalyzeRequest) -> dict:
+async def analyze(
+    request: AnalyzeRequest,
+    user_id: str = Depends(auth0_setup.get_current_user_id),
+) -> dict:
     current_period = request.current_period
     prior_period = request.prior_period
+    company_id = request.company_id.strip() or "default"
 
     if request.transaction_file_ids or request.period_summary_file_ids:
-        transactions, period_summaries, profile_core = _load_uploaded_dataset(request)
+        transactions, period_summaries, profile_core, available_files = _load_uploaded_dataset(
+            request, user_id=user_id, company_id=company_id
+        )
         # Uploaded data won't necessarily cover the request's default periods,
         # so take the two most recent periods actually present. An explicit
         # period pair in the request still wins if it matches the data.
@@ -184,28 +206,49 @@ async def analyze(request: AnalyzeRequest) -> dict:
                 )
             current_period, prior_period = inferred
     else:
-        transactions, period_summaries, profile_core = _load_demo_fixture()
+        transactions, period_summaries, profile_core, available_files = _load_demo_fixture()
+        company_id = request.company_id.strip() or profile_core.company_id
 
     run_id = f"run_{uuid.uuid4().hex[:12]}"
-    _RUNS[run_id] = {"status": "running", "state": None, "error": None}
+    if profile_core.business_context:
+        add_reference_document(
+            user_id,
+            company_id,
+            Document(
+                chunk_id=f"run:{run_id}:business_context",
+                source="user_business_context",
+                text=profile_core.business_context,
+                metadata={"run_id": run_id, "kind": "user_context"},
+            ),
+        )
+    _RUNS[run_id] = {"status": "running", "state": None, "error": None, "user_id": user_id}
 
     asyncio.create_task(
         _execute_pipeline(
+            user_id,
             run_id,
-            company_id=request.company_id,
+            company_id=company_id,
             current_period=current_period,
             prior_period=prior_period,
             company_profile_core=profile_core,
             transactions=transactions,
             period_summaries=period_summaries,
+            available_files=available_files,
             known_aliases=request.known_aliases or {"vendor:aws": ["AWS", "Amazon Web Services", "AMZN AWS"]},
         )
     )
     return {"run_id": run_id, "status": "running", "stream_url": f"/api/analyze/stream/{run_id}"}
 
 
+def _owned_run_entry(run_id: str, user_id: str) -> dict:
+    entry = _RUNS.get(run_id)
+    if entry is None or entry.get("user_id") != user_id:
+        raise HTTPException(status_code=404, detail=f"Run {run_id} not found")
+    return entry
+
+
 @router.get("/runs")
-def list_runs() -> list[dict]:
+def list_runs(user_id: str = Depends(auth0_setup.get_current_user_id)) -> list[dict]:
     return [
         {
             "run_id": run_id,
@@ -214,13 +257,12 @@ def list_runs() -> list[dict]:
             "current_period": entry["state"]["current_period"] if entry["state"] else None,
         }
         for run_id, entry in _RUNS.items()
+        if entry.get("user_id") == user_id
     ]
 
 
-def get_run_or_404(run_id: str) -> RunState:
-    entry = _RUNS.get(run_id)
-    if entry is None:
-        raise HTTPException(status_code=404, detail=f"Run {run_id} not found")
+def get_run_or_404(run_id: str, *, user_id: str) -> RunState:
+    entry = _owned_run_entry(run_id, user_id)
     if entry["status"] == "running":
         raise HTTPException(status_code=202, detail=f"Run {run_id} is still in progress")
     if entry["status"] == "error":
@@ -229,18 +271,22 @@ def get_run_or_404(run_id: str) -> RunState:
 
 
 @router.get("/runs/{run_id}")
-def get_run(run_id: str) -> dict:
+def get_run(run_id: str, user_id: str = Depends(auth0_setup.get_current_user_id)) -> dict:
     """Returns the finished run in the shape the React dashboard consumes
     (api/presenters.py). Raises 202 while the run is still in flight, which
     is what the frontend's analyzeRun() polls on.
     """
-    state = get_run_or_404(run_id)
+    state = get_run_or_404(run_id, user_id=user_id)
     return to_frontend_analysis(state)
 
 
 @router.get("/runs/{run_id}/evidence")
-def get_evidence(run_id: str, fact_id: str | None = None) -> dict:
-    state = get_run_or_404(run_id)
+def get_evidence(
+    run_id: str,
+    fact_id: str | None = None,
+    user_id: str = Depends(auth0_setup.get_current_user_id),
+) -> dict:
+    state = get_run_or_404(run_id, user_id=user_id)
     facts = state.get("facts", [])
     if fact_id:
         facts = [f for f in facts if f.fact_id == fact_id]
@@ -261,11 +307,11 @@ def get_evidence(run_id: str, fact_id: str | None = None) -> dict:
 
 
 @router.get("/runs/{run_id}/trace")
-def get_trace(run_id: str) -> dict:
+def get_trace(run_id: str, user_id: str = Depends(auth0_setup.get_current_user_id)) -> dict:
     """Full audit trace -- every input, every agent output, every check
     result (plan section 10.4's auditability requirement).
     """
-    state = get_run_or_404(run_id)
+    state = get_run_or_404(run_id, user_id=user_id)
     return {
         key: (
             [v.model_dump() if hasattr(v, "model_dump") else v for v in value]
@@ -277,7 +323,9 @@ def get_trace(run_id: str) -> dict:
 
 
 @router.get("/analyze/stream/{run_id}")
-async def stream_run(run_id: str):
+async def stream_run(run_id: str, user_id: str = Depends(auth0_setup.get_current_user_id)):
+    _owned_run_entry(run_id, user_id)
+
     async def event_generator():
         async for event in EVENT_BUS.subscribe(run_id):
             yield {"event": event["type"], "data": json.dumps(event, default=str)}

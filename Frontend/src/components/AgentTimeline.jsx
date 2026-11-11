@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import Tick from './Tick'
 import './AgentTimeline.css'
 
 const STATUS_LABEL = {
@@ -51,20 +52,19 @@ export default function AgentTimeline({ steps, onComplete }) {
   return (
     <div className={`agent-timeline ${finalizing ? 'agent-timeline--finalizing' : ''}`}>
       <div className="agent-timeline__header">
-        <h2>{finalizing ? 'Preparing results dashboard' : 'Running analysis'}</h2>
+        <h1>{finalizing ? 'Writing up the results' : 'Working through your files'}</h1>
         <p>
           {finalizing
-            ? 'Agent work is complete. Waiting for the final evidence-backed result payload.'
-            : 'Multi-agent pipeline is processing your data'}
+            ? 'Every check has run. Waiting for the finished explanation.'
+            : 'Each step below checks or builds on the one before it.'}
         </p>
       </div>
 
-      <div className="agent-timeline__bar">
+      <div className="agent-timeline__bar" role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100} aria-label="Analysis progress">
         <div className="agent-timeline__bar-fill" style={{ width: `${progressPct}%` }} />
       </div>
-      <div className="agent-timeline__pct">{progressPct}%</div>
 
-      <ul className="agent-timeline__list">
+      <ol className="agent-timeline__list" aria-live="polite">
         {steps.map((step, idx) => {
           const isDone = doneIndices.includes(idx)
           const isActive = activeIndex === idx && !isDone
@@ -72,7 +72,7 @@ export default function AgentTimeline({ steps, onComplete }) {
           return (
             <li key={step.name} className={`agent-step agent-step--${state}`}>
               <span className="agent-step__icon">
-                {state === 'done' && '✓'}
+                {state === 'done' && <Tick />}
                 {state === 'running' && <span className="agent-step__spinner" />}
                 {state === 'pending' && idx + 1}
               </span>
@@ -90,11 +90,11 @@ export default function AgentTimeline({ steps, onComplete }) {
             <span className="agent-step__icon">
               <span className="agent-step__spinner" />
             </span>
-            <span className="agent-step__name">Results dashboard</span>
-            <span className="agent-step__status">Finalizing</span>
+            <span className="agent-step__name">Explanation and dashboard</span>
+            <span className="agent-step__status">In progress</span>
           </li>
         )}
-      </ul>
+      </ol>
     </div>
   )
 }
