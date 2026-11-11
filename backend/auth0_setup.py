@@ -185,6 +185,12 @@ def build_auth_client():
         client_secret=AUTH0_CLIENT_SECRET,
         app_base_url=APP_BASE_URL,
         secret=SESSION_SECRET or _UNSAFE_DEV_SECRET,
+        # Without `openid` Auth0 returns no ID token/userinfo, so the SDK
+        # persists a session with `user=None`. That passes `require_session`
+        # but has no `sub`, which is what makes `get_current_user_id` fail
+        # with "session is missing a user identifier". `profile email` fill
+        # in the name/email claims the UI reads from /api/auth/status.
+        authorization_params={"scope": "openid profile email"},
     )
     return config, AuthClient(config), register_auth_routes
 
