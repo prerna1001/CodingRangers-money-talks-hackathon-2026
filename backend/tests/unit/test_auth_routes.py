@@ -69,8 +69,8 @@ def _cleared_cookies(response) -> set[str]:
     }
 
 
-def test_declined_consent_redirects_to_the_homepage(app):
-    application, _ = app
+def test_declined_consent_logs_out_of_auth0_and_redirects_home(app):
+    application, fake = app
     with TestClient(application) as client:
         response = client.get(
             "/auth/callback?error=access_denied&error_description=User%20did%20not%20authorize",
@@ -78,12 +78,14 @@ def test_declined_consent_redirects_to_the_homepage(app):
         )
 
     assert response.status_code == 302
-    assert response.headers["location"] == f"{auth0_setup.APP_URL}/"
+    assert response.headers["location"].startswith("https://tenant.example/v2/logout")
+    assert fake.client.logout_options.return_to == f"{auth0_setup.APP_BASE_URL}/"
+    assert fake.client.logout_options.federated is False
     assert auth0_setup.SDK_SESSION_COOKIE in _cleared_cookies(response)
     assert auth0_setup.APP_ORIGIN_COOKIE in _cleared_cookies(response)
 
 
-def test_failed_callback_redirects_home_instead_of_returning_json(app):
+def test_failed_callback_logs_out_of_auth0_instead_of_returning_json(app):
     application, fake = app
     fake.complete_login_error = ValueError("The token is not yet valid (iat)")
 
@@ -93,7 +95,35 @@ def test_failed_callback_redirects_home_instead_of_returning_json(app):
         )
 
     assert response.status_code == 302
-    assert response.headers["location"] == f"{auth0_setup.APP_URL}/"
+    assert response.headers["location"].startswith("https://tenant.example/v2/logout")
+    assert fake.client.logout_options.return_to == f"{auth0_setup.APP_BASE_URL}/"
+    assert fake.client.logout_options.federated is False
+
+
+def test_declined_consent_keeps_google_signed_in_even_with_federated_logout(
+    app, monkeypatch
+):
+    application, fake = app
+    monkeypatch.setattr(auth0_setup, "AUTH0_FEDERATED_LOGOUT", True)
+
+    with TestClient(application) as client:
+        response = client.get(
+            "/auth/callback?error=access_denied", follow_redirects=False
+        )
+
+    assert response.status_code == 302
+    assert fake.client.logout_options.federated is False
+
+
+def test_explicit_logout_can_opt_into_federated_logout(app, monkeypatch):
+    application, fake = app
+    monkeypatch.setattr(auth0_setup, "AUTH0_FEDERATED_LOGOUT", True)
+
+    with TestClient(application) as client:
+        response = client.get("/auth/logout", follow_redirects=False)
+
+    assert response.status_code == 302
+    assert fake.client.logout_options.federated is True
 
 
 def test_logout_clears_every_session_chunk_without_logging_out_of_google(app):

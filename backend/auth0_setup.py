@@ -334,6 +334,29 @@ def init_auth(app: FastAPI) -> None:
 
     auth_router = APIRouter()
 
+    async def _logout_and_redirect(
+        request: Request,
+        response: Response,
+        return_to: str,
+        *,
+        federated: bool,
+    ) -> RedirectResponse:
+        # Expire our cookies and the SDK's transaction/session cookies, then
+        # send the browser through Auth0's /v2/logout so the Auth0 session is
+        # gone too. Clearing Auth0 (but not Google) is what makes the next
+        # "Log in" start at the account chooser instead of replaying the
+        # consent screen for the account that just declined.
+        _clear_auth_cookies(response)
+        try:
+            logout_url = await auth_client.client.logout(
+                LogoutOptions(return_to=return_to, federated=federated),
+                store_options={"request": request, "response": response},
+            )
+        except Exception as exc:  # noqa: BLE001 - never strand the browser
+            logger.warning("Auth0 logout failed: %s", exc)
+            logout_url = f"{APP_URL}/"
+        return RedirectResponse(logout_url, status_code=302, headers=response.headers)
+
     @auth_router.get("/auth/login")
     async def login(request: Request, response: Response):
         # Start from a clean slate so a stale chunk from an earlier session
@@ -356,12 +379,13 @@ def init_auth(app: FastAPI) -> None:
     @auth_router.get("/auth/callback")
     async def callback(request: Request, response: Response):
         # Auth0 sends `error` when the user declines consent or the upstream
-        # IdP fails. That is a normal outcome, not a server error: clear the
-        # half-finished transaction and send the browser home.
+        # IdP fails. That is a normal outcome, not a server error. The user
+        # already authenticated with the IdP at this point, so Auth0 has a
+        # session even though the app got no tokens; clear that session too or
+        # the next login replays consent for the same account.
         if request.query_params.get("error"):
-            _clear_auth_cookies(response)
-            return RedirectResponse(
-                f"{APP_URL}/", status_code=302, headers=response.headers
+            return await _logout_and_redirect(
+                request, response, f"{APP_BASE_URL}/", federated=False
             )
 
         try:
@@ -374,9 +398,8 @@ def init_auth(app: FastAPI) -> None:
             # Nothing was persisted, so clean up rather than showing raw JSON
             # at the backend origin.
             logger.warning("Auth0 callback failed: %s", exc)
-            _clear_auth_cookies(response)
-            return RedirectResponse(
-                f"{APP_URL}/", status_code=302, headers=response.headers
+            return await _logout_and_redirect(
+                request, response, f"{APP_BASE_URL}/", federated=False
             )
 
         app_state = session_data.get("app_state") or {}
@@ -385,25 +408,15 @@ def init_auth(app: FastAPI) -> None:
 
     @auth_router.get("/auth/logout")
     async def logout(request: Request, response: Response):
-        # Clear the app's cookies before anything that can fail. Federated
-        # logout is opt-in: by default only the Auth0/app session ends, so
-        # signing out of Ledgerlight does not sign the user out of Google
-        # everywhere else in the browser. The next login is still clean
+        # Federated logout is opt-in: by default only the Auth0/app session
+        # ends, so signing out of Ledgerlight does not sign the user out of
+        # Google everywhere else in the browser. The next login is still clean
         # because the Auth0 session is gone and `prompt=select_account`
         # forces the account chooser.
-        _clear_auth_cookies(response)
         return_to = request.query_params.get("returnTo") or f"{APP_BASE_URL}/"
-        try:
-            logout_url = await auth_client.client.logout(
-                LogoutOptions(
-                    return_to=return_to, federated=AUTH0_FEDERATED_LOGOUT
-                ),
-                store_options={"request": request, "response": response},
-            )
-        except Exception as exc:  # noqa: BLE001 - never strand the browser
-            logger.warning("Auth0 logout failed: %s", exc)
-            logout_url = f"{APP_URL}/"
-        return RedirectResponse(logout_url, status_code=302, headers=response.headers)
+        return await _logout_and_redirect(
+            request, response, return_to, federated=AUTH0_FEDERATED_LOGOUT
+        )
 
     app.include_router(auth_router)
 
