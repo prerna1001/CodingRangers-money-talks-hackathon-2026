@@ -107,10 +107,19 @@ SDK_TRANSACTION_COOKIE = "_a0_tx"
 # PyJWT rejects an ID token whose `iat` is even one second in the future, so
 # a slightly fast Auth0 clock would otherwise turn a valid login into a 400.
 CLOCK_SKEW_LEEWAY_SECONDS = _env_int("AUTH0_CLOCK_SKEW_LEEWAY_SECONDS", 120)
-# Signing out of the app should not leave the upstream identity provider
-# (Google, etc.) logged in, or the next login silently reuses it. Set to 0 if
-# you would rather keep the IdP session and only end the Auth0/app session.
-AUTH0_FEDERATED_LOGOUT = _env_bool("AUTH0_FEDERATED_LOGOUT", True)
+# Keep the upstream identity provider (Google, etc.) signed in when the user
+# signs out of Ledgerlight. Federated logout is available, but it is opt-in:
+# ending the app session should not also sign the user out of every other
+# Google site in the same browser.
+AUTH0_FEDERATED_LOGOUT = _env_bool("AUTH0_FEDERATED_LOGOUT", False)
+# Ask the identity provider to show its account chooser instead of silently
+# reusing the last account. For a Google connection this becomes Google's
+# "Choose an account" screen; set to an empty value to disable it.
+AUTH0_LOGIN_PROMPT = (
+    _env("AUTH0_LOGIN_PROMPT")
+    if "AUTH0_LOGIN_PROMPT" in os.environ
+    else "select_account"
+)
 
 # Redirect targets are restricted to these. Anything else is ignored and we
 # fall back to APP_URL: this endpoint is a redirect, so honouring an arbitrary
@@ -261,6 +270,13 @@ def _install_clock_skew_tolerance(auth_client) -> None:
     auth_client.client._verify_and_decode_jwt = verify
 
 
+def _authorization_params() -> dict[str, str]:
+    params = {"scope": "openid profile email"}
+    if AUTH0_LOGIN_PROMPT:
+        params["prompt"] = AUTH0_LOGIN_PROMPT
+    return params
+
+
 def build_auth_client():
     """Return ``(config, auth_client, register_auth_routes)`` or ``None`` when
     Auth0 is not configured."""
@@ -279,7 +295,11 @@ def build_auth_client():
         # persists a session with `user=None`. That passes `require_session`
         # but has no `sub`, which is what makes `get_current_user_id` fail
         # with "session is missing a user identifier".
-        authorization_params={"scope": "openid profile email"},
+        #
+        # `prompt=select_account` is forwarded to the connection, so a Google
+        # login shows the account chooser instead of silently reusing whichever
+        # Google account is already signed in to the browser.
+        authorization_params=_authorization_params(),
     )
     auth_client = AuthClient(config)
     _install_clock_skew_tolerance(auth_client)
@@ -365,10 +385,12 @@ def init_auth(app: FastAPI) -> None:
 
     @auth_router.get("/auth/logout")
     async def logout(request: Request, response: Response):
-        # Clear the app's cookies before anything that can fail, and log out
-        # federated so Auth0 also ends the upstream (e.g. Google) session.
-        # Otherwise the next login silently reuses that session and drops the
-        # user straight onto the consent screen.
+        # Clear the app's cookies before anything that can fail. Federated
+        # logout is opt-in: by default only the Auth0/app session ends, so
+        # signing out of Ledgerlight does not sign the user out of Google
+        # everywhere else in the browser. The next login is still clean
+        # because the Auth0 session is gone and `prompt=select_account`
+        # forces the account chooser.
         _clear_auth_cookies(response)
         return_to = request.query_params.get("returnTo") or f"{APP_BASE_URL}/"
         try:

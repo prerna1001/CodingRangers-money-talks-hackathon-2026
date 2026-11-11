@@ -29,7 +29,7 @@ class _FakeServerClient:
         self.logout_options = options
         return (
             "https://tenant.example/v2/logout"
-            f"?returnTo={options.return_to}&federated=true"
+            f"?returnTo={options.return_to}&federated={str(options.federated).lower()}"
         )
 
 
@@ -96,7 +96,7 @@ def test_failed_callback_redirects_home_instead_of_returning_json(app):
     assert response.headers["location"] == f"{auth0_setup.APP_URL}/"
 
 
-def test_logout_clears_every_session_chunk_and_logs_out_federated(app):
+def test_logout_clears_every_session_chunk_without_logging_out_of_google(app):
     application, fake = app
     with TestClient(application) as client:
         client.cookies.set(f"{auth0_setup.SDK_SESSION_COOKIE}_0", "stale")
@@ -106,12 +106,22 @@ def test_logout_clears_every_session_chunk_and_logs_out_federated(app):
         )
 
     assert response.status_code == 302
-    assert "federated=true" in response.headers["location"]
-    assert fake.client.logout_options.federated is True
+    assert "federated=false" in response.headers["location"]
+    assert fake.client.logout_options.federated is False
     cleared = _cleared_cookies(response)
     assert f"{auth0_setup.SDK_SESSION_COOKIE}_0" in cleared
     assert auth0_setup.SDK_TRANSACTION_COOKIE in cleared
     assert auth0_setup.APP_ORIGIN_COOKIE in cleared
+
+
+def test_login_asks_for_the_account_chooser(monkeypatch):
+    monkeypatch.setattr(auth0_setup, "AUTH0_LOGIN_PROMPT", "select_account")
+    assert auth0_setup._authorization_params()["prompt"] == "select_account"
+
+
+def test_login_prompt_can_be_disabled(monkeypatch):
+    monkeypatch.setattr(auth0_setup, "AUTH0_LOGIN_PROMPT", "")
+    assert "prompt" not in auth0_setup._authorization_params()
 
 
 def test_login_clears_stale_session_but_keeps_the_return_target(app):
