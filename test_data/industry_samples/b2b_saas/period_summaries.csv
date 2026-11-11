@@ -1,0 +1,7 @@
+period_id,start_date,end_date,account,account_type,amount
+2026-07,2026-07-01,2026-07-31,Subscription revenue,revenue,190000
+2026-07,2026-07-01,2026-07-31,Cloud infrastructure,opex,24000
+2026-07,2026-07-01,2026-07-31,Sales commissions,opex,13000
+2026-08,2026-08-01,2026-08-31,Subscription revenue,revenue,252000
+2026-08,2026-08-01,2026-08-31,Cloud infrastructure,opex,34000
+2026-08,2026-08-01,2026-08-31,Sales commissions,opex,22000

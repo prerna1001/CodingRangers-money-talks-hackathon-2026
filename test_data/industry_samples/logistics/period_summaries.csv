@@ -1,0 +1,7 @@
+period_id,start_date,end_date,account,account_type,amount
+2026-07,2026-07-01,2026-07-31,Freight revenue,revenue,147000
+2026-07,2026-07-01,2026-07-31,Fuel expense,opex,31000
+2026-07,2026-07-01,2026-07-31,Carrier expense,cogs,39000
+2026-08,2026-08-01,2026-08-31,Freight revenue,revenue,208000
+2026-08,2026-08-01,2026-08-31,Fuel expense,opex,46000
+2026-08,2026-08-01,2026-08-31,Carrier expense,cogs,61000

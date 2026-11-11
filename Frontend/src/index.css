@@ -1,36 +1,50 @@
+/* Ledgerlight tokens. The look is a month-end workpaper: a cool columnar pad,
+   blue-black ink, and copying-pencil violet reserved for tickmarks, focus and
+   the primary action. Green / red / amber carry meaning only (up, down,
+   caution) — never decoration. */
 :root {
-  --bg: #f4f6f8;
-  --bg-alt: #f9fafb;
-  --surface: #ffffff;
+  --bg: #eef1ec;
+  --bg-alt: #f4f6f2;
+  --surface: #fafbf8;
   --surface-raised: #ffffff;
-  --border: #dde3ec;
-  --border-strong: #c7d0dc;
-  --text: #445064;
-  --text-h: #111827;
-  --text-dim: #738096;
-  --accent: #11a978;
-  --accent-strong: #087f5b;
-  --accent-bg: rgba(17, 169, 120, 0.1);
-  --accent-border: rgba(17, 169, 120, 0.34);
-  --danger: #d94b42;
-  --danger-bg: rgba(224, 67, 61, 0.1);
-  --warning: #c47a16;
-  --info: #3c72d9;
-  --chart-up: #16b982;
-  --chart-down: #e05249;
-  --chart-baseline: #9aa4b4;
-  --chart-end: #12966f;
-  --chart-grid: rgba(113, 128, 150, 0.16);
-  --code-bg: #f1f3f6;
-  --shadow-sm: 0 1px 2px rgba(16, 20, 28, 0.05);
-  --shadow-md: 0 8px 24px -8px rgba(16, 20, 28, 0.12);
-  --shadow-lg: 0 20px 48px -16px rgba(16, 20, 28, 0.18);
+  --border: #cdd6ce;
+  --border-strong: #a9b6ac;
+  --text: #3a475a;
+  --text-h: #16233a;
+  --text-dim: #637083;
 
-  --sans: 'Segoe UI', system-ui, Roboto, sans-serif;
+  --accent: #5b3fa8;
+  --accent-strong: #472f8a;
+  --accent-bg: rgba(91, 63, 168, 0.09);
+  --accent-border: rgba(91, 63, 168, 0.32);
+  --on-accent: #ffffff;
+
+  --up: #1d7048;
+  --up-bg: rgba(29, 112, 72, 0.1);
+  --danger: #b42318;
+  --danger-bg: rgba(180, 35, 24, 0.09);
+  --warning: #9a5b00;
+  --warning-bg: rgba(154, 91, 0, 0.1);
+
+  --chart-up: #2a8a5c;
+  --chart-down: #c8453a;
+  --chart-total: #16233a;
+  --chart-carry: #d6dce3;
+  --chart-grid: rgba(22, 35, 58, 0.09);
+  --code-bg: #e8ece6;
+
+  --shadow-sheet: 0 1px 0 rgba(22, 35, 58, 0.04), 0 12px 32px -18px rgba(22, 35, 58, 0.22);
+
+  --serif: 'Spectral', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Public Sans', 'Segoe UI', system-ui, sans-serif;
   --mono: 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
 
-  font: 16px/150% var(--sans);
-  color-scheme: light dark;
+  --radius-sheet: 10px;
+  --radius-control: 6px;
+
+  font: 16px/1.5 var(--sans);
+  font-variant-numeric: tabular-nums lining-nums;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -41,32 +55,39 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #090b0f;
-    --bg-alt: #0d1118;
-    --surface: #11151d;
-    --surface-raised: #151a23;
-    --border: #263040;
-    --border-strong: #39465a;
-    --text: #b1bac9;
-    --text-h: #f7f9fc;
-    --text-dim: #7e8aa0;
-    --accent: #24c98d;
-    --accent-strong: #57e0ad;
-    --accent-bg: rgba(36, 201, 141, 0.13);
-    --accent-border: rgba(36, 201, 141, 0.36);
-    --danger: #ff6b61;
-    --danger-bg: rgba(242, 102, 95, 0.12);
-    --warning: #f2b14f;
-    --info: #7ca7ff;
-    --chart-up: #24c98d;
-    --chart-down: #ff655b;
-    --chart-baseline: #8994a8;
-    --chart-end: #18a77a;
-    --chart-grid: rgba(150, 164, 185, 0.13);
-    --code-bg: #0d1117;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.65);
+    --bg: #0f161d;
+    --bg-alt: #131b23;
+    --surface: #161f28;
+    --surface-raised: #1a242e;
+    --border: #293642;
+    --border-strong: #3c4b59;
+    --text: #b7c2cc;
+    --text-h: #e8edf2;
+    --text-dim: #8391a0;
+
+    --accent: #b6a2f5;
+    --accent-strong: #cdbfff;
+    --accent-bg: rgba(182, 162, 245, 0.12);
+    --accent-border: rgba(182, 162, 245, 0.38);
+    --on-accent: #1a1330;
+
+    --up: #5cc896;
+    --up-bg: rgba(92, 200, 150, 0.12);
+    --danger: #ff8a7d;
+    --danger-bg: rgba(255, 138, 125, 0.12);
+    --warning: #e8a94a;
+    --warning-bg: rgba(232, 169, 74, 0.13);
+
+    --chart-up: #4cb886;
+    --chart-down: #f07a6d;
+    --chart-total: #d5dde5;
+    --chart-carry: #2c3946;
+    --chart-grid: rgba(232, 237, 242, 0.08);
+    --code-bg: #111920;
+
+    --shadow-sheet: 0 1px 0 rgba(0, 0, 0, 0.3), 0 16px 40px -22px rgba(0, 0, 0, 0.7);
+
+    color-scheme: dark;
   }
 }
 
@@ -76,25 +97,47 @@
 
 body {
   margin: 0;
+  background: var(--bg);
 }
 
 h1,
 h2,
-h3 {
-  font-family: var(--sans);
-  font-weight: 600;
+h3,
+h4 {
+  font-family: var(--serif);
+  font-weight: 500;
   color: var(--text-h);
   margin: 0;
+  letter-spacing: -0.005em;
 }
 
 p {
   margin: 0;
 }
 
-button {
+button,
+input,
+textarea,
+select {
   font-family: inherit;
+  font-variant-numeric: inherit;
 }
 
 code {
   font-family: var(--mono);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,0 +1,36 @@
+INFO:     Started server process [37580]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+llm.complete task=guardrail provider=groq model=openai/gpt-oss-120b attempt=1 failed: Client error '429 Too Many Requests' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+llm.complete task=guardrail provider=groq model=openai/gpt-oss-120b attempt=2 failed: Client error '429 Too Many Requests' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+llm.complete task=guardrail provider=groq model=openai/gpt-oss-120b attempt=3 failed: Client error '429 Too Many Requests' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+guardrail LLM review unavailable (LLM call for task 'guardrail' failed on provider 'groq' model 'openai/gpt-oss-120b' after retries) -- falling back to grounding-only
+llm.complete task=guardrail provider=groq model=openai/gpt-oss-120b attempt=1 failed: Client error '429 Too Many Requests' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+llm.complete task=guardrail provider=groq model=openai/gpt-oss-120b attempt=2 failed: Client error '429 Too Many Requests' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+llm.complete task=guardrail provider=groq model=openai/gpt-oss-120b attempt=3 failed: Client error '429 Too Many Requests' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+guardrail LLM review unavailable (LLM call for task 'guardrail' failed on provider 'groq' model 'openai/gpt-oss-120b' after retries) -- falling back to grounding-only
+llm.complete task=analyst provider=groq model=openai/gpt-oss-120b attempt=1 failed: Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413
+llm.complete task=analyst provider=groq model=openai/gpt-oss-120b attempt=2 failed: Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413
+llm.complete task=analyst provider=groq model=openai/gpt-oss-120b attempt=3 failed: Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413
+llm.complete task=analyst provider=groq model=openai/gpt-oss-120b attempt=1 failed: Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413
+llm.complete task=analyst provider=groq model=openai/gpt-oss-120b attempt=2 failed: Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413
+llm.complete task=analyst provider=groq model=openai/gpt-oss-120b attempt=3 failed: Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413
+llm.complete task=analyst provider=groq model=openai/gpt-oss-120b attempt=1 failed: Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413
+llm.complete task=analyst provider=groq model=openai/gpt-oss-120b attempt=2 failed: Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413
+llm.complete task=analyst provider=groq model=openai/gpt-oss-120b attempt=3 failed: Client error '413 Payload Too Large' for url 'https://api.groq.com/openai/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413

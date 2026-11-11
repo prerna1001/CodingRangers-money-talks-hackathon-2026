@@ -3,16 +3,16 @@
    first (component-scoped CSS files should not redefine these). */
 
 .btn {
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   padding: 10px 18px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: opacity 0.15s ease, background 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .btn:disabled {
@@ -22,7 +22,7 @@
 
 .btn--primary {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .btn--primary:hover:not(:disabled) {
@@ -32,24 +32,25 @@
 .btn--ghost {
   background: transparent;
   border-color: var(--border-strong);
-  color: var(--text);
+  color: var(--text-h);
 }
 
 .btn--ghost:hover:not(:disabled) {
   border-color: var(--text-dim);
+  background: var(--bg-alt);
 }
 
 .btn--sm {
   padding: 6px 12px;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 
 .spinner {
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #ffffff;
+  border: 2px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-top-color: currentColor;
   animation: spin 0.7s linear infinite;
 }
 
@@ -60,33 +61,37 @@
 }
 
 .banner {
-  font-size: 13px;
+  font-size: 14px;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
 }
 
 .banner--error {
   background: var(--danger-bg);
   color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
 }
 
+/* Status marks: a small glyph plus a word, so status never relies on color. */
 .badge {
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 999px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 .badge--success {
-  background: var(--accent-bg);
-  color: var(--accent-strong);
+  background: var(--up-bg);
+  color: var(--up);
 }
 
 .badge--warn {
-  background: rgba(217, 155, 20, 0.12);
-  color: #c98a13;
+  background: var(--warning-bg);
+  color: var(--warning);
 }
 
 .badge--fail {
@@ -94,53 +99,104 @@
   color: var(--danger);
 }
 
-.result__header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: var(--bg-alt);
-  border-bottom: 1px solid var(--border);
-}
-
-.result__label {
-  font-size: 12px;
-  color: var(--text-dim);
-  font-family: var(--mono);
-}
-
-.result__json {
-  margin: 0;
-  padding: 16px;
-  font-family: var(--mono);
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: var(--text);
+.badge--neutral {
   background: var(--code-bg);
-  overflow-x: auto;
+  color: var(--text-dim);
 }
 
-.call-confirm {
+.text-up {
+  color: var(--up);
+}
+
+.text-down {
+  color: var(--danger);
+}
+
+/* Auditor's tickmark — used only where a figure really was traced or checked. */
+.tick {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.tick path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.panel-heading {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  color: var(--accent-strong);
-  background: var(--accent-bg);
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
-.call-confirm code {
+.panel-heading h2 {
+  font-size: 22px;
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+
+.panel-heading p {
+  color: var(--text-dim);
+  font-size: 14px;
+  max-width: 60ch;
+}
+
+.panel-loading {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.source-tag {
   font-size: 11.5px;
-  color: var(--text-h);
+  color: var(--text-dim);
+  display: inline-flex;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 3px 8px;
+  background: var(--code-bg);
+  border-radius: 4px;
+}
+
+.source-tag code {
+  font-family: var(--mono);
 }
 
 .call-confirm__dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--up);
   flex-shrink: 0;
-  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+@media (max-width: 640px) {
+  .panel-heading {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .source-tag {
+    white-space: normal;
+    flex-wrap: wrap;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

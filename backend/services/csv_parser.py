@@ -89,6 +89,8 @@ def parse_transactions(rows: Iterable[dict[str, str]], *, source_file_id: str) -
     for idx, row in enumerate(rows, start=2):
         posted_date = _parse_date(_pick(row, "posted_date"))
         period_id = _pick(row, "period_id") or posted_date.strftime("%Y-%m")
+        account_name = _pick(row, "account_name")
+        account_id = _pick(row, "account_id") or account_name
         account_type = AccountType(_pick(row, "account_type", "opex").lower())
         counterparty_type_raw = _pick(row, "counterparty_type")
         counterparty_type = CounterpartyType(counterparty_type_raw.lower()) if counterparty_type_raw else None
@@ -101,8 +103,8 @@ def parse_transactions(rows: Iterable[dict[str, str]], *, source_file_id: str) -
                 source_row=idx,
                 posted_date=posted_date,
                 period_id=period_id,
-                account_id=_pick(row, "account_id"),
-                account_name=_pick(row, "account_name"),
+                account_id=account_id,
+                account_name=account_name,
                 account_type=account_type,
                 category=_pick(row, "category", "uncategorized"),
                 counterparty_name=_pick(row, "counterparty_name") or None,
@@ -123,10 +125,12 @@ def parse_period_summaries(rows: Iterable[dict[str, str]]) -> list[PeriodSummary
         period_id = _pick(row, "period_id")
         start = _parse_date(row.get("start_date", f"{period_id}-01"))
         end = _parse_date(row.get("end_date", f"{period_id}-28"))
+        account_name = _pick(row, "account_name")
+        account_id = _pick(row, "account_id") or account_name
         grouped.setdefault(period_id, []).append(
             PeriodLine(
-                account_id=_pick(row, "account_id"),
-                account_name=_pick(row, "account_name"),
+                account_id=account_id,
+                account_name=account_name,
                 account_type=AccountType(_pick(row, "account_type", "opex").lower()),
                 amount=_parse_amount(_pick(row, "amount", "0")),
             )

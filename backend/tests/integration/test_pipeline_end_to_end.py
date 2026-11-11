@@ -22,6 +22,8 @@ from graph.workflow import run_pipeline
 from models.schemas import CanonicalTransaction, CompanyProfileCore, GuardrailStatus, PeriodSummary
 from services.memory_store import MemoryStore
 
+TEST_USER_ID = "test_user"
+
 FIXTURES_DIR = Path(__file__).resolve().parent.parent / "fixtures"
 
 
@@ -53,6 +55,7 @@ def test_pipeline_runs_end_to_end_and_produces_a_grounded_approved_explanation(d
     transactions, period_summaries, profile_core = demo_dataset
 
     final_state = run_pipeline(
+        user_id=TEST_USER_ID,
         company_id="demo_saas_test",
         current_period="2026-08",
         prior_period="2026-07",
@@ -89,6 +92,7 @@ def test_pipeline_runs_end_to_end_and_produces_a_grounded_approved_explanation(d
 def test_memory_persists_and_is_used_across_two_runs(demo_dataset, isolated_memory_db):
     transactions, period_summaries, profile_core = demo_dataset
     kwargs = dict(
+        user_id=TEST_USER_ID,
         company_id="demo_saas_test",
         current_period="2026-08",
         prior_period="2026-07",
@@ -101,7 +105,7 @@ def test_memory_persists_and_is_used_across_two_runs(demo_dataset, isolated_memo
     assert len(first_run["memories"]) == 0  # nothing to load on a cold store
 
     store = MemoryStore(isolated_memory_db)
-    assert len(store.list_for_company("demo_saas_test")) > 0, "memory_update should have created candidates"
+    assert len(store.list_for_company("demo_saas_test", user_id=TEST_USER_ID)) > 0, "memory_update should have created candidates"
 
     second_run = run_pipeline(**kwargs)
     assert len(second_run["memories"]) > 0, "second run should load memories the first run created"

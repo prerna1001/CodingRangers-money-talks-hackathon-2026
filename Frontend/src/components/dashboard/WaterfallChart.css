@@ -2,123 +2,35 @@
   min-width: 0;
 }
 
-.panel-heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-
-.panel-heading h3 {
-  font-size: 16px;
-  line-height: 1.25;
-  margin-bottom: 4px;
-}
-
-.panel-heading p {
+.waterfall-chart__badge,
+.driver-table__count {
   color: var(--text-dim);
-  font-size: 12.5px;
-}
-
-.waterfall-chart__badge {
-  border: 1px solid var(--accent-border);
-  background: var(--accent-bg);
-  color: var(--accent-strong);
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 11.5px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   white-space: nowrap;
+  padding-top: 6px;
 }
 
 .waterfall-chart__frame {
   position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 92%, var(--accent-bg)), var(--surface-raised)),
-    var(--surface-raised);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 0;
 }
 
 .waterfall-chart__empty {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+  padding: 48px 24px;
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 14px;
   text-align: center;
-  z-index: 1;
-}
-
-.waterfall-chart__svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  min-height: 300px;
-}
-
-.waterfall-chart__grid {
-  stroke: var(--chart-grid);
-  stroke-width: 1;
-}
-
-.waterfall-chart__zero {
-  stroke: var(--border-strong);
-  stroke-width: 1.2;
-}
-
-.waterfall-chart__connector {
-  stroke: var(--text-dim);
-  stroke-width: 1.2;
-  stroke-dasharray: 4 5;
-  opacity: 0.48;
-}
-
-.waterfall-chart__axis,
-.waterfall-chart__label,
-.waterfall-chart__value {
-  font-family: var(--sans);
-  dominant-baseline: middle;
-}
-
-.waterfall-chart__axis {
-  fill: var(--text-dim);
-  font-size: 11px;
-}
-
-.waterfall-chart__label {
-  fill: var(--text);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.waterfall-chart__label-muted {
-  fill: var(--text-dim);
-  font-weight: 600;
-}
-
-.waterfall-chart__value {
-  fill: var(--text-h);
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.waterfall-chart__value--down {
-  fill: var(--danger);
 }
 
 .waterfall-chart__legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 18px;
   margin-top: 12px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-dim);
 }
 
@@ -129,24 +41,19 @@
 }
 
 .waterfall-chart__legend i {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 2px;
   display: inline-block;
 }
 
+/* Many drivers on a phone: let the chart keep a readable width and scroll. */
 @media (max-width: 720px) {
-  .panel-heading {
-    flex-direction: column;
-    gap: 8px;
-  }
-
   .waterfall-chart__frame {
     overflow-x: auto;
   }
 
-  .waterfall-chart__svg {
-    width: 860px;
-    max-width: none;
+  .waterfall-chart__frame .echart {
+    min-width: 640px;
   }
 }

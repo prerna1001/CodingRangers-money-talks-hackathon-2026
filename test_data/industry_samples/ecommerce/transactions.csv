@@ -1,0 +1,11 @@
+date,account,account_type,category,counterparty_name,counterparty_type,amount,currency,memo
+2026-07-04,Online sales,revenue,merchandise,Direct web store,customer,148000,USD,July web orders
+2026-07-16,Online sales,revenue,merchandise,Marketplace store,customer,67000,USD,July marketplace orders
+2026-07-09,Paid media,opex,marketing,Meta Ads,vendor,19000,USD,July paid social
+2026-07-21,Fulfillment costs,cogs,shipping,ShipBob,vendor,28000,USD,July fulfillment
+2026-07-27,Refunds,revenue,returns,Shopify,other,-7000,USD,July returns
+2026-08-04,Online sales,revenue,merchandise,Direct web store,customer,205000,USD,Back-to-school campaign orders
+2026-08-16,Online sales,revenue,merchandise,Marketplace store,customer,84000,USD,Marketplace promotion orders
+2026-08-09,Paid media,opex,marketing,Meta Ads,vendor,35000,USD,Back-to-school paid social
+2026-08-21,Fulfillment costs,cogs,shipping,ShipBob,vendor,42000,USD,Higher order volume fulfillment
+2026-08-27,Refunds,revenue,returns,Shopify,other,-11000,USD,Promotion-related returns
