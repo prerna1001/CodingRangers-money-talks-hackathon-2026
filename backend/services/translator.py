@@ -18,6 +18,7 @@ the model.
 from __future__ import annotations
 
 import logging
+import re
 import threading
 
 from config import (
@@ -46,6 +47,37 @@ _lock = threading.Lock()
 # Plenty for a UI's worth of labels plus a run's analysis text; keeps a
 # long demo session from growing the cache without bound.
 MAX_CACHE_ENTRIES = 5_000
+
+
+# OPUS-MT is a general-purpose model, so it picks the everyday sense of this
+# app's finance terms: a revenue "driver" becomes a car driver ("conductor"),
+# a device "controller", and an analysis "run" becomes a race ("carrera").
+# Whole-word fixes on the Spanish output, applied before caching.
+_GLOSSARY: dict[str, list[tuple[re.Pattern[str], str]]] = {
+    "es": [
+        (re.compile(pattern, re.IGNORECASE), replacement)
+        for pattern, replacement in [
+            (r"\bconductores\b", "factores"),
+            (r"\bconductor\b", "factor"),
+            (r"\bcontroladores\b", "factores"),
+            (r"\bcontrolador\b", "factor"),
+            (r"\besta carrera\b", "este análisis"),
+            (r"\bla carrera\b", "el análisis"),
+            (r"\buna carrera\b", "un análisis"),
+            (r"\bcarreras\b", "análisis"),
+            (r"\bcarrera\b", "análisis"),
+        ]
+    ],
+}
+
+
+def _apply_glossary(text: str, target: str) -> str:
+    for pattern, replacement in _GLOSSARY.get(target, []):
+        text = pattern.sub(
+            lambda m, r=replacement: r[0].upper() + r[1:] if m.group(0)[0].isupper() else r,
+            text,
+        )
+    return text
 
 
 def available() -> bool:
@@ -161,7 +193,7 @@ def translate(texts: list[str], *, target: str, source: str = "en") -> list[str]
 
     if todo:
         originals = list(todo)
-        translated = _translate_uncached(originals, source, target)
+        translated = [_apply_glossary(text, target) for text in _translate_uncached(originals, source, target)]
         if len(_cache) > MAX_CACHE_ENTRIES:
             _cache.clear()
         for original, result in zip(originals, translated):

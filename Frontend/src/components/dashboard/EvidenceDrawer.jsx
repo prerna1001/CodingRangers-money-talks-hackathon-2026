@@ -38,7 +38,7 @@ export default function EvidenceDrawer({ driver, evidence, loading, onClose }) {
       >
         <div className="evidence-drawer__header">
           <div>
-            <h2 id="evidence-title">{driver.driver}</h2>
+            <h2 id="evidence-title" translate="no">{driver.driver}</h2>
             <p>{driver.account}, {ledgerChange(driver.amount)} this period</p>
           </div>
           <button ref={closeRef} type="button" className="evidence-drawer__close" onClick={onClose} aria-label="Close evidence">
@@ -57,7 +57,7 @@ export default function EvidenceDrawer({ driver, evidence, loading, onClose }) {
               {evidence.transactions.map((tx) => (
                 <li key={`${tx.date}-${tx.customer}`} className="evidence-item">
                   <div className="evidence-item__top">
-                    <span className="evidence-item__customer">{tx.customer}</span>
+                    <span className="evidence-item__customer" translate="no">{tx.customer}</span>
                     <span className={tx.amount < 0 ? 'text-down' : ''}>{ledgerMoney(tx.amount)}</span>
                   </div>
                   <div className="evidence-item__meta">

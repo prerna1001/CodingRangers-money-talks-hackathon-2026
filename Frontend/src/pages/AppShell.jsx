@@ -5,6 +5,7 @@ import Dashboard from '../components/dashboard/Dashboard'
 import Tick from '../components/Tick'
 import { useAuth } from '../auth/authContext'
 import LanguageToggle from '../i18n/LanguageToggle'
+import PageTranslator from '../i18n/PageTranslator'
 import { analyzeRun } from '../services/api'
 
 const PIPELINE_STEPS = [
@@ -32,6 +33,7 @@ function AppShell() {
   const [error, setError] = useState(null)
   const timelineDoneRef = useRef(false)
   const analysisRef = useRef(null)
+  const pageRef = useRef(null)
 
   const tryEnterDashboard = () => {
     if (timelineDoneRef.current && analysisRef.current) {
@@ -73,12 +75,13 @@ function AppShell() {
   }
 
   return (
-    <div className="page">
+    <div className="page" ref={pageRef}>
+      <PageTranslator rootRef={pageRef} />
       <a className="skip-link" href="#main">Skip to content</a>
       <header className="page__header">
         <div className="brand">
           <span className="brand__mark"><Tick /></span>
-          <span className="brand__name">Ledgerlight</span>
+          <span className="brand__name" translate="no">Ledgerlight</span>
         </div>
         <span className="page__tagline">Every variance explained and traced to its transactions</span>
         <LanguageToggle />

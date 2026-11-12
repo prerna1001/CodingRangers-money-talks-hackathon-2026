@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { sendChatMessage, synthesizeSpeech, transcribeAudio } from '../../services/api'
+import { sendChatMessage, synthesizeSpeech, transcribeAudio, translateTexts } from '../../services/api'
 import { useLanguage } from '../../i18n/context'
 import Icon from '../Icon'
 import './ChatPanel.css'
@@ -96,13 +96,26 @@ export default function ChatPanel({ analysis, compact = false }) {
     // Sending mid-dictation ends it, so late results don't refill the box.
     recognitionRef.current?.abort()
 
-    const history = messages.map(({ role, content }) => ({ role, content }))
+    // The backend reasons in English, so a question asked in another
+    // language is translated before it is sent. The thread still shows the
+    // user's own words; `sent` keeps the English that went to the backend.
+    const history = messages.map(({ role, content, sent }) => ({ role, content: sent ?? content }))
     setMessages((prev) => [...prev, { role: 'user', content: text }])
     setInput('')
     setSending(true)
 
     try {
-      const res = await sendChatMessage(analysis.run_id, text, history)
+      let question = text
+      if (language !== 'en') {
+        try {
+          ;[question] = await translateTexts([text], 'en', language)
+          const index = messages.length
+          setMessages((prev) => prev.map((m, i) => (i === index ? { ...m, sent: question } : m)))
+        } catch {
+          // Translation unavailable: send the question as typed.
+        }
+      }
+      const res = await sendChatMessage(analysis.run_id, question, history)
       setMessages((prev) => [...prev, { role: 'assistant', content: res.reply }])
     } catch (err) {
       setMessages((prev) => [

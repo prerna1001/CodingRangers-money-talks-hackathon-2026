@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { ledgerChange, ledgerMoney, toNumber } from './format'
 
 const PAGE_WIDTH = 210
 const PAGE_HEIGHT = 297
@@ -272,32 +273,36 @@ export function downloadAnalysisPdf(analysis) {
   doc.setFontSize(19)
   doc.setFont('helvetica', 'bold')
   setColor(doc, 'setTextColor', COLOR.textDark)
-  const headlineLines = doc.splitTextToSize(analysis.headline, CONTENT_WIDTH)
+  const headlineLines = doc.splitTextToSize(analysis.headline || 'Financial results analyzed', CONTENT_WIDTH)
   doc.text(headlineLines, MARGIN, y)
   y += headlineLines.length * 7.2 + 3
 
   doc.setFontSize(10.5)
   doc.setFont('helvetica', 'normal')
   setColor(doc, 'setTextColor', COLOR.textDim)
-  const summaryLines = doc.splitTextToSize(analysis.summary, CONTENT_WIDTH)
+  const summaryLines = doc.splitTextToSize(analysis.summary || '', CONTENT_WIDTH)
   doc.text(summaryLines, MARGIN, y)
   y += summaryLines.length * 5.2 + 10
 
   y = drawScoreCards(doc, y, analysis)
-  y = drawWaterfallChart(doc, y, analysis.waterfall)
+  y = drawWaterfallChart(doc, y, Array.isArray(analysis.waterfall) ? analysis.waterfall : [])
 
+  const drivers = Array.isArray(analysis.drivers) ? analysis.drivers : []
   y = drawSectionTitle(doc, y, 'Driver drilldown', 'Ranked by absolute contribution to the change')
   y = tableTheme(doc, y, {
     head: [['Driver', 'Account', 'Current', 'Prior', 'Change', '% Share', 'Conf.']],
-    body: analysis.drivers.map((d) => [
-      d.driver,
-      d.account,
-      `$${d.current.toLocaleString()}`,
-      `$${d.prior.toLocaleString()}`,
-      `${d.amount >= 0 ? '+' : ''}$${d.amount.toLocaleString()}`,
-      `${d.share_of_change_pct >= 0 ? '+' : ''}${d.share_of_change_pct}%`,
-      `${Math.round(d.confidence * 100)}%`,
-    ]),
+    body: drivers.map((d) => {
+      const share = toNumber(d.share_of_change_pct)
+      return [
+        d.driver || 'Unknown driver',
+        d.account || '',
+        ledgerMoney(d.current),
+        ledgerMoney(d.prior),
+        ledgerChange(d.amount),
+        `${share >= 0 ? '+' : ''}${share}%`,
+        `${Math.round(toNumber(d.confidence) * 100)}%`,
+      ]
+    }),
     columnStyles: {
       0: { cellWidth: 44, fontStyle: 'bold' },
       2: { halign: 'right' },
@@ -317,21 +322,25 @@ export function downloadAnalysisPdf(analysis) {
 
   y = drawSectionTitle(doc, y, 'Evidence', 'Source transactions cited for each driver')
   const evidenceRows = []
-  analysis.drivers.forEach((d) => {
-    d.evidence.forEach((e, idx) => {
-      evidenceRows.push([idx === 0 ? d.driver : '', e])
+  drivers.forEach((d) => {
+    // The analysis may carry no evidence list for a driver (a computed
+    // aggregate). The report still downloads, with that driver left out
+    // here, instead of throwing and leaving the button stuck.
+    const evidence = Array.isArray(d.evidence) ? d.evidence : []
+    evidence.forEach((e, idx) => {
+      evidenceRows.push([idx === 0 ? d.driver : '', String(e)])
     })
   })
   y = tableTheme(doc, y, {
     head: [['Driver', 'Evidence']],
-    body: evidenceRows,
+    body: evidenceRows.length ? evidenceRows : [['No detailed evidence in this run', '']],
     columnStyles: {
       0: { cellWidth: 44, fontStyle: 'bold', textColor: COLOR.textDark },
       1: { textColor: COLOR.textDim },
     },
   })
 
-  y = drawRiskCallout(doc, y, analysis.risks_or_caveats)
+  y = drawRiskCallout(doc, y, Array.isArray(analysis.risks_or_caveats) ? analysis.risks_or_caveats : [])
 
   if (analysis.agent_timeline?.length) {
     y = drawSectionTitle(doc, y, 'Agent run timeline')

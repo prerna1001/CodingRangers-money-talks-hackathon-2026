@@ -38,11 +38,6 @@ export default function Dashboard({ analysis, onReset }) {
   const waterfall = Array.isArray(analysis?.waterfall) ? analysis.waterfall : []
   const agentTimeline = Array.isArray(analysis?.agent_timeline) ? analysis.agent_timeline : []
 
-  const priorRevenue = Number(prior.revenue) || 0
-  const currentRevenue = Number(current.revenue) || 0
-  const revenueChangePct = priorRevenue
-    ? Math.round(((currentRevenue - priorRevenue) / priorRevenue) * 100)
-    : 0
   const normalizedAnalysis = {
     ...analysis,
     periods: { prior, current },
@@ -115,7 +110,7 @@ export default function Dashboard({ analysis, onReset }) {
         {tab === 'memory' && <MemoryPanel />}
         {tab === 'rag' && <RagPanel />}
         {tab === 'stress' && <StressTestPanel />}
-        {tab === 'scenarios' && <ScenarioSimulator baselinePct={revenueChangePct} />}
+        {tab === 'scenarios' && <ScenarioSimulator analysis={normalizedAnalysis} />}
         {tab === 'report' && <ReportPanel analysis={normalizedAnalysis} />}
       </div>
 

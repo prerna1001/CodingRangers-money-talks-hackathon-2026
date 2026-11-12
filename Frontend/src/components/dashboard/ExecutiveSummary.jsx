@@ -138,7 +138,7 @@ export default function ExecutiveSummary({ analysis }) {
               return (
                 <tr key={`${line.name}-${index}`} className="bridge__row">
                   <th scope="row">
-                    {unattributed ? 'Not attributed to a named driver' : line.name}
+                    {unattributed ? 'Not attributed to a named driver' : <span translate="no">{line.name}</span>}
                   </th>
                   <td className={value < 0 ? 'text-down' : ''}>{ledgerChange(value)}</td>
                   <td className="bridge__tick">

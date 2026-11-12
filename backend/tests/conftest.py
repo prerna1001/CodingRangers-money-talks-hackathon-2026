@@ -23,3 +23,18 @@ import config
 @pytest.fixture(autouse=True)
 def _force_llm_mock_mode(monkeypatch):
     monkeypatch.setattr(config, "LLM_MOCK_MODE", True)
+
+
+@pytest.fixture(autouse=True)
+def _auth_off_by_default(monkeypatch):
+    """Run the API as if no Auth0 tenant were configured.
+
+    auth0_setup reads AUTH0_ENABLED / AUTH0_REQUIRED at request time, so with
+    real keys in the developer's .env every API test would get 401. Tests
+    that are about auth switch it back on with their own monkeypatch, which
+    runs after this one.
+    """
+    import auth0_setup
+
+    monkeypatch.setattr(auth0_setup, "AUTH0_ENABLED", False)
+    monkeypatch.setattr(auth0_setup, "AUTH0_REQUIRED", False)

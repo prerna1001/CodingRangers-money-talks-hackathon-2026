@@ -4,16 +4,21 @@ import Tick from '../Tick'
 import './ReportPanel.css'
 
 export default function ReportPanel({ analysis }) {
-  const [pdf, setPdf] = useState({ status: 'idle', filename: null })
+  const [pdf, setPdf] = useState({ status: 'idle', filename: null, error: null })
   const [powerbi, setPowerbi] = useState({ status: 'idle', filename: null, error: null })
   const [deck, setDeck] = useState({ status: 'idle', theme: null, filename: null, error: null })
 
   // jsPDF is loaded on demand so it stays out of the first page load.
   const handlePdf = async () => {
-    setPdf({ status: 'working', filename: null })
-    const { downloadAnalysisPdf } = await import('../../utils/pdfReport')
-    const filename = downloadAnalysisPdf(analysis)
-    setPdf({ status: 'done', filename })
+    setPdf({ status: 'working', filename: null, error: null })
+    try {
+      const { downloadAnalysisPdf } = await import('../../utils/pdfReport')
+      const filename = downloadAnalysisPdf(analysis)
+      setPdf({ status: 'done', filename, error: null })
+    } catch (err) {
+      // Never leave the button spinning: say what failed.
+      setPdf({ status: 'error', filename: null, error: `Could not create the PDF: ${err.message}` })
+    }
   }
 
   const handlePowerBi = async () => {
@@ -49,6 +54,11 @@ export default function ReportPanel({ analysis }) {
           </button>
           {pdf.status === 'done' && (
             <p className="report-panel__confirm" role="status"><Tick /> Saved as <code>{pdf.filename}</code></p>
+          )}
+          {pdf.status === 'error' && (
+            <p className="report-panel__error" role="alert">
+              {pdf.error}
+            </p>
           )}
         </div>
       </section>

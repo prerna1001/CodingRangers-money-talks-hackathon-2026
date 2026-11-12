@@ -48,7 +48,7 @@ export default function DriverTable({ drivers = [], onOpenDriver }) {
               return (
                 <tr key={`${d.account || 'account'}-${d.driver || index}`} onClick={() => onOpenDriver?.(d)}>
                   <th scope="row">
-                    <button type="button" className="driver-table__open" onClick={(e) => { e.stopPropagation(); onOpenDriver?.(d) }}>
+                    <button type="button" className="driver-table__open" translate="no" onClick={(e) => { e.stopPropagation(); onOpenDriver?.(d) }}>
                       {d.driver || 'Unknown driver'}
                     </button>
                   </th>

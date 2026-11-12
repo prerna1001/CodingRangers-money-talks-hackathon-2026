@@ -52,6 +52,9 @@ export function LanguageProvider({ children }) {
 
   // Strings waiting to go out, and the timer that will send them.
   const pendingRef = useRef(new Set())
+  // Strings already sent and not yet answered, so a re-render while a slow
+  // CPU translation is running does not send them again.
+  const sentRef = useRef(new Set())
   const timerRef = useRef(null)
 
   const setLanguage = useCallback((next) => {
@@ -69,6 +72,7 @@ export function LanguageProvider({ children }) {
     pendingRef.current = new Set()
     timerRef.current = null
     if (texts.length === 0) return
+    texts.forEach((text) => sentRef.current.add(text))
 
     try {
       const translations = await translateTexts(texts, target)
@@ -84,11 +88,14 @@ export function LanguageProvider({ children }) {
       // Leave the English text on screen rather than blanking the UI; the
       // toggle shows that translation is unavailable.
       setFailed(true)
+    } finally {
+      texts.forEach((text) => sentRef.current.delete(text))
     }
   }, [])
 
   const request = useCallback(
     (target, text) => {
+      if (sentRef.current.has(text)) return
       pendingRef.current.add(text)
       if (timerRef.current) return
       timerRef.current = setTimeout(() => flush(target), BATCH_DELAY_MS)
@@ -115,9 +122,22 @@ export function LanguageProvider({ children }) {
     [language, failed, request, cache],
   )
 
+  // Lets the page-wide translator (PageTranslator) share this cache, so a
+  // string translated once is never sent twice, whichever path asked for it.
+  const remember = useCallback((target, texts, translations) => {
+    setCache((prev) => {
+      const next = { ...prev }
+      texts.forEach((text, i) => {
+        next[`${target}:${text}`] = translations[i] ?? text
+      })
+      saveCache(next)
+      return next
+    })
+  }, [])
+
   const value = useMemo(
-    () => ({ language, setLanguage, t, translationFailed: failed }),
-    [language, setLanguage, t, failed],
+    () => ({ language, setLanguage, t, translationFailed: failed, cache, remember, setFailed }),
+    [language, setLanguage, t, failed, cache, remember],
   )
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
