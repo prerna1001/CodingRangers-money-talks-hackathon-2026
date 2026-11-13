@@ -13,10 +13,8 @@
 3. [Feature Table](#feature-table)
 4. [System Architecture](#system-architecture)
 5. [Tech Stack](#tech-stack)
-6. [Project Structure](#project-structure)
-7. [API Reference](#api-reference)
-8. [Auth0](#auth0)
-9. [Getting Started](#getting-started)
+6. [Auth0](#auth0)
+7. [Getting Started](#getting-started)
 
 ---
 
@@ -34,7 +32,7 @@ Ledgerlight is an agentic financial analysis tool that turns monthly account sum
 
 ## Features
 
-The workspace is organized into eight tabs. Screenshots should be placed in `docs/screenshots/` at the paths shown below.
+The workspace is organized into eight tabs.
 
 ### Summary tab
 
@@ -134,17 +132,6 @@ Ledgerlight keeps deterministic money math separate from language generation. Th
 
 **Agentic workflow.** A LangGraph state machine runs the analysis. Memory, RAG, and the analytics engine execute in parallel after the data-quality gate, then fan in to the Analyst. The Guardrail can send the explanation back for revision, approve it, or fall back to a deterministic fact report. Approved output continues to stress testing, report writing, and the memory update.
 
-```text
-Profile Builder
-    -> Data QA gate
-         |-- unsafe --> Data Issue Report (stop)
-         |-- safe ---> Memory / RAG / Analytics engine (parallel)
-                            -> Analyst -> Guardrail
-                                 |-- approved ------> Stress Test -> Report Writer -> Memory Update
-                                 |-- needs revision -> Analyst (up to 2 passes)
-                                 `-- still failing -> deterministic fallback -> Stress Test
-```
-
 **Presentation and exports.** The API returns one dashboard-shaped analysis object. The React frontend renders the Summary, Drivers, Agent run, Memory, Retrieved context, Stress tests, Scenarios, and Report tabs from that object. PDF, PowerPoint, and Power BI exports all read the same completed run state.
 
 <img src="https://github.com/user-attachments/assets/a089a4eb-78b1-4a56-8206-bb82ff24c2eb" alt="System architecture" width="700">
@@ -153,99 +140,11 @@ Profile Builder
 
 ## Tech Stack
 
-**Frontend**
-- React 19 + Vite 8
-- React Router 7
-- Recharts and Apache ECharts for charts
-- jsPDF + jspdf-autotable for browser-side PDF export
-- oxlint
-
-**Backend**
-- FastAPI + Uvicorn, Pydantic v2
-- LangGraph for multi-agent orchestration
-- Per-agent LLM routing across Anthropic and OpenAI-compatible providers (NVIDIA NIM, Groq, OpenRouter), with a deterministic mock mode for offline development and tests
-- pandas + numpy for deterministic analytics
-- SQLite-backed memory store, plus SQLAlchemy models for run and file records
-- Chroma + sentence-transformers with a rank-bm25 fallback for retrieval
-- openpyxl, python-docx, PyMuPDF, Pillow, and PaddleOCR for multi-format ingestion
-- python-pptx for PowerPoint export, and a Power BI Project (PBIP) writer for Power BI export
-- Auth0 FastAPI SDK + itsdangerous for the login gate
-
-**Testing**
-- pytest + httpx, with unit, integration, and golden-dataset tests
-
----
-
-## Project Structure
-
-```text
-codingrangers/
-├── backend/
-│   ├── main.py                   # FastAPI app, router mounting, Auth0 wiring
-│   ├── auth0_setup.py            # login/callback/logout and session guard
-│   ├── config.py                 # model routing, thresholds, memory and RAG settings
-│   ├── agents/                   # Profile Builder, Data QA, Memory, RAG, Analyst,
-│   │                             # Guardrail, Stress Test, Report Writer
-│   ├── analytics/                # variance, attribution, reconciliation, anomalies,
-│   │                             # bridges, concentration, recurrence, price/volume/mix
-│   ├── api/routes/               # upload, analyze, memory, stress tests, scenarios,
-│   │                             # reports, health
-│   ├── graph/                    # LangGraph workflow, state, and event bus
-│   ├── models/                   # Pydantic contracts and SQLAlchemy records
-│   ├── services/                 # ingestion, LLM routing, memory/RAG stores,
-│   │                             # grounding, Power BI, pitch deck, report export
-│   ├── tests/                    # unit, integration, and golden tests
-│   ├── requirements.txt
-│   └── .env.example
-├── Frontend/
-│   ├── src/
-│   │   ├── pages/                # HomePage, AppShell
-│   │   ├── auth/                 # Auth0 session provider and route guard
-│   │   ├── components/
-│   │   │   └── dashboard/        # one component per tab
-│   │   ├── services/api.js       # upload, analyze, export calls
-│   │   ├── constants/api.js      # endpoint map
-│   │   └── utils/pdfReport.js    # browser PDF renderer
-│   ├── package.json
-│   └── vite.config.js            # dev proxy for /api
-├── data/                         # demo transaction and summary CSVs
-├── test_data/                    # known-good and adversarial upload datasets
-├── docs/screenshots/             # README screenshots (provided separately)
-├── scripts/                      # architecture diagram renderers
-└── README.md
-```
-
----
-
-## API Reference
-
-All `/api/*` routes require an Auth0 session when a tenant is configured. Requests and responses are JSON unless noted otherwise.
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/health` | Reports LLM mode, retrieval backend, and optional integration status. |
-| `POST` | `/api/upload` | Accepts a multipart file, extracts and classifies it, and returns a `file_id`, preview, row count, and review status. |
-| `GET` | `/api/uploads/{file_id}` | Returns the stored metadata and extraction result for an upload. |
-| `POST` | `/api/uploads/{file_id}/confirm` | Confirms how an ambiguous upload should be used: transaction data, period summaries, or reference document. |
-| `POST` | `/api/analyze` | Starts a run from uploaded file IDs or the built-in demo fixture; returns a `run_id` and stream URL. |
-| `GET` | `/api/runs` | Lists runs currently known to the backend. |
-| `GET` | `/api/runs/{run_id}` | Returns the dashboard-shaped analysis; responds `202` while the run is still in progress. |
-| `GET` | `/api/runs/{run_id}/evidence` | Returns facts with the transactions that support them; optional `fact_id` filter. |
-| `GET` | `/api/runs/{run_id}/trace` | Returns the full audit trace: inputs, agent outputs, grounding, and check results. |
-| `GET` | `/api/analyze/stream/{run_id}` | Server-sent events stream of agent progress and completion. |
-| `GET` | `/api/memory?company_id=...` | Lists stored memories for a company. |
-| `PATCH` | `/api/memory/{memory_id}` | Corrects a memory's content. |
-| `DELETE` | `/api/memory/{memory_id}` | Deletes a memory so it will not be used again. |
-| `POST` | `/api/stress-tests/run` | Re-runs stress-test scenarios against a completed run. |
-| `GET` | `/api/stress-tests/results?run_id=...` | Returns the stored stress-test results for a run. |
-| `POST` | `/api/scenarios/simulate` | Simulates a run with named drivers excluded and returns the adjusted change. |
-| `GET` | `/api/reports/{run_id}/markdown` | Returns the markdown report for a completed run. |
-| `GET` | `/api/reports/{run_id}/board-update` | Returns the structured board update for a run. |
-| `POST` | `/api/reports/{run_id}/pdf` | Returns a server-side PDF when the optional WeasyPrint dependency is installed. |
-| `GET` | `/api/runs/{run_id}/powerbi` | Returns a zip containing ready-made Power BI projects, data tables, Power Query scripts, and themes. |
-| `GET` | `/api/runs/{run_id}/pitch-deck?theme=finance\|dark` | Returns a seven-slide PowerPoint deck in the selected theme. |
-
----
+- **Frontend**: React 19 + Vite 8 + React Router 7
+- **Backend**: FastAPI + Uvicorn
+- **Agents**: LangGraph
+- **Authentication**: Auth0
+- Integration tests
 
 ## Auth0
 
