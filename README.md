@@ -1,6 +1,6 @@
 # Ledgerlight
 
-**Authors:** Coding Rangers
+**Authors:** Adish Padalia, Prerna Shinde, Amy Storr, Ori Ben Yossef
 
 > Every variance explained and traced to its transactions.
 
